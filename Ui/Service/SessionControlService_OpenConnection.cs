@@ -191,10 +191,6 @@ namespace _1RM.Service
 
             #region prepare
 
-            //// trace source view
-            //if (string.IsNullOrEmpty(fromView) == false)
-            //    MsAppCenterHelper.TraceSessionOpen(protocol.Protocol, fromView);
-
             // connect count save to config
             _configurationService.Engagement.ConnectCount++;
             _configurationService.Save();

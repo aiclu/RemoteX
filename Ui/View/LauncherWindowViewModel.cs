@@ -145,10 +145,6 @@ namespace _1RM.View
 
                 lock (this)
                 {
-                    //if (window.Visibility != Visibility.Visible)
-                    //{
-                    //    MsAppCenterHelper.TraceView(nameof(LauncherWindowView), true);
-                    //}
                     window.WindowState = WindowState.Normal;
                     QuickConnectionViewModel.SelectedProtocol = QuickConnectionViewModel.Protocols.First();
                     ReSetWindowHeight();
