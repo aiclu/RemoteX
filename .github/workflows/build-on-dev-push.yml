@@ -443,10 +443,12 @@ jobs:
         run: |
           set -e
           REPO="aiclu/RemoteX"
+          # --target main: this job has no checkout, so point the tag at the
+          # default branch tip explicitly instead of relying on a local HEAD.
           if gh release view Nightly --repo "$REPO" >/dev/null 2>&1; then
             echo "Nightly release already exists"
           else
-            gh release create Nightly --repo "$REPO" --title "Nightly" --prerelease
+            gh release create Nightly --repo "$REPO" --title "Nightly" --prerelease --target main
           fi
           echo "NIGHTLY_RELEASE_ID=$(gh api repos/$REPO/releases --jq '.[] | select(.tag_name == "Nightly") | .id')" >> "$GITHUB_ENV"
           echo "NIGHTLY_UPLOAD_URL=$(gh api repos/$REPO/releases --jq '.[] | select(.tag_name == "Nightly") | .upload_url')" >> "$GITHUB_ENV"
