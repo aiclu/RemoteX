@@ -39,3 +39,17 @@ _Avoid_: 启动脚本、自动命令文件
 **Code Page (编码页)**:
 远程字节流到 Unicode 的字符编码。本期仅支持 UTF-8。
 _Avoid_: 字符集、文本编码（仅限本语境歧义时使用）
+
+## UI 现代化
+
+**UI 现代化 (UI Modernization)**:
+一次跨多个版本的 UI 升级计划，含三个独立目标轴：性能优化、内存占用、视觉现代化。三轴各自独立验收，按 性能→内存→视觉 顺序推进。
+_Avoid_: UI 改版、界面美化（单指视觉轴时除外）
+
+**性能基线 (Performance Baseline)**:
+在改动前用 DEV-only 插桩记录的各场景耗时（DB 读取、UI 提交、过滤计算、视图切换），作为每次改动后回归对比的量化锚点。
+_Avoid_: 基准测试、benchmark（本语境仅指应用内插桩数字）
+
+**会话区 / 非会话区 (Session Area / Non-Session Area)**:
+会话区 = 承载 RDP/SSH/VNC 等协议渲染的 HwndHost/WindowsFormsHost 区域；非会话区 = 主窗口背景、菜单、面板等普通 WPF 区域。视觉特效（Mica/Acrylic）仅限非会话区，因 Airspace 限制会话区无法被 WPF 元素覆盖。
+_Avoid_: 内容区、主区域（不区分渲染载体时）

@@ -213,11 +213,14 @@ namespace _1RM.View.ServerView
                     
                     // Clear and repopulate the existing collection instead of replacing it
                     // This prevents race conditions with VirtualizingWrapPanel during layout operations
-                    VmServerList.Clear();
-                    foreach (var item in newList)
+                    PerfTracer.Measure($"BuildView: UI commit ({newList.Count} items)", () =>
                     {
-                        VmServerList.Add(item);
-                    }
+                        VmServerList.Clear();
+                        foreach (var item in newList)
+                        {
+                            VmServerList.Add(item);
+                        }
+                    });
 
                     SelectedServerViewModel = null;
                     foreach (var vs in VmServerList)

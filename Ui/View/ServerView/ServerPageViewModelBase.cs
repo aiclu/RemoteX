@@ -638,6 +638,8 @@ namespace _1RM.View.ServerView
 
                 _lastKeyword = filter;
 
+                PerfTracer.Measure($"CalcServerVisibleAndRefresh: filter ({servers.Count} servers)", () =>
+                {
                 var tmp = TagAndKeywordEncodeHelper.DecodeKeyword(filter);
                 TagFilters = tmp.TagFilterList;
                 
@@ -671,6 +673,7 @@ namespace _1RM.View.ServerView
                         { "matchResults.Count", matchResults.Count.ToString() },
                     });
                 }
+                }); // end PerfTracer.Measure
             }
         }
     }

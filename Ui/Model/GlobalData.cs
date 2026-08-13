@@ -97,8 +97,11 @@ namespace _1RM.Model
                 if (force || needRead)
                 {
                     // read from db
-                    VmItemList = _sourceService.GetServers(force);
-                    _sourceService.GetCredentials(force);
+                    PerfTracer.Measure($"ReloadAll: DB read (force={force})", () =>
+                    {
+                        VmItemList = _sourceService.GetServers(force);
+                        _sourceService.GetCredentials(force);
+                    });
                     LocalityConnectRecorder.ConnectTimeCleanup();
                     ReloadTagsFromServers();
                     OnReloadAll?.Invoke();
