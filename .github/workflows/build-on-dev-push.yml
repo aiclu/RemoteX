@@ -83,6 +83,18 @@ jobs:
         id: get_version
         run: ./scripts/Get-Version.ps1
 
+      # Build the Rust SSH core (ssh_rust.dll). The release binary is not
+      # committed; it is produced here and consumed by Ui.csproj's
+      # <None Include="..\ssh-rust\target\release\ssh_rust.dll">.
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Build Rust SSH core (release)
+        shell: cmd
+        run: cd ssh-rust && call build-release.cmd
+
       # echo ${{env.BuildVersion}} and ${{env.PreRelease}}
       # - name: Echo Version
       #   shell: pwsh
