@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nombre de la Aplicación;
 server_editor_remote_app_name_tag;Nombre de la aplicación (ej. hola);
 server_editor_remote_app_fullname;Ruta de la Aplicación;
 server_editor_remote_app_fullname_tag;Ruta completa del ejecutable en el servidor (ej. C:\Apps\hola.exe);
-about_page_how_to_use;Cómo usar;
 about_page_feedback;Comentarios;
 guidance_introduce;RemoteX te permite abrir una sesión remota donde y cuando quieras.;
 guidance_feature_launcher_key;invocar lanzador con;
@@ -235,10 +234,6 @@ Follow system;Seguir sistema (Versiones Soportadas: Windows Server 2012 R2 o sup
 tag_tooltips;clic : filtrar por esta etiqueta{0}Ctrl + clic : agregar a lista de inclusión{0}Alt + clic : agregar a lista de exclusión;
 Are you sure you want to close the connection?;¿Seguro que querés cerrar la conexión?;
 Hi there,;Hola,;
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Espero que esta app te sea útil. Si querés apoyar mi trabajo, podés invitarme un café o dejar una buena reseña. Gracias!;
-Give suggestions;Dar sugerencias;
-Buy a coffee;Comprar un café;
-Give nice review;Dar buena reseña;
 Do not show this again in current version;No mostrar de nuevo en esta versión;
 User profile;Perfil de usuario;
 Selected runner;Ejecutor seleccionado;

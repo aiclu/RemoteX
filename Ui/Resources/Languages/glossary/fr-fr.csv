@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nom de l'application
 server_editor_remote_app_name_tag;nom de l'application (par exemple bonjour)
 server_editor_remote_app_fullname;Chemin de l'application
 server_editor_remote_app_fullname_tag;Chemin complet de l'éxecutable sur le serveur (par exemple C:\\Apps\\hello.exe)
-about_page_how_to_use;Comment utiliser
 about_page_feedback;Retour
 guidance_introduce;RemoteX vous permet d'ouvrir une session à distance à tout moment et de n'importe où.
 guidance_feature_launcher_key;Appeler le lanceur par
@@ -239,10 +238,6 @@ Follow system;Suivre le système(Serveur pris en charge: Windows Server 2012 R2 
 tag_tooltips;clic : définir cette balise comme filtre{0}Ctrl + clic : ajouter cette balise à la liste d'inclusion {0}Alt + clic : ajouter cette balise à la liste d'exclusion
 Are you sure you want to close the connection?;Voulez-vous vraiment fermer la connexion?
 Hi there,;Bonjour à tous,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;J'espère que vous trouverez cette application utile. Si vous souhaitez soutenir mon travail, vous pouvez m'offrir un café ou donner une belle critique. Merci!
-Give suggestions;Faire des suggestions
-Buy a coffee;Acheter un café
-Give nice review;Donnez une belle critique
 Do not show this again in current version;Ne plus l'afficher dans la version actuelle
 User profile;Profil de l'utilisateur
 Selected runner;Coureur sélectionné

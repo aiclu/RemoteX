@@ -200,7 +200,6 @@
     <s:String x:Key="server_editor_remote_app_name_tag">アプリの名前 (例: hello)</s:String>
     <s:String x:Key="server_editor_remote_app_fullname">アプリのパス</s:String>
     <s:String x:Key="server_editor_remote_app_fullname_tag">リモートコンピューター上のフルパス (例: C:\Apps\hello.exe)</s:String>
-    <s:String x:Key="about_page_how_to_use">使い方</s:String>
     <s:String x:Key="about_page_feedback">フィードバック</s:String>
     <s:String x:Key="guidance_introduce">RemoteXで、いつでもどこでもリモートセッションを開くことができます。</s:String>
     <s:String x:Key="guidance_feature_launcher_key">ランチャーを呼び出すホットキー</s:String>
@@ -237,10 +236,6 @@
     <s:String x:Key="tag_tooltips">クリック : このタグを持つアイテムのみを表示{0}Ctrl + クリック : このタグを持つことをリスト条件に加える{0}Alt + クリック : このタグを持たないことをリスト条件に加える\n</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">本当に接続を閉じてよろしいですか？</s:String>
     <s:String x:Key="Hi there,">こんにちは！</s:String>
-    <s:String x:Key="I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!">このアプリがお役に立つことを願っています。もし私の仕事を応援してくださるなら、コーヒーをおごっていただくか、素敵なレビューをしてください。ありがとう！</s:String>
-    <s:String x:Key="Give suggestions">提案をする</s:String>
-    <s:String x:Key="Buy a coffee">コーヒーをおごる</s:String>
-    <s:String x:Key="Give nice review">レビューを書く</s:String>
     <s:String x:Key="Do not show this again in current version">現バージョンではもうこれを表示しない</s:String>
     <s:String x:Key="User profile">ユーザープロファイル</s:String>
     <s:String x:Key="Selected runner">ランナー選択</s:String>

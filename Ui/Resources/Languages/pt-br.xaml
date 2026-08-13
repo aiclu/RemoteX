@@ -200,7 +200,6 @@
     <s:String x:Key="server_editor_remote_app_name_tag">Nome do aplicativo (ex.: kernel)</s:String>
     <s:String x:Key="server_editor_remote_app_fullname">Caminho do APP</s:String>
     <s:String x:Key="server_editor_remote_app_fullname_tag">Caminho completo do .exe no servidor (ex.: C:\Apps\kernel.exe)</s:String>
-    <s:String x:Key="about_page_how_to_use">Como usar</s:String>
     <s:String x:Key="about_page_feedback">Dê seu feedback</s:String>
     <s:String x:Key="guidance_introduce">O RemoteX permite que você abra uma sessão remota a qualquer hora e em qualquer lugar.</s:String>
     <s:String x:Key="guidance_feature_launcher_key">chame os atalhos por</s:String>
@@ -237,10 +236,6 @@
     <s:String x:Key="tag_tooltips">Clique com o botão esquerdo : defina esta tag como filtro{0}Ctrl + clique com o botão esquerdo : adicione esta tag à lista de inclusão {0}Alt + clique com o botão esquerdo : adicione esta tag à lista de exclusão</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">Tem certeza de que deseja encerrar a conexão?</s:String>
     <s:String x:Key="Hi there,">E ai,</s:String>
-    <s:String x:Key="I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!">Espero que ache este APP útil! Se quiser apoiar meu trabalho pode me pagar um cerveja ou me dar um elogio, obrigado!</s:String>
-    <s:String x:Key="Give suggestions">Me dê sugestões</s:String>
-    <s:String x:Key="Buy a coffee">Me pague uma cerveja</s:String>
-    <s:String x:Key="Give nice review">Me dê um elogio</s:String>
     <s:String x:Key="Do not show this again in current version">Não mostrar isso novamente na versão atual</s:String>
     <s:String x:Key="User profile">Perfil de usuário</s:String>
     <s:String x:Key="Selected runner">corredor selecionado</s:String>

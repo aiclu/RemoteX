@@ -198,7 +198,6 @@ server_editor_remote_app_name;Programm Name
 server_editor_remote_app_name_tag;Name des Programms (bspw. Hallo)
 server_editor_remote_app_fullname;Pfad zum Programm
 server_editor_remote_app_fullname_tag;vollständiger Programm-Pfad auf dem Server (z. B. C:\\Apps\\hallo.exe)
-about_page_how_to_use;Handbuch im Github Wiki
 about_page_feedback;Feedback
 guidance_introduce;Mit RemoteX können Sie jederzeit und überall eine Remote-Sitzung eröffnen.
 guidance_feature_launcher_key;Rufen Sie den Launcher auf mit
@@ -239,10 +238,6 @@ Follow system;Systemvorgaben nutzen(Unterstützter Server: Windows Server 2012 R
 tag_tooltips;Klick : Setzt den Tag {0} als Filter STRG + Klick : Fügt {0} zur Liste hinzu ALT + Klick : Fügt {0} zur Auschlussliste hinzu
 Are you sure you want to close the connection?;Möchten Sie die Verbindung wirklich beenden?
 Hi there,;Hallo,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Ich hoffe, Sie finden diese App nützlich. Wenn Sie meine Arbeit unterstützen möchten, können Sie mir gerne einen Kaffee spendieren oder eine nette Bewertung abgeben. Danke!
-Give suggestions;Vorschläge machen
-Buy a coffee;Kaffee spendieren
-Give nice review;Bewertung abgeben
 Do not show this again in current version;In der aktuellen Version nicht mehr anzeigen
 User profile;Benutzerprofil
 Selected runner;Ausgewählter Runner

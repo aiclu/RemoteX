@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nome do APP
 server_editor_remote_app_name_tag;Nome do aplicativo (ex.: kernel)
 server_editor_remote_app_fullname;Caminho do APP
 server_editor_remote_app_fullname_tag;Caminho completo do .exe no servidor (ex.: C:\Apps\kernel.exe)
-about_page_how_to_use;Como usar
 about_page_feedback;Dê seu feedback
 guidance_introduce;O RemoteX permite que você abra uma sessão remota a qualquer hora e em qualquer lugar.
 guidance_feature_launcher_key;chame os atalhos por
@@ -239,10 +238,6 @@ Follow system;Seguir o sistema (Servidor Compatível com Windows Server 2012 R2 
 tag_tooltips;Clique com o botão esquerdo : defina esta tag como filtro{0}Ctrl + clique com o botão esquerdo : adicione esta tag à lista de inclusão {0}Alt + clique com o botão esquerdo : adicione esta tag à lista de exclusão
 Are you sure you want to close the connection?;Tem certeza de que deseja encerrar a conexão?
 Hi there,;E ai,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Espero que ache este APP útil! Se quiser apoiar meu trabalho pode me pagar um cerveja ou me dar um elogio, obrigado!
-Give suggestions;Me dê sugestões
-Buy a coffee;Me pague uma cerveja
-Give nice review;Me dê um elogio
 Do not show this again in current version;Não mostrar isso novamente na versão atual
 User profile;Perfil de usuário
 Selected runner;corredor selecionado

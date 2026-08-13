@@ -199,7 +199,6 @@ server_editor_remote_app_name;アプリ名
 server_editor_remote_app_name_tag;アプリの名前 (例: hello)
 server_editor_remote_app_fullname;アプリのパス
 server_editor_remote_app_fullname_tag;リモートコンピューター上のフルパス (例: C:\Apps\hello.exe)
-about_page_how_to_use;使い方
 about_page_feedback;フィードバック
 guidance_introduce;RemoteXで、いつでもどこでもリモートセッションを開くことができます。
 guidance_feature_launcher_key;ランチャーを呼び出すホットキー
@@ -241,10 +240,6 @@ tag_tooltips;"クリック : このタグを持つアイテムのみを表示{0}
 "
 Are you sure you want to close the connection?;本当に接続を閉じてよろしいですか？
 Hi there,;こんにちは！
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;このアプリがお役に立つことを願っています。もし私の仕事を応援してくださるなら、コーヒーをおごっていただくか、素敵なレビューをしてください。ありがとう！
-Give suggestions;提案をする
-Buy a coffee;コーヒーをおごる
-Give nice review;レビューを書く
 Do not show this again in current version;現バージョンではもうこれを表示しない
 User profile;ユーザープロファイル
 Selected runner;ランナー選択

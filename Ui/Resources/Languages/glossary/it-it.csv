@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nome applicazione
 server_editor_remote_app_name_tag;Nome dell'applicazione (es. ciao)
 server_editor_remote_app_fullname;Percorso applicazione
 server_editor_remote_app_fullname_tag;Percorso exe completo sul server (es. C:\programmi\ciao.exe)
-about_page_how_to_use;Come usare
 about_page_feedback;Feedback
 guidance_introduce;RemoteX ti consente di aprire una sessione remota in qualsiasi momento e ovunque.
 guidance_feature_launcher_key;chiama l'avvio applicazione tramite
@@ -239,10 +238,6 @@ Follow system;Segui il sistema (Server supportato: Windows Server 2012 R2 e vers
 tag_tooltips;click: imposta questo tag come filtro {0}Ctrl + click: aggiungi questo tag all'elenco {0} Alt click: aggiungi questo tag all'elenco da escludere
 Are you sure you want to close the connection?;Sei sicuro di voler chiudere la connessione?
 Hi there,;Ciao,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Spero che tu trovi utile questa app. Se desideri supportare il mio lavoro, puoi offrirmi un caffè o lasciare una recensione positiva. Grazie
-Give suggestions;Dai suggerimenti
-Buy a coffee;Offrimi un caffè
-Give nice review;Lascia una recensione positiva
 Do not show this again in current version;Non mostrare nuovamente nella versione corrente
 User profile;Profilo utente
 Selected runner;Runner selezionato

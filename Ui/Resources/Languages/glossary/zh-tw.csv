@@ -198,7 +198,6 @@ server_editor_remote_app_name;程式名稱
 server_editor_remote_app_name_tag;應用程式的檔案名稱 (例如 hello.exe)
 server_editor_remote_app_fullname;遠端應用程式路徑
 server_editor_remote_app_fullname_tag;遠端伺服器上的應用程式路徑 (例如 'C:\\Apps\\hello.exe')
-about_page_how_to_use;說明
 about_page_feedback;意見或需求反映
 guidance_introduce;RemoteX 可協助您管理遠端連線，並在任何時候建立工作階段。
 guidance_feature_launcher_key;快速呼叫啟動器
@@ -239,10 +238,6 @@ Follow system;與系統相同 (Windows Server 2012 R2 及以上的伺服器)
 tag_tooltips;滑鼠左鍵：過濾出該標籤{0}Ctrl + 滑鼠左鍵：將該標籤加入至過濾清單 {0}Alt + 滑鼠左鍵：將該標籤加入到排除清單
 Are you sure you want to close the connection?;確定要關閉連線嗎？
 Hi there,;您好！
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;希望這個應用程式有幫助到您，如果想要支持我的專案，可以幫我買杯咖啡或給我一些評等，若有任何建議也歡迎您透過 GitHub 反映，謝謝您！
-Give suggestions;給予建議
-Buy a coffee;買杯咖啡
-Give nice review;給個好評
 Do not show this again in current version;不要在此版本再次顯示
 User profile;使用者設定
 Selected runner;選擇的執行器

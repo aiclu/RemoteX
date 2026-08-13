@@ -198,7 +198,6 @@ server_editor_remote_app_name;程序名称
 server_editor_remote_app_name_tag;程序名称的名称（如 hello.exe）
 server_editor_remote_app_fullname;服务端路径
 server_editor_remote_app_fullname_tag;被远程程序在服务器上的路径（如 ' C:\\Apps\\hello.exe'）
-about_page_how_to_use;帮助
 about_page_feedback;提意见/需求
 guidance_introduce;RemoteX 为您管理远程会话，帮您通过启动器快速打开远程桌面
 guidance_feature_launcher_key;快速呼出启动器
@@ -239,10 +238,6 @@ Follow system;跟随系统(服务器要求Windows Server 2012 R2及以上)
 tag_tooltips;鼠标左键: 筛选出该标签{0}Ctrl + 鼠标左键 : 将该标签添加到筛选列表 {0}Alt + 鼠标左键 : 将该标签添加到排除列表
 Are you sure you want to close the connection?;确定要关闭连接么？
 Hi there,;你好呀！
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;希望你觉得这个 APP 还有点用处。如果你想支持我的工作，可以给我买杯咖啡或给我一个好评，如果有任何改进建议欢迎通过 Github 反馈（QQ群也行:168542318）。谢啦！
-Give suggestions;提点意见
-Buy a coffee;买杯咖啡
-Give nice review;给个好评
 Do not show this again in current version;当前版本不再显示
 User profile;用户配置
 Selected runner;指定Runner

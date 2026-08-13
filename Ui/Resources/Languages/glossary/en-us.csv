@@ -198,7 +198,6 @@ server_editor_remote_app_name;App Name
 server_editor_remote_app_name_tag;Name of the app (e.g. hello)
 server_editor_remote_app_fullname;App Path
 server_editor_remote_app_fullname_tag;Full exe path on the server (e.g. C:\Apps\hello.exe)
-about_page_how_to_use;How to use
 about_page_feedback;Feedback
 guidance_introduce;RemoteX allows you to open a remote session at any time and anywhere.
 guidance_feature_launcher_key;call the launcher by
@@ -239,10 +238,6 @@ Follow system;Follow system(Supported server: Windows Server 2012 R2 and above)
 tag_tooltips;click : set this tag as filter{0}Ctrl + click : add this tag to the include list {0}Alt + click : add this tag to the exclude list
 Are you sure you want to close the connection?;Are you sure you want to close the connection?
 Hi there,;Hi there,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!
-Give suggestions;Give suggestions
-Buy a coffee;Buy a coffee
-Give nice review;Give nice review
 Do not show this again in current version;Do not show this again in current version
 User profile;User profile
 Selected runner;Selected runner

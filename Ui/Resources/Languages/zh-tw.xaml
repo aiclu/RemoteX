@@ -200,7 +200,6 @@
     <s:String x:Key="server_editor_remote_app_name_tag">應用程式的檔案名稱 (例如 hello.exe)</s:String>
     <s:String x:Key="server_editor_remote_app_fullname">遠端應用程式路徑</s:String>
     <s:String x:Key="server_editor_remote_app_fullname_tag">遠端伺服器上的應用程式路徑 (例如 'C:\\Apps\\hello.exe')</s:String>
-    <s:String x:Key="about_page_how_to_use">說明</s:String>
     <s:String x:Key="about_page_feedback">意見或需求反映</s:String>
     <s:String x:Key="guidance_introduce">RemoteX 可協助您管理遠端連線，並在任何時候建立工作階段。</s:String>
     <s:String x:Key="guidance_feature_launcher_key">快速呼叫啟動器</s:String>
@@ -237,10 +236,6 @@
     <s:String x:Key="tag_tooltips">滑鼠左鍵：過濾出該標籤{0}Ctrl + 滑鼠左鍵：將該標籤加入至過濾清單 {0}Alt + 滑鼠左鍵：將該標籤加入到排除清單</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">確定要關閉連線嗎？</s:String>
     <s:String x:Key="Hi there,">您好！</s:String>
-    <s:String x:Key="I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!">希望這個應用程式有幫助到您，如果想要支持我的專案，可以幫我買杯咖啡或給我一些評等，若有任何建議也歡迎您透過 GitHub 反映，謝謝您！</s:String>
-    <s:String x:Key="Give suggestions">給予建議</s:String>
-    <s:String x:Key="Buy a coffee">買杯咖啡</s:String>
-    <s:String x:Key="Give nice review">給個好評</s:String>
     <s:String x:Key="Do not show this again in current version">不要在此版本再次顯示</s:String>
     <s:String x:Key="User profile">使用者設定</s:String>
     <s:String x:Key="Selected runner">選擇的執行器</s:String>

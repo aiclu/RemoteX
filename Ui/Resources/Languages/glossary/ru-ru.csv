@@ -198,7 +198,6 @@ server_editor_remote_app_name;Имя приложения
 server_editor_remote_app_name_tag;Название приложения (например, привет)
 server_editor_remote_app_fullname;Путь к приложению
 server_editor_remote_app_fullname_tag;Полный путь exe на сервере (например, C:\Apps\hello.exe)
-about_page_how_to_use;Как использовать
 about_page_feedback;Обратная связь
 guidance_introduce;RemoteX позволяет открыть удаленный сеанс в любое время и в любом месте.
 guidance_feature_launcher_key;вызвать лаунчер через
@@ -239,10 +238,6 @@ Follow system;Как системе (поддерживается Windows Server
 tag_tooltips;щелчок : установить этот тег в качестве фильтра{0}Ctrl + щелчок : добавить этот тег в список включения {0}Alt + щелчок : добавить этот тег в список исключений
 Are you sure you want to close the connection?;Вы уверены, что хотите закрыть соединение?
 Hi there,;Всем привет,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Я надеюсь, что вы найдете это приложение полезным. Если вы хотите поддержать мою работу, вы можете купить мне кофе или оставить хороший отзыв. Спасибо!
-Give suggestions;Высказать предложения
-Buy a coffee;Купить кофе
-Give nice review;Напишите хороший отзыв
 Do not show this again in current version;Не показывать это снова в текущей версии
 User profile;Профиль пользователя
 Selected runner;Выбранный триггер

@@ -200,7 +200,6 @@
     <s:String x:Key="server_editor_remote_app_name_tag">Nazwa aplikacji (e.g. Czesc)</s:String>
     <s:String x:Key="server_editor_remote_app_fullname">Ścieżka do aplikacji</s:String>
     <s:String x:Key="server_editor_remote_app_fullname_tag">Pełna ścieżka do aplikacji na serwerze (np. C:\Aplikacje\Czesc.exe)</s:String>
-    <s:String x:Key="about_page_how_to_use">Jak używać</s:String>
     <s:String x:Key="about_page_feedback">Opinia</s:String>
     <s:String x:Key="guidance_introduce">RemoteX umożliwia otwarcie sesji zdalnej, zawsze i wszędzie.</s:String>
     <s:String x:Key="guidance_feature_launcher_key">Uruchom aplikację startową przez</s:String>
@@ -237,10 +236,6 @@
     <s:String x:Key="tag_tooltips">LPM : ustaw ten tag jako filtr{0}CTRL + LPM : dodaj ten tag do listy filtrów {0} ALT + LPM : usuń ten tag z listy filtrów</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">Czy na pewno zamknąć połączenie?</s:String>
     <s:String x:Key="Hi there,">Cześć,</s:String>
-    <s:String x:Key="I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!">Mam nadzieję, że ta aplikacja jest przydatna. Jeśli chcesz wesprzeć moją pracę, możesz kupić mi kawę albo zostawić miłą recenzję. Dzięki!</s:String>
-    <s:String x:Key="Give suggestions">Dodaj sugestię</s:String>
-    <s:String x:Key="Buy a coffee">Kup kawę</s:String>
-    <s:String x:Key="Give nice review">Zostaw miłą recenzję</s:String>
     <s:String x:Key="Do not show this again in current version">Nie pokazuj tego okna w aktualnej wersji</s:String>
     <s:String x:Key="User profile">Ustawienia użytkownika</s:String>
     <s:String x:Key="Selected runner">Wybrany program uruchamiający</s:String>

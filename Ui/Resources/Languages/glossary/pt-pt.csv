@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nome da aplicação
 server_editor_remote_app_name_tag;Nome da aplicação (ex: hello)
 server_editor_remote_app_fullname;Caminho da aplicação
 server_editor_remote_app_fullname_tag;Caminho completo do exe no servidor (ex: C:\Apps\hello.exe)
-about_page_how_to_use;Como usar
 about_page_feedback;Feedback
 guidance_introduce;O RemoteX permite-lhe iniciar uma sessão remota em qualquer altura e em qualquer lugar.
 guidance_feature_launcher_key;chamar o iniciador por
@@ -243,10 +242,6 @@ Ctrl + clique : adicionar esta etiqueta à lista de inclusão {0}
 Alt + clique : adicionar esta etiqueta à lista de exclusão"
 Are you sure you want to close the connection?;Tem a certeza de que pretende fechar a ligação?
 Hi there,;Olá,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Espero que esta aplicação lhe seja útil. Se quiser apoiar o meu trabalho, pode oferecer-me um café ou deixar uma avaliação positiva. Obrigado!
-Give suggestions;Dar sugestões
-Buy a coffee;Oferecer um café
-Give nice review;Dar uma avaliação positiva
 Do not show this again in current version;Não mostrar novamente nesta versão
 User profile;Perfil do utilizador
 Selected runner;Executor selecionado

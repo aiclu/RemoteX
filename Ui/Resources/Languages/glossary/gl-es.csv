@@ -198,7 +198,6 @@ server_editor_remote_app_name;Nome da aplicación
 server_editor_remote_app_name_tag;Nome da aplicaciónes (ex. Olá)
 server_editor_remote_app_fullname;Ruta da aplicación
 server_editor_remote_app_fullname_tag;Ruta completa do exe no servidor (ex. C:\Apps\ola.exe)
-about_page_how_to_use;Como se usa
 about_page_feedback;Opinións
 guidance_introduce;RemoteX permíteche abrir unha sesión remota en calquera momento en calquer lugar
 guidance_feature_launcher_key;chamar ao lanzador por
@@ -237,10 +236,6 @@ Follow system;Seguir sistema (servidor soportado: Windows Server 2012 R2 e super
 tag_tooltips;Clic esquerdo : pon esta etiqueta coma filtro{0}Ctrl + Clic esquerdo : engadir esta etiqueta a lista incluída {0}Alt + Clic esquerdo :  engadir esta etiqueta a lista de excluídos
 Are you sure you want to close the connection?;Estás seguro de que queres pechar a conexión?
 Hi there,;Olá,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Espero que atopes útil esta aplicación. Se queres apoiar o meu traballo, podes invitarme a un café ou deixarme unha boa reseña. Grazas!
-Give suggestions;Dar suxerencias
-Buy a coffee;Invitar a un café
-Give nice review;Deixar unha boa reseña
 Do not show this again in current version;Non mostrar isto de novo na versión actual
 User profile;Perfil de usuario
 Selected runner;Executable elexido

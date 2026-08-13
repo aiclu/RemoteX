@@ -198,7 +198,6 @@ server_editor_remote_app_name;Název aplikace
 server_editor_remote_app_name_tag;Název aplikace (např. ahoj)
 server_editor_remote_app_fullname;Popis umístění aplikace
 server_editor_remote_app_fullname_tag;Úplný popis umístění spustitelného souboru na serveru (např. C:\Aplikace\ahoj.exe)
-about_page_how_to_use;Jak používat
 about_page_feedback;Podněty vývojářům
 guidance_introduce;RemoteX umožňuje navazovat relace na vzdálené stroje – kdykoli a odkudkoli.
 guidance_feature_launcher_key;zavolat spouštěč prostřednictvím
@@ -240,10 +239,6 @@ Follow system;Stejně jako v systému (podporovaný server: Windows Server 2012 
 tag_tooltips;Kliknutí levým tlačítkem: nastavit tento štítek jako filter{0}Ctrl + kliknutí levým tlačítkem: přidat tento štítek do seznamu zahrnutých {0}Alt + kliknutí levým tlačítkem: přidat tento štítek do seznamu vynechaných
 Are you sure you want to close the connection?;Opravdu chcete spojení zavřít?
 Hi there,;Zdravím,
-I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!;Doufám, že vám tato aplikace bude užitečná. Pokud chcete mou práci podpořit, můžete mi koupit kafe nebo napsat pozitivní recenzi. Díky!
-Give suggestions;Podělit se o nápady
-Buy a coffee;Koupit kafe
-Give nice review;Napsat kladnou recenzi
 Do not show this again in current version;Ve stávající verzi znovu nezobrazovat
 User profile;Profil uživatele
 Selected runner;Vybraný spouštěč

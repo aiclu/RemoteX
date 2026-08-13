@@ -200,7 +200,6 @@
     <s:String x:Key="server_editor_remote_app_name_tag">Название приложения (например, привет)</s:String>
     <s:String x:Key="server_editor_remote_app_fullname">Путь к приложению</s:String>
     <s:String x:Key="server_editor_remote_app_fullname_tag">Полный путь exe на сервере (например, C:\Apps\hello.exe)</s:String>
-    <s:String x:Key="about_page_how_to_use">Как использовать</s:String>
     <s:String x:Key="about_page_feedback">Обратная связь</s:String>
     <s:String x:Key="guidance_introduce">RemoteX позволяет открыть удаленный сеанс в любое время и в любом месте.</s:String>
     <s:String x:Key="guidance_feature_launcher_key">вызвать лаунчер через</s:String>
@@ -237,10 +236,6 @@
     <s:String x:Key="tag_tooltips">щелчок : установить этот тег в качестве фильтра{0}Ctrl + щелчок : добавить этот тег в список включения {0}Alt + щелчок : добавить этот тег в список исключений</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">Вы уверены, что хотите закрыть соединение?</s:String>
     <s:String x:Key="Hi there,">Всем привет,</s:String>
-    <s:String x:Key="I hope that you find this app useful. If you would like to support my work, you can buy me a coffee or give a nice review. Thanks!">Я надеюсь, что вы найдете это приложение полезным. Если вы хотите поддержать мою работу, вы можете купить мне кофе или оставить хороший отзыв. Спасибо!</s:String>
-    <s:String x:Key="Give suggestions">Высказать предложения</s:String>
-    <s:String x:Key="Buy a coffee">Купить кофе</s:String>
-    <s:String x:Key="Give nice review">Напишите хороший отзыв</s:String>
     <s:String x:Key="Do not show this again in current version">Не показывать это снова в текущей версии</s:String>
     <s:String x:Key="User profile">Профиль пользователя</s:String>
     <s:String x:Key="Selected runner">Выбранный триггер</s:String>
