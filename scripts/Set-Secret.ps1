@@ -6,8 +6,8 @@
 # .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -Secret "secret_value" -isRevert
 
 # read secret from file
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\1Remote_Secret\AppCenterSecret.txt"
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\1Remote_Secret\AppCenterSecret.txt" -isRevert
+# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\RemoteX_Secret\AppCenterSecret.txt"
+# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\RemoteX_Secret\AppCenterSecret.txt" -isRevert
 
 
 param (

@@ -35,7 +35,7 @@ RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / T
 
 ## Traps
 
-- **Secrets**: non-`Debug` configurations run PreBuild/PostBuild targets that inject real secrets (App Center, Sentry, Salt) from `C:\1Remote_Secret\` into `Ui/Assert.cs` and `Ui/AppVersion.cs`, then revert them. If that folder is missing the build fails — develop against the `Debug` configuration. Never commit real secrets.
+- **Secrets**: non-`Debug` configurations run PreBuild/PostBuild targets that inject real secrets (App Center, Sentry, Salt) from `C:\RemoteX_Secret\` into `Ui/Assert.cs` and `Ui/AppVersion.cs`, then revert them. If that folder is missing the build fails — develop against the `Debug` configuration. Never commit real secrets.
 - **`App.Close()`** intentionally spawns a delayed `Environment.Exit(1)` workaround — do not "fix" it.
 - **GDI+ exceptions**: transient `ExternalException` failures from `WindowsFormsHost` painting are deliberately suppressed in `Bootstrapper.OnUnhandledException` (Windows 11 24H2 issue, ref #924). Preserve that filtering.
 - **RDP hosting**: RDP uses the `AxMsRdpClient09` ActiveX control hosted in WPF through Windows Forms interop; `lib/` interop assemblies are checked in (regenerate with `scripts/MSTSCLib-Maker.ps1`).
