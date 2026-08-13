@@ -86,7 +86,7 @@
     <Content Include="Images\Square44x44Logo.targetsize-256.png" />
     <Content Include="Images\Square44x44Logo.targetsize-32.png" />
     <Content Include="Images\Square44x44Logo.targetsize-48.png" />
-    <None Include="Package.StoreAssociation.xml" />
+    <None Include="Package.StoreAssociation.xml" Condition="Exists('Package.StoreAssociation.xml')" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ui\Ui.csproj">

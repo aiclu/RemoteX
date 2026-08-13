@@ -222,7 +222,6 @@
         <Reference Include="AxMSTSCLib">
             <HintPath>..\lib\AxMSTSCLib.dll</HintPath>
         </Reference>
-        <Reference Include="Microsoft.CSharp" />
         <Reference Include="MSTSCLib">
             <HintPath>..\lib\MSTSCLib.dll</HintPath>
         </Reference>
