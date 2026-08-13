@@ -212,17 +212,9 @@
                            Opacity="0.3"
                            Foreground="{DynamicResource PrimaryTextBrush}"
                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                           FontSize="12"
+                           TextTrimming="CharacterEllipsis"
                 >
-                    <TextBlock.FontSize>
-                        <MultiBinding Converter="{StaticResource ConverterTextWidthAndContent2PresentationSize}" ConverterParameter="FontSize">
-                            <Binding RelativeSource="{RelativeSource Self}" Path="Text"></Binding>
-                            <Binding RelativeSource="{RelativeSource Self}" Path="Width"></Binding>
-                            <Binding RelativeSource="{RelativeSource Self}" Path="FontFamily"></Binding>
-                            <Binding RelativeSource="{RelativeSource Self}" Path="FontStyle"></Binding>
-                            <Binding RelativeSource="{RelativeSource Self}" Path="FontWeight"></Binding>
-                            <Binding RelativeSource="{RelativeSource Self}" Path="FontStretch"></Binding>
-                        </MultiBinding>
-                    </TextBlock.FontSize>
                 </TextBlock>
             </Grid>
 
