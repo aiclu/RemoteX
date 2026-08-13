@@ -227,7 +227,7 @@
         </Grid>
 
         <!-- Card Border: Hover Button Layer -->
-        <Border Name="CardRealBorder" CornerRadius="4" BorderThickness="2" Style="{StaticResource ButtonLayerStyle}">
+        <Border Name="CardRealBorder" CornerRadius="8" BorderThickness="2" Style="{StaticResource ButtonLayerStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
