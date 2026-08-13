@@ -390,7 +390,7 @@ namespace _1RM.View.ServerView
                             var ret = source.Database_InsertServer(list);
                             if (ret.IsSuccess)
                             {
-                                AppData.ReloadAll(true); // reload server list after import
+                                AppData.ReloadAllAsync(true); // reload server list after import
                                 MessageBoxHelper.Info(IoC.Translate("import_done_0_items_added", list.Count.ToString()));
                             }
                             else
@@ -476,7 +476,7 @@ namespace _1RM.View.ServerView
                             var ret = source.Database_InsertServer(list);
                             if (ret.IsSuccess)
                             {
-                                AppData.ReloadAll(true); // reload server list after import db
+                                AppData.ReloadAllAsync(true); // reload server list after import db
                                 MessageBoxHelper.Info(IoC.Translate("import_done_0_items_added", list.Count.ToString()));
                             }
                             else
@@ -523,7 +523,7 @@ namespace _1RM.View.ServerView
                                 var ret = source.Database_InsertServer(list);
                                 if (ret.IsSuccess)
                                 {
-                                    AppData.ReloadAll(true); // reload server list after import db
+                                    AppData.ReloadAllAsync(true); // reload server list after import db
                                     MessageBoxHelper.Info(IoC.Translate("import_done_0_items_added", list.Count.ToString()));
                                 }
                                 else

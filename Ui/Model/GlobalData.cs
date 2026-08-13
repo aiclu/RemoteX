@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using _1RM.Model.Protocol.Base;
+using Stylet;
 using _1RM.Service;
 using _1RM.Service.DataSource;
 using _1RM.Service.DataSource.DAO;
@@ -48,6 +51,51 @@ namespace _1RM.Model
         }
 
 
+        private int _dataVersion = 0;
+
+        /// <summary>
+        /// Check whether any data source needs a read.
+        /// </summary>
+        private bool NeedReload(bool force)
+        {
+            if (_sourceService == null)
+                return false;
+
+            var needRead = false;
+            if (force == false)
+            {
+                needRead |= _sourceService.LocalDataSource?.NeedRead(TableServer.TABLE_NAME) ?? false;
+                needRead |= _sourceService.LocalDataSource?.NeedRead(TableCredential.TABLE_NAME) ?? false;
+                if (needRead == false)
+                {
+                    foreach (var additionalSource in _sourceService.AdditionalSources)
+                    {
+                        if (additionalSource.Value.Status != EnumDatabaseStatus.OK)
+                        {
+                            // if this source is not connected, we skip it
+                            continue;
+                        }
+
+                        if (needRead == false)
+                        {
+                            needRead |= additionalSource.Value.NeedRead(TableServer.TABLE_NAME);
+                        }
+                        if (needRead == false)
+                        {
+                            needRead |= additionalSource.Value.NeedRead(TableCredential.TABLE_NAME);
+                        }
+                        if (needRead)
+                        {
+                            // if any additional source need read, we read all servers
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return force || needRead;
+        }
+
         /// <summary>
         /// reload data based on `LastReadFromDataSourceMillisecondsTimestamp` and `DataSourceDataUpdateTimestamp`
         /// return true if read data
@@ -56,69 +104,69 @@ namespace _1RM.Model
         {
             try
             {
-                if (_sourceService == null)
-                {
+                if (NeedReload(force) == false)
                     return false;
-                }
 
-
-                var needRead = false;
-                if (force == false)
+                Interlocked.Increment(ref _dataVersion); // invalidate any in-flight async reload
+                // read from db
+                PerfTracer.Measure($"ReloadAll: DB read (force={force})", () =>
                 {
-                    needRead |= _sourceService.LocalDataSource?.NeedRead(TableServer.TABLE_NAME) ?? false;
-                    needRead |= _sourceService.LocalDataSource?.NeedRead(TableCredential.TABLE_NAME) ?? false;
-                    if (needRead == false)
-                    {
-                        foreach (var additionalSource in _sourceService.AdditionalSources)
-                        {
-                            if (additionalSource.Value.Status != EnumDatabaseStatus.OK)
-                            {
-                                // if this source is not connected, we skip it
-                                continue;
-                            }
-
-                            if (needRead == false)
-                            {
-                                needRead |= additionalSource.Value.NeedRead(TableServer.TABLE_NAME);
-                            }
-                            if (needRead == false)
-                            {
-                                needRead |= additionalSource.Value.NeedRead(TableCredential.TABLE_NAME);
-                            }
-                            if (needRead)
-                            {
-                                // if any additional source need read, we read all servers
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (force || needRead)
-                {
-                    // read from db
-                    PerfTracer.Measure($"ReloadAll: DB read (force={force})", () =>
-                    {
-                        VmItemList = _sourceService.GetServers(force);
-                        _sourceService.GetCredentials(force);
-                    });
-                    LocalityConnectRecorder.ConnectTimeCleanup();
-                    ReloadTagsFromServers();
-                    OnReloadAll?.Invoke();
-                    return true;
-                }
-
-                return false;
+                    VmItemList = _sourceService!.GetServers(force);
+                    _sourceService.GetCredentials(force);
+                });
+                LocalityConnectRecorder.ConnectTimeCleanup();
+                ReloadTagsFromServers();
+                OnReloadAll?.Invoke();
+                return true;
             }
             catch (Exception ex)
             {
                 SimpleLogHelper.Error(ex);
                 UnifyTracing.Error(ex);
             }
-            finally
-            {
-            }
             return false;
+        }
+
+        /// <summary>
+        /// Async reload: DB reads run on a background task; the list and UI notification are
+        /// committed on the UI thread only if no newer reload has started meanwhile.
+        /// </summary>
+        public Task ReloadAllAsync(bool force = false)
+        {
+            if (NeedReload(force) == false)
+                return Task.CompletedTask;
+
+            var version = Interlocked.Increment(ref _dataVersion);
+            return Task.Run(() =>
+            {
+                return PerfTracer.Measure($"ReloadAllAsync: DB read (force={force})", () =>
+                {
+                    var servers = _sourceService!.GetServers(force);
+                    _sourceService.GetCredentials(force);
+                    return servers;
+                });
+            }).ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    SimpleLogHelper.Error(t.Exception);
+                    UnifyTracing.Error(t.Exception);
+                    return;
+                }
+                if (version != Volatile.Read(ref _dataVersion))
+                    return; // a newer reload superseded this one; drop the stale result
+
+                var servers = t.Result;
+                Execute.OnUIThread(() =>
+                {
+                    if (version != Volatile.Read(ref _dataVersion))
+                        return;
+                    VmItemList = servers;
+                    LocalityConnectRecorder.ConnectTimeCleanup();
+                    ReloadTagsFromServers();
+                    OnReloadAll?.Invoke();
+                });
+            }, TaskScheduler.Default);
         }
 
 
@@ -134,7 +182,7 @@ namespace _1RM.Model
             var ret = dataSource.Database_InsertServer(protocolServer);
             if (ret.IsSuccess)
             {
-                ReloadAll(force: true); // AddServer & needReload
+                ReloadAllAsync(force: true); // AddServer & needReload
             }
             StartTick();
             return ret;
@@ -190,7 +238,7 @@ namespace _1RM.Model
                 {
                     if (needReload)
                     {
-                        ReloadAll(); // UpdateServers & needReload
+                        ReloadAllAsync(); // UpdateServers & needReload
                     }
                     else
                     {
@@ -238,7 +286,7 @@ namespace _1RM.Model
                 // update viewmodel
                 if (isAnySuccess)
                 {
-                    ReloadAll(true); // DeleteServers
+                    ReloadAllAsync(true); // DeleteServers
                 }
 
                 return failMessages.Any() ? Result.Fail(string.Join("\r\n", failMessages)) : Result.Success();

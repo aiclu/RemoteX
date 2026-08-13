@@ -80,7 +80,7 @@ namespace _1RM.View.Settings.CredentialVault
                         {
                             if (ret.NeedReloadUI)
                             {
-                                IoC.Get<GlobalData>().ReloadAll();
+                                IoC.Get<GlobalData>().ReloadAllAsync();
                             }
                             else
                             {
@@ -126,7 +126,7 @@ namespace _1RM.View.Settings.CredentialVault
                             {
                                 if (ret.NeedReloadUI)
                                 {
-                                    IoC.Get<GlobalData>().ReloadAll();
+                                    IoC.Get<GlobalData>().ReloadAllAsync();
                                 }
                                 return true;
                             }
@@ -159,7 +159,7 @@ namespace _1RM.View.Settings.CredentialVault
                     {
                         if (ret.NeedReloadUI)
                         {
-                            IoC.Get<GlobalData>().ReloadAll();
+                            IoC.Get<GlobalData>().ReloadAllAsync();
                         }
                         else
                         {

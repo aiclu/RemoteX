@@ -193,7 +193,7 @@ namespace _1RM.Service.DataSource
             finally
             {
                 if (doReload)
-                    IoC.Get<GlobalData>().ReloadAll(); // reload server list after adding a new data source
+                    IoC.Get<GlobalData>().ReloadAllAsync(); // reload server list after adding a new data source
             }
         }
 
@@ -206,7 +206,7 @@ namespace _1RM.Service.DataSource
                 AdditionalSources[name].Database_CloseConnection();
                 if (AdditionalSources.TryRemove(name, out _))
                 {
-                    IoC.Get<GlobalData>().ReloadAll(true); // reload server list after removing a data source
+                    IoC.Get<GlobalData>().ReloadAllAsync(true); // reload server list after removing a data source
                 }
             }
         }

@@ -669,7 +669,7 @@ namespace _1RM.View.ServerView.Tree
                 SortNodes(targetFolder.Children, false);
                 // Update all servers' TreeNode in the moved folder and its subfolders
                 UpdateDbServerTreeNodesByCurrentTreeStructure(sourceNode);
-                IoC.Get<GlobalData>().ReloadAll();
+                IoC.Get<GlobalData>().ReloadAllAsync();
                 return true;
             }
             catch (Exception ex)
