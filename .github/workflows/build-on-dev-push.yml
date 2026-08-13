@@ -418,14 +418,28 @@ jobs:
           files: ${{needs.JobBuild.outputs.artifact_net9xsc}}
           dest: ${{needs.JobBuild.outputs.artifact_net9xsc}}.zip
 
-      # for 1Remote project
+      # Ensure the Nightly release exists in the RemoteX repo, then upload assets.
+      # deploy-nightly@v2 requires a pre-existing release; we create/fetch it via gh
+      # so the hardcoded release id / upload_url from the upstream repo are no longer needed.
+      - name: Ensure Nightly release
+        run: |
+          set -e
+          REPO="aiclu/RemoteX"
+          if gh release view Nightly --repo "$REPO" >/dev/null 2>&1; then
+            echo "Nightly release already exists"
+          else
+            gh release create Nightly --repo "$REPO" --title "Nightly" --prerelease
+          fi
+          echo "NIGHTLY_RELEASE_ID=$(gh api repos/$REPO/releases --jq '.[] | select(.tag_name == "Nightly") | .id')" >> "$GITHUB_ENV"
+          echo "NIGHTLY_UPLOAD_URL=$(gh api repos/$REPO/releases --jq '.[] | select(.tag_name == "Nightly") | .upload_url')" >> "$GITHUB_ENV"
+
       # publish nightly with WebFreak001/deploy-nightly@v2.0.0
       - uses: WebFreak001/deploy-nightly@v2.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         with:
-          upload_url: https://uploads.github.com/repos/1Remote/1Remote/releases/96075099/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
-          release_id: 96075099 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+          upload_url: ${{ env.NIGHTLY_UPLOAD_URL }}
+          release_id: ${{ env.NIGHTLY_RELEASE_ID }}
           asset_path: ${{needs.JobBuild.outputs.artifact_net9x}}.zip # path to archive to upload
           asset_name: ${{needs.JobBuild.outputs.artifact_net9x}}-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
           asset_content_type: application/zip # required by GitHub API
@@ -435,8 +449,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         with:
-          upload_url: https://uploads.github.com/repos/1Remote/1Remote/releases/96075099/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
-          release_id: 96075099 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+          upload_url: ${{ env.NIGHTLY_UPLOAD_URL }}
+          release_id: ${{ env.NIGHTLY_RELEASE_ID }}
           asset_path: ${{needs.JobBuild.outputs.artifact_net9xsc}}.zip # path to archive to upload
           asset_name: ${{needs.JobBuild.outputs.artifact_net9x}}-nightly-$$-self-contained.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
           asset_content_type: application/zip # required by GitHub API
