@@ -43,15 +43,19 @@
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ElementName=CardNameBarMask,Path=IsMouseOver}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
+                    <Setter Property="Background" Value="#14FFFFFF"></Setter>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding ElementName=PopupCardSettingMenu,Path=IsOpen}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
+                    <Setter Property="Background" Value="#14FFFFFF"></Setter>
                 </DataTrigger>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
+                    <Setter Property="Background" Value="#14FFFFFF"></Setter>
                 </Trigger>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
+                    <Setter Property="Background" Value="#1FFFFFFF"></Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
