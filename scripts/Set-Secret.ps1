@@ -27,8 +27,9 @@ if (!$Pattern) {
 if (!$Secret) {
 
     if(!$localSecretFilePath){
-        Write-Host "Error: Secret is empty."
-        exit 1
+        # no secret and no secret file: keep the placeholder, do not fail the build
+        Write-Host "Warning: Secret is empty, skip injecting."
+        exit 0
     }
     if (Test-Path -Path $localSecretFilePath -PathType Leaf) {
         $Secret = Get-Content $localSecretFilePath

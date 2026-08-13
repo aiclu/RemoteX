@@ -70,13 +70,13 @@ jobs:
       - name: Restore nuget packages 📦️
         run: msbuild $env:Main_Project /t:Restore /p:Configuration=$env:Configuration
 
-      # Run script
+      # Run script (missing secrets are skipped: Set-Secret.ps1 exits 0 when
+      # the -Secret value is empty and no -localSecretFilePath is given)
       - name: Run script
         shell: pwsh
         run: |
-          ./scripts/Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -Secret ${{ secrets.APP_CENTER_SECRET_REMOTEX }}
-          ./scripts/Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SENTRY_IO_DEN===" -Secret ${{ secrets.SENTRY_IO_DEN }}
-          ./scripts/Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -Secret ${{ secrets.GLOBAL_STRING_ENCRYPTION_SLAT }}
+          ./scripts/Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SENTRY_IO_DEN===" -Secret "${{ secrets.SENTRY_IO_DEN }}"
+          ./scripts/Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -Secret "${{ secrets.GLOBAL_STRING_ENCRYPTION_SLAT }}"
 
       # Get ${{env.BuildVersion}} and ${{env.PreRelease}}
       - name: Get Version
