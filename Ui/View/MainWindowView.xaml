@@ -168,7 +168,7 @@
                        IsOpen="{Binding ElementName=CbPopForMenu, Path=IsChecked}"
                        StaysOpen="False"
                        PlacementTarget="{Binding ElementName=CbPopForMenu}">
-                    <Border CornerRadius="5" Background="{DynamicResource PrimaryDarkBrush}">
+                    <Border CornerRadius="{DynamicResource DefaultCornerRadius}" Background="{DynamicResource PrimaryDarkBrush}">
                         <StackPanel Orientation="Vertical" MinWidth="138">
                             <MenuItem Header="{DynamicResource Options}" Command="{Binding CmdGoSysOptionsPage}">
                                 <MenuItem.Icon>

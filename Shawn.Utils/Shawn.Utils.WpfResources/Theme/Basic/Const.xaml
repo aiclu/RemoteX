@@ -3,6 +3,6 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <system:Double x:Key="DefaultControlHeight">30</system:Double>
     <Thickness x:Key="DefaultControlPadding">10,6</Thickness>
-    <system:Double x:Key="DefaultCornerRadiusValue">4</system:Double>
+    <system:Double x:Key="DefaultCornerRadiusValue">6</system:Double>
     <CornerRadius x:Key="DefaultCornerRadius" TopLeft="{StaticResource DefaultCornerRadiusValue}" TopRight="{StaticResource DefaultCornerRadiusValue}" BottomLeft="{StaticResource DefaultCornerRadiusValue}" BottomRight="{StaticResource DefaultCornerRadiusValue}"></CornerRadius>
 </ResourceDictionary>
