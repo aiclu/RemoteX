@@ -19,28 +19,28 @@ namespace _1RM
             string.IsNullOrEmpty(PreRelease)
                 ? new[]
                 {
-                    "https://1remote.github.io/download/",
-                    "https://github.com/1Remote/1Remote",
+                    "https://github.com/aiclu/RemoteX/releases",
+                    "https://github.com/aiclu/RemoteX",
                 }
                 : new[]
                 {
-                    "https://github.com/1Remote/1Remote/releases/expanded_assets/Nightly",
-                    "https://1remote.github.io/download/",
-                    "https://github.com/1Remote/1Remote",
+                    "https://github.com/aiclu/RemoteX/releases/expanded_assets/Nightly",
+                    "https://github.com/aiclu/RemoteX/releases",
+                    "https://github.com/aiclu/RemoteX",
                 };
 
         public static string[] UpdatePublishUrls =>
             string.IsNullOrEmpty(PreRelease)
                 ? new[]
                 {
-                    "https://1remote.github.io/download/",
-                    "https://github.com/1Remote/1Remote",
+                    "https://github.com/aiclu/RemoteX/releases/latest",
+                    "https://github.com/aiclu/RemoteX",
                 }
                 : new[]
                 {
-                    "https://github.com/1Remote/1Remote/releases/tag/Nightly",
-                    "https://1remote.github.io/download/",
-                    "https://github.com/1Remote/1Remote",
+                    "https://github.com/aiclu/RemoteX/releases/tag/Nightly",
+                    "https://github.com/aiclu/RemoteX/releases/latest",
+                    "https://github.com/aiclu/RemoteX",
                 };
     }
 }
