@@ -35,7 +35,7 @@ namespace _1RM.Service
                 ThemeName = "Dark",
                 PrimaryMidColor = "#323233",
                 PrimaryLightColor = "#474748",
-                PrimaryDarkColor = "#2d2d2d",
+                PrimaryDarkColor = "#3a3a3a",
                 PrimaryTextColor = "#cccccc",
                 AccentMidColor = "#FF007ACC",
                 AccentLightColor = "#FF32A7F4",
