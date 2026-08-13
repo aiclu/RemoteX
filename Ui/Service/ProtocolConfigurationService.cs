@@ -58,7 +58,11 @@ namespace _1RM.Service
             //ProtocolConfigs[RDP.ProtocolName].Runners.Add(new Runner("Built-in AxMsRdpClient", RDP.ProtocolName));
             //ProtocolConfigs[RDP.ProtocolName].Runners.Add(new Runner("Mstsc.exe", RDP.ProtocolName));
             ProtocolConfigs.Add(VNC.ProtocolName, InitProtocol(protocolFolderName, new VNC(), new InternalDefaultRunner(VNC.ProtocolName), $"Built-in VNC"));
+#if RUST_SSH
+            ProtocolConfigs.Add(SSH.ProtocolName, InitProtocol(protocolFolderName, new SSH(), new RustSshRunner(SSH.ProtocolName), RustSshRunner.Name));
+#else
             ProtocolConfigs.Add(SSH.ProtocolName, InitProtocol(protocolFolderName, new SSH(), new PuttyRunner(SSH.ProtocolName), PuttyRunner.Name));
+#endif
             ProtocolConfigs.Add(Telnet.ProtocolName, InitProtocol(protocolFolderName, new Telnet(), new PuttyRunner(Telnet.ProtocolName), PuttyRunner.Name));
             ProtocolConfigs.Add(Serial.ProtocolName, InitProtocol(protocolFolderName, new Serial(), new PuttyRunner(Serial.ProtocolName), PuttyRunner.Name));
             ProtocolConfigs.Add(SFTP.ProtocolName, InitProtocol(protocolFolderName, new SFTP(), new InternalDefaultRunner(SFTP.ProtocolName), $"Built-in SFTP"));
@@ -239,6 +243,11 @@ namespace _1RM.Service
                 }
                 if (SSH.ProtocolName == protocolName)
                 {
+#if RUST_SSH
+                    // In net9, PuTTY is an optional runner alongside the Rust default.
+                    if (c.Runners.All(x => x.Name != PuttyRunner.Name))
+                        c.Runners.Add(new PuttyRunner(SSH.ProtocolName));
+#endif
                     if (c.Runners.All(x => x.Name != "Putty"))
                         c.Runners.Add(new ExternalRunnerForSSH("Putty", protocolName)
                         {

@@ -28,6 +28,7 @@
     <s:String x:Key="File Name">Имя файла</s:String>
     <s:String x:Key="Test">Тест</s:String>
     <s:String x:Key="Reconnect">Восстановить соединение</s:String>
+    <s:String x:Key="Disconnected">Отключено</s:String>
     <s:String x:Key="Dismiss">Отклонить</s:String>
     <s:String x:Key="Lock">Замок</s:String>
     <s:String x:Key="Always on top">Always on top</s:String>

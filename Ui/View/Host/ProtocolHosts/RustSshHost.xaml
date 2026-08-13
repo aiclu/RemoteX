@@ -1,0 +1,30 @@
+<protocolHosts1:HostBase x:Class="_1RM.View.Host.ProtocolHosts.RustSshHost"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:protocolHosts1="clr-namespace:_1RM.View.Host.ProtocolHosts"
+                   mc:Ignorable="d"
+                   d:DesignHeight="450" d:DesignWidth="800"
+                   Background="#0C0C0C">
+    <Grid>
+        <!-- Hosts the TerminalControl renderer (created in code-behind). -->
+        <Grid x:Name="TerminalHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Control Name="GridLoading" Style="{StaticResource BusyAnimationStyle}" Background="#0C0C0C"/>
+        <Grid Name="GridMessageBox" Background="#0C0C0C">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.1*" MaxWidth="100" MinWidth="20"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="0.1*" MaxWidth="100" MinWidth="20"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Name="TbMessageTitle" FontSize="{DynamicResource GlobalFontSizeTitle}" HorizontalAlignment="Center" Text="{DynamicResource Error}" Foreground="White" Margin="10"></TextBlock>
+                <TextBlock Name="TbMessage" FontSize="{DynamicResource GlobalFontSizeBody}" HorizontalAlignment="Center" Text="" Foreground="White" Margin="5" TextWrapping="WrapWithOverflow"></TextBlock>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 20 0 0">
+                    <Button x:Name="BtnReconn" Click="BtnReconn_OnClick" Style="{StaticResource ButtonPrimaryStyle}" Width="80" Margin="5" Content="{DynamicResource Reconnect}"></Button>
+                    <Button x:Name="BtnCancel" Click="BtnCancel_OnClick" Style="{StaticResource ButtonPrimaryStyle}" Width="80" Margin="5" Content="{DynamicResource Dismiss}"></Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</protocolHosts1:HostBase>

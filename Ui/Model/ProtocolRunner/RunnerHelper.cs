@@ -190,6 +190,12 @@ namespace _1RM.Model.ProtocolRunner
             // build-in runner
             switch (protocol)
             {
+#if RUST_SSH
+                case SSH ssh when runner is RustSshRunner:
+                    {
+                        return RustSshHost.Create(ssh);
+                    }
+#endif
                 case RDP rdp:
                     {
                         var size = tab?.GetTabContentSize(ColorAndBrushHelper.ColorIsTransparent(protocol.ColorHex) == true);

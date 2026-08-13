@@ -28,6 +28,7 @@
     <s:String x:Key="File Name">Nazwa pliku</s:String>
     <s:String x:Key="Test">Test</s:String>
     <s:String x:Key="Reconnect">Połącz ponownie</s:String>
+    <s:String x:Key="Disconnected">Rozłączono</s:String>
     <s:String x:Key="Dismiss">Odrzuć</s:String>
     <s:String x:Key="Lock">Zablokuj</s:String>
     <s:String x:Key="Always on top">Zawsze na wierzchu</s:String>

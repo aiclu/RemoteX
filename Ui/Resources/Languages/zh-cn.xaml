@@ -28,6 +28,7 @@
     <s:String x:Key="File Name">文件名</s:String>
     <s:String x:Key="Test">测试</s:String>
     <s:String x:Key="Reconnect">重新连接</s:String>
+    <s:String x:Key="Disconnected">已断开连接</s:String>
     <s:String x:Key="Dismiss">关闭</s:String>
     <s:String x:Key="Lock">锁定</s:String>
     <s:String x:Key="Always on top">置顶</s:String>

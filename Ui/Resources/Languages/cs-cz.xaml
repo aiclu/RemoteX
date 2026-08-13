@@ -28,6 +28,7 @@
     <s:String x:Key="File Name">Název souboru</s:String>
     <s:String x:Key="Test">Test</s:String>
     <s:String x:Key="Reconnect">Znovu připojit</s:String>
+    <s:String x:Key="Disconnected">Odpojeno</s:String>
     <s:String x:Key="Dismiss">Zahodit</s:String>
     <s:String x:Key="Lock">Zamknout</s:String>
     <s:String x:Key="Always on top">Vždy na vrchu</s:String>

@@ -28,6 +28,7 @@
     <s:String x:Key="File Name">Nome do arquivo</s:String>
     <s:String x:Key="Test">Test</s:String>
     <s:String x:Key="Reconnect">Reconectar</s:String>
+    <s:String x:Key="Disconnected">Desconectado</s:String>
     <s:String x:Key="Dismiss">Rexeitar</s:String>
     <s:String x:Key="Lock">Bloquear</s:String>
     <s:String x:Key="Always on top">Sempre encima</s:String>
