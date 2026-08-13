@@ -1,0 +1,45 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles">
+
+    <Style x:Key="WindowChromeBaseBaseStyle" TargetType="styles:WindowChromeBase">
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome CaptionHeight="0" 
+                              GlassFrameThickness="1"
+                              ResizeBorderThickness="3" 
+                              UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="styles:WindowChromeBase">
+                    <Border x:Name="WindowBorder" Padding="0" Background="{DynamicResource PrimaryMidBrush}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderThickness" Value="1"></Setter>
+                                <Setter Property="BorderBrush" Value="{DynamicResource DefaultBorderBrush}"></Setter>
+                            </Style>
+                        </Border.Style>
+                        <Grid x:Name="WindowContentGrid" Background="{TemplateBinding Background}">
+                            <ContentPresenter />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter TargetName="WindowContentGrid" Property="Margin" Value="8 6 8 8" />
+                            <Setter TargetName="WindowBorder" Property="BorderThickness" Value="0"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=WindowStyle}" Value="None">
+                <Setter Property="AllowsTransparency" Value="True"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="styles:WindowChromeBase" BasedOn="{StaticResource WindowChromeBaseBaseStyle}"></Style>
+</ResourceDictionary>

@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converter="clr-namespace:Shawn.Utils.WpfResources.Converter">
+    <converter:ConverterIsGreaterThan x:Key="ConverterIsGreaterThan0" CompareValue="0" />
+    <converter:ConverterIsLowerThan x:Key="ConverterIsLowerThan1" CompareValue="1" />
+    <converter:ConverterBool2Visible x:Key="ConverterBool2Visible" />
+    <converter:ConverterBool2VisibleInv x:Key="ConverterBool2VisibleInv" />
+    <converter:ConverterBoolInverse x:Key="ConverterBoolInverse" />
+    <converter:ConverterTextWidthAndContent2PresentationSize x:Key="ConverterTextWidthAndContent2PresentationSize" />
+    <converter:ConverterDouble2Half x:Key="ConverterDouble2Half" />
+    <converter:ConverterColorHexString2Brush x:Key="ConverterColorHexString2Brush"></converter:ConverterColorHexString2Brush>
+    <converter:ConverterColorHexString2Color x:Key="ConverterColorHexString2Color"></converter:ConverterColorHexString2Color>
+    <converter:ConverterColorIsTransparent x:Key="ConverterColorIsTransparent"></converter:ConverterColorIsTransparent>
+    <converter:ConverterIsTheSame x:Key="ConverterIsTheSame"></converter:ConverterIsTheSame>
+    <converter:ConverterEqual2Visible x:Key="ConverterEqual2Visible"></converter:ConverterEqual2Visible>
+    <converter:ConverterEqual2Collapsed x:Key="ConverterEqual2Collapsed"></converter:ConverterEqual2Collapsed>
+    <converter:DoubleAdd x:Key="DoubleAdd1" AddValue="1"></converter:DoubleAdd>
+    <converter:DoubleAdd x:Key="DoubleAdd2" AddValue="2"></converter:DoubleAdd>
+    <converter:DoubleAdd x:Key="DoubleAdd_1" AddValue="-1"></converter:DoubleAdd>
+    <converter:DoubleAdd x:Key="DoubleAdd_2" AddValue="-2"></converter:DoubleAdd>
+    <converter:IntAdd x:Key="IntAdd1" AddValue="1"></converter:IntAdd>
+    <converter:IntAdd x:Key="IntAdd2" AddValue="2"></converter:IntAdd>
+    <converter:IntAdd x:Key="IntAdd_1" AddValue="-1"></converter:IntAdd>
+    <converter:IntAdd x:Key="IntAdd_2" AddValue="-2"></converter:IntAdd>
+    <converter:ConverterIsEqual2Static x:Key="ConverterIsEqual2Static"></converter:ConverterIsEqual2Static>
+    <converter:ConverterIsEqual x:Key="ConverterIsEqual"></converter:ConverterIsEqual>
+    <converter:ConverterIsNotEqual x:Key="ConverterIsNotEqual"></converter:ConverterIsNotEqual>
+</ResourceDictionary>

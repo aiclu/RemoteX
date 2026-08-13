@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0-windows;net6.0-windows;net48;net452;</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<LangVersion>10.0</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Shawn.Utils.Wpf\Shawn.Utils.Wpf.csproj" />
+	  <ProjectReference Include="..\Shawn.Utils\Shawn.Utils.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Theme\Basic\Const.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	  </Page>
+	  <Page Update="Theme\Styles\TabControl.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	  </Page>
+	  <Page Update="Theme\Styles\WindowChromeBaseStyles.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	  </Page>
+	</ItemGroup>
+
+</Project>

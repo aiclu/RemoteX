@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0-windows;net8.0-windows;net6.0-windows;net48;</TargetFrameworks>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<UseWPF>true</UseWPF>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<PackageIconUrl>https://raw.githubusercontent.com/ButchersBoy/Dragablz/master/Resources/D32.png</PackageIconUrl>
+		<PackageLicenseExpression></PackageLicenseExpression>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageProjectUrl>http://dragablz.net</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ButchersBoy/Dragablz</RepositoryUrl>
+		<PackageTags>WPF TabControl Tab Tearable</PackageTags>
+		<PackageReleaseNotes>Support for .NET 8</PackageReleaseNotes>
+		<RepositoryType>git</RepositoryType>
+		<Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\bin\Debug</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\bin\Release</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0-windows;net6.0-windows;net48;net452;</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+        <LangVersion>latest</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|AnyCPU'">
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Controls\ColorPickerWPF\colorpicker1.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Shawn.Utils\Shawn.Utils.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="PresentationFramework">
+			<HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\PresentationFramework.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Controls\ColorPickerWPF\colorpicker1.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Controls\ColorPickerWPF\ColorPickerControl4Popup.xaml">
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ColorPickerWPF\ColorPickRowPopup.xaml">
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ColorPickerWPF\SliderRow.xaml">
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<PackageReference Include="System.IO.FileSystem.AccessControl">
+			<Version>5.0.0</Version>
+		</PackageReference>
+	</ItemGroup>
+
+</Project>
