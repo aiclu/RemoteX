@@ -129,4 +129,13 @@ namespace _1RM.Utils.Tracing
             Trace(EventName.Special, kys);
         }
     }
+
+    public enum EventName
+    {
+        App,
+        View,
+        SessionEdit,
+        SessionConnect,
+        Special,
+    }
 }

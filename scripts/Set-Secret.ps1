@@ -2,12 +2,12 @@
 # usage:
 
 # given a secret
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -Secret "secret_value"
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -Secret "secret_value" -isRevert
+# .\Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -Secret "secret_value"
+# .\Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -Secret "secret_value" -isRevert
 
 # read secret from file
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\RemoteX_Secret\AppCenterSecret.txt"
-# .\Set-Secret.ps1 -filePath .\Ui\Utils\MsAppCenterHelper.cs -Pattern "===REPLACE_ME_WITH_APP_CENTER_SECRET===" -localSecretFilePath "C:\RemoteX_Secret\AppCenterSecret.txt" -isRevert
+# .\Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -localSecretFilePath "C:\RemoteX_Secret\Salt.txt"
+# .\Set-Secret.ps1 -filePath .\Ui\Assert.cs -Pattern "===REPLACE_ME_WITH_SALT===" -localSecretFilePath "C:\RemoteX_Secret\Salt.txt" -isRevert
 
 
 param (
