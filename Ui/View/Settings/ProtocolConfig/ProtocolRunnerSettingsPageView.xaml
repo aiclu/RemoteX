@@ -34,7 +34,7 @@
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <Grid Margin="10 3" Cursor="Hand">
-                                            <Border x:Name="GridContainer" CornerRadius="5" 
+                                            <Border x:Name="GridContainer" CornerRadius="{DynamicResource DefaultCornerRadius}" 
                                                     BorderBrush="{DynamicResource DefaultBorderBrush}" BorderThickness="1">
                                             </Border>
                                             <ContentPresenter x:Name="ContentPresenter"/>

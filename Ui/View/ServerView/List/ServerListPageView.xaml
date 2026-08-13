@@ -1073,7 +1073,7 @@
                            StaysOpen="False"
                            AllowsTransparency="True"
                            PlacementTarget="{Binding ElementName=CbPopForInExport}">
-                        <Border CornerRadius="5" Background="{DynamicResource PrimaryDarkBrush}">
+                        <Border CornerRadius="{DynamicResource DefaultCornerRadius}" Background="{DynamicResource PrimaryDarkBrush}">
                             <StackPanel Orientation="Vertical">
                                 <MenuItem Header="{DynamicResource Add}" Command="{Binding CmdAdd}">
                                     <MenuItem.Icon>
