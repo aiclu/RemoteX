@@ -375,7 +375,6 @@
         <Resource Include="Resources\Icons\20210106\20210106_103.png" />
         <Resource Include="Resources\Icons\20210106\20210106_104.png" />
         <Resource Include="Resources\Icons\20210106\20210106_105.png" />
-        <Resource Include="Resources\Image\Logo\author_avatar.jpg" />
         <Resource Include="Resources\Image\Logo\logo256.png" />
         <Resource Include="Resources\Image\Logo\logo32.png" />
         <Resource Include="Resources\Image\Logo\logo64.png" />
