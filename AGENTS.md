@@ -2,7 +2,7 @@
 
 ## What this is
 
-1Remote — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / Telnet / FTP / SFTP / Serial / RemoteApp). UI uses **Stylet** MVVM with a StyletIoC container. Root namespace is `_1RM` (assembly `1Remote`). Default target framework is `net9.0-windows10.0.19041.0`; `ReleaseNet6` and `ReleaseNet48` configurations also exist. Nullable is enabled and `LangVersion=latest`.
+RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / Telnet / FTP / SFTP / Serial / RemoteApp). UI uses **Stylet** MVVM with a StyletIoC container. Root namespace is `_1RM` (assembly `RemoteX`). Default target framework is `net9.0-windows10.0.19041.0`; `ReleaseNet6` and `ReleaseNet48` configurations also exist. Nullable is enabled and `LangVersion=latest`.
 
 ## Commands
 

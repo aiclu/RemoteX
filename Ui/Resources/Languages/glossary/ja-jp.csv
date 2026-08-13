@@ -52,7 +52,7 @@ Font;フォント
 Font size;フォントサイズ
 Themes;テーマ
 Options;オプション
-About;1Remoteについて
+About;RemoteXについて
 Language;言語
 Startup;起動
 Tags;タグ
@@ -190,7 +190,7 @@ server_editor_gateway_logon_method_smart_card;ICカード
 server_editor_gateway_bypass_gateway_for_local_address;ローカル アドレスの RD ゲートウェイ サーバーをバイパスする
 How to select the specified monitors;どのようにモニターを使用するかを指定します
 mstsc.exe mode;mstsc.exe モード
-In this mode RDP will start the session in the way mstsc.exe xxxx.rdp in CMD, it can offer more custom parameters.;このモードでは、1Remoteのウィンドウの代わりに、より多くのカスタムパラメーターを利用可能な 'mstsc.exe xxxx.rdp' という方法でRDPセッションを実行します。
+In this mode RDP will start the session in the way mstsc.exe xxxx.rdp in CMD, it can offer more custom parameters.;このモードでは、RemoteXのウィンドウの代わりに、より多くのカスタムパラメーターを利用可能な 'mstsc.exe xxxx.rdp' という方法でRDPセッションを実行します。
 Note: This mode will be automatically enabled if there are 2+ monitors with different display scaling on your PC and you selected the full screen mode.;注: PC上に異なる表示スケーリングのモニターが2台以上あり、フルスクリーンモードを選択した場合には、このモードが自動的に有効になります。
 Additional settings;追加の設定
 Preview rdp file;rdpファイルをプレビュー
@@ -201,7 +201,7 @@ server_editor_remote_app_fullname;アプリのパス
 server_editor_remote_app_fullname_tag;リモートコンピューター上のフルパス (例: C:\Apps\hello.exe)
 about_page_how_to_use;使い方
 about_page_feedback;フィードバック
-guidance_introduce;1Remoteで、いつでもどこでもリモートセッションを開くことができます。
+guidance_introduce;RemoteXで、いつでもどこでもリモートセッションを開くことができます。
 guidance_feature_launcher_key;ランチャーを呼び出すホットキー
 guidance_feature_launcher_select;選択
 guidance_feature_launcher_connect;接続
@@ -216,7 +216,7 @@ Profile is saved in your Windows AppData folder;プロファイルはユーザ�
 word_oops;おっと…
 error_report_unexpected_error_occurred;予期しないエラーが発生しました。エラー情報は以下のとおりです。
 error_report_to_clipboard;クリップボードにコピー
-error_report_please_help_us_improve;このエラーを報告して 1Remote の改善にご協力ください。
+error_report_please_help_us_improve;このエラーを報告して RemoteX の改善にご協力ください。
 error_report_how_help_us_improve;エラー情報をコピーし、報告方法を選ぶだけです。
 error_report_send_by_email;電子メールで送信
 error_report_send_by_github;GitHubで送信
@@ -227,15 +227,15 @@ Cmd parameter;引数
 New runner name;追加するランナーの名前
 Can not be empty!;記入が必要です
 Hosting;ホスティング
-Hosting this exe in 1Remote tab view?;このexeを1Remoteのウィンドウでホストする
-Caution: some exe can not be hosted in 1Remote.;注意: exeによっては1Remoteのウィンドウでホストできないかもしれません。ご自身でテストしてください。
+Hosting this exe in RemoteX tab view?;このexeをRemoteXのウィンドウでホストする
+Caution: some exe can not be hosted in RemoteX.;注意: exeによってはRemoteXのウィンドウでホストできないかもしれません。ご自身でテストしてください。
 Show environment variables;環境変数を表示する
 Add environment variables;環境変数を追加
 write permissions alert;"ディレクトリ `{0}` への書き込みが許可されていません
 以下をお試しください:
 1. 管理者として実行する
 2. ディレクトリまたはアクセス許可を変更する
-3. 1Remoteを別のフォルダーに移動する"
+3. RemoteXを別のフォルダーに移動する"
 Follow system;システムに従う (対応サーバー: Windows Server 2012 R2 以降)
 tag_tooltips;"クリック : このタグを持つアイテムのみを表示{0}Ctrl + クリック : このタグを持つことをリスト条件に加える{0}Alt + クリック : このタグを持たないことをリスト条件に加える
 "

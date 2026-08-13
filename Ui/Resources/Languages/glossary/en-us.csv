@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;App Path
 server_editor_remote_app_fullname_tag;Full exe path on the server (e.g. C:\Apps\hello.exe)
 about_page_how_to_use;How to use
 about_page_feedback;Feedback
-guidance_introduce;1Remote allows you to open a remote session at any time and anywhere.
+guidance_introduce;RemoteX allows you to open a remote session at any time and anywhere.
 guidance_feature_launcher_key;call the launcher by
 guidance_feature_launcher_select;select item by
 guidance_feature_launcher_connect;connect by
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;Profile is saved in your Windows
 word_oops;Oops...
 error_report_unexpected_error_occurred;Unexpected error occurred. Error info is shown below:
 error_report_to_clipboard;Copy to clipboard
-error_report_please_help_us_improve;Please help us improve 1Remote by reporting this error.
+error_report_please_help_us_improve;Please help us improve RemoteX by reporting this error.
 error_report_how_help_us_improve;Simply copy the error message and choose a way to report it.
 error_report_send_by_email;Send by e-mail
 error_report_send_by_github;Send by GitHub
@@ -226,15 +226,15 @@ Cmd parameter;CMD parameter
 New runner name;New runner name
 Can not be empty!;Can not be empty!
 Hosting;Hosting
-Hosting this exe in 1Remote tab view?;Hosting this exe in 1Remote tab windowView?
-Caution: some exe can not be hosted in 1Remote.;Caution: some exe can not be hosted by 1Remote, please test by your self.
+Hosting this exe in RemoteX tab view?;Hosting this exe in RemoteX tab windowView?
+Caution: some exe can not be hosted in RemoteX.;Caution: some exe can not be hosted by RemoteX, please test by your self.
 Show environment variables;Show environment variables
 Add environment variables;Add environment variables
 write permissions alert;"We don't have write permissions for the `{0}` directory!
 Please try:
 1. run as administrator
 2. change directory or file permissions 
-3. move 1Remote to another folder"
+3. move RemoteX to another folder"
 Follow system;Follow system(Supported server: Windows Server 2012 R2 and above)
 tag_tooltips;click : set this tag as filter{0}Ctrl + click : add this tag to the include list {0}Alt + click : add this tag to the exclude list
 Are you sure you want to close the connection?;Are you sure you want to close the connection?

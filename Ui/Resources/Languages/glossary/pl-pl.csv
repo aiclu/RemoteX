@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Ścieżka do aplikacji
 server_editor_remote_app_fullname_tag;Pełna ścieżka do aplikacji na serwerze (np. C:\Aplikacje\Czesc.exe)
 about_page_how_to_use;Jak używać
 about_page_feedback;Opinia
-guidance_introduce;1Remote umożliwia otwarcie sesji zdalnej, zawsze i wszędzie.
+guidance_introduce;RemoteX umożliwia otwarcie sesji zdalnej, zawsze i wszędzie.
 guidance_feature_launcher_key;Uruchom aplikację startową przez
 guidance_feature_launcher_select;Wybierz wpisy przez
 guidance_feature_launcher_connect;Połącz przez
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;Profil zostanie zapisany w folde
 word_oops;Ojoj...
 error_report_unexpected_error_occurred;Wystąpił nieoczekiwany błąd. Opis błędu poniżej:
 error_report_to_clipboard;Kopiuj do schowka
-error_report_please_help_us_improve;Pomoż rozwijać 1Remote poprzez zgłoszenie tego błędu.
+error_report_please_help_us_improve;Pomoż rozwijać RemoteX poprzez zgłoszenie tego błędu.
 error_report_how_help_us_improve;Po prostu skopiuj ten błąd, i wybierz sposób wysłania.
 error_report_send_by_email;Wyślij mailem
 error_report_send_by_github;Wyślij przez GitHub'a
@@ -226,15 +226,15 @@ Cmd parameter;Parametry konsoli
 New runner name;Nazwa nowego programu uruchamiającego
 Can not be empty!;Ciąg nie może być pusty!
 Hosting;Hosting
-Hosting this exe in 1Remote tab view?;Hostować ten plik exe w 1Remote?
-Caution: some exe can not be hosted in 1Remote.;Uwaga: niektóre pliki exe nie mogą zostać hostowane, proszę przetestuj sam.
+Hosting this exe in RemoteX tab view?;Hostować ten plik exe w RemoteX?
+Caution: some exe can not be hosted in RemoteX.;Uwaga: niektóre pliki exe nie mogą zostać hostowane, proszę przetestuj sam.
 Show environment variables;Pokaż zmienne środowiskowe
 Add environment variables;Dodaj zmienne środowiskowe
 write permissions alert;"Brak uprawnień do folderu `{0}`! 
 Spróbuj tych czynności: 
 1. uruchom jako administrator 
 2. zmień uprawnienia folderu lub zmień folder 
-3. przenieś 1Remote do innego folderu"
+3. przenieś RemoteX do innego folderu"
 Follow system;Śledź system (wspierana wersja: Windows Server 2012 R2 i nowsze)
 tag_tooltips;LPM : ustaw ten tag jako filtr{0}CTRL + LPM : dodaj ten tag do listy filtrów {0} ALT + LPM : usuń ten tag z listy filtrów
 Are you sure you want to close the connection?;Czy na pewno zamknąć połączenie?

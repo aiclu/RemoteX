@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Caminho da aplicação
 server_editor_remote_app_fullname_tag;Caminho completo do exe no servidor (ex: C:\Apps\hello.exe)
 about_page_how_to_use;Como usar
 about_page_feedback;Feedback
-guidance_introduce;O 1Remote permite-lhe iniciar uma sessão remota em qualquer altura e em qualquer lugar.
+guidance_introduce;O RemoteX permite-lhe iniciar uma sessão remota em qualquer altura e em qualquer lugar.
 guidance_feature_launcher_key;chamar o iniciador por
 guidance_feature_launcher_select;selecionar item por
 guidance_feature_launcher_connect;ligar por
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;O perfil é guardado na pasta Ap
 word_oops;Ups...
 error_report_unexpected_error_occurred;Ocorreu um erro inesperado. Informação do erro abaixo:
 error_report_to_clipboard;Copiar para a área de transferência
-error_report_please_help_us_improve;Ajude-nos a melhorar o 1Remote reportando este erro.
+error_report_please_help_us_improve;Ajude-nos a melhorar o RemoteX reportando este erro.
 error_report_how_help_us_improve;Basta copiar a mensagem de erro e escolher como reportar.
 error_report_send_by_email;Enviar por e-mail
 error_report_send_by_github;Enviar via GitHub
@@ -226,8 +226,8 @@ Cmd parameter;Parâmetro CMD
 New runner name;Novo nome do executor
 Can not be empty!;Não pode estar vazio!
 Hosting;Alojamento
-Hosting this exe in 1Remote tab view?;Alojar este exe numa aba do 1Remote?
-Caution: some exe can not be hosted in 1Remote.;Atenção: alguns exe não podem ser alojados no 1Remote. Teste previamente.
+Hosting this exe in RemoteX tab view?;Alojar este exe numa aba do RemoteX?
+Caution: some exe can not be hosted in RemoteX.;Atenção: alguns exe não podem ser alojados no RemoteX. Teste previamente.
 Show environment variables;Mostrar variáveis de ambiente
 Add environment variables;Adicionar variáveis de ambiente
 write permissions alert;"Não temos permissões de escrita para a diretoria {0}!
@@ -236,7 +236,7 @@ Tente o seguinte:
 
 2. Altere as permissões da diretoria ou ficheiro
 
-3. Mova o 1Remote para outra pasta"
+3. Mova o RemoteX para outra pasta"
 Follow system;Seguir o sistema (servidores suportados: Windows Server 2012 R2 e superior)
 tag_tooltips;"clique : definir esta etiqueta como filtro {0}
 Ctrl + clique : adicionar esta etiqueta à lista de inclusão {0}

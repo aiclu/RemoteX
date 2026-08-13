@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Путь к приложению
 server_editor_remote_app_fullname_tag;Полный путь exe на сервере (например, C:\Apps\hello.exe)
 about_page_how_to_use;Как использовать
 about_page_feedback;Обратная связь
-guidance_introduce;1Remote позволяет открыть удаленный сеанс в любое время и в любом месте.
+guidance_introduce;RemoteX позволяет открыть удаленный сеанс в любое время и в любом месте.
 guidance_feature_launcher_key;вызвать лаунчер через
 guidance_feature_launcher_select;выбрать элемент по
 guidance_feature_launcher_connect;подключиться через
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;Профиль сохраняе�
 word_oops;Упс...
 error_report_unexpected_error_occurred;Произошла непредвиденная ошибка. Информация об ошибке показана ниже:
 error_report_to_clipboard;Скопировать в буфер обмена
-error_report_please_help_us_improve;Пожалуйста, помогите нам улучшить 1Remote, сообщив об этой ошибке.
+error_report_please_help_us_improve;Пожалуйста, помогите нам улучшить RemoteX, сообщив об этой ошибке.
 error_report_how_help_us_improve;Просто скопируйте сообщение об ошибке и выберите способ сообщить о нем.
 error_report_send_by_email;Послать по электронной почте
 error_report_send_by_github;Отправить через GitHub
@@ -226,15 +226,15 @@ Cmd parameter;Параметр командной строки
 New runner name;Название нового триггера
 Can not be empty!;Не может быть пустым!
 Hosting;Размещение
-Hosting this exe in 1Remote tab view?;Разместить этот exe-файл на вкладке 1Remote windowView?
-Caution: some exe can not be hosted in 1Remote.;Внимание: некоторые exe-файлы не могут быть размещены на 1Remote, пожалуйста, проверьте файл сами.
+Hosting this exe in RemoteX tab view?;Разместить этот exe-файл на вкладке RemoteX windowView?
+Caution: some exe can not be hosted in RemoteX.;Внимание: некоторые exe-файлы не могут быть размещены на RemoteX, пожалуйста, проверьте файл сами.
 Show environment variables;Показать переменные среды
 Add environment variables;Добавьте переменные среды
 write permissions alert;"У нас нет прав на запись в каталог `{0}`!
 Пожалуйста попробуйте:
 1. запустить от имени администратора
 2. изменить права доступа к каталогу или файлу
-3. переместите 1Remote в другую папку"
+3. переместите RemoteX в другую папку"
 Follow system;Как системе (поддерживается Windows Server 2012 R2 и выше)
 tag_tooltips;щелчок : установить этот тег в качестве фильтра{0}Ctrl + щелчок : добавить этот тег в список включения {0}Alt + щелчок : добавить этот тег в список исключений
 Are you sure you want to close the connection?;Вы уверены, что хотите закрыть соединение?

@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Ruta da aplicación
 server_editor_remote_app_fullname_tag;Ruta completa do exe no servidor (ex. C:\Apps\ola.exe)
 about_page_how_to_use;Como se usa
 about_page_feedback;Opinións
-guidance_introduce;1Remote permíteche abrir unha sesión remota en calquera momento en calquer lugar
+guidance_introduce;RemoteX permíteche abrir unha sesión remota en calquera momento en calquer lugar
 guidance_feature_launcher_key;chamar ao lanzador por
 guidance_feature_launcher_select;escoller obxecto por
 guidance_feature_launcher_connect;conectar por
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;O perfil é gravado no teu carta
 word_oops;Ups…
 error_report_unexpected_error_occurred;Ocorreu un erro inesperado. Móstrase máis información abaixo
 error_report_to_clipboard;Copiar ao portapapeis
-error_report_please_help_us_improve;Por favor, axúdanos a mellorar 1Remote informando deste erro
+error_report_please_help_us_improve;Por favor, axúdanos a mellorar RemoteX informando deste erro
 error_report_how_help_us_improve;Simplemente copia a mensaxe do error e excolle unha forma para informar.
 error_report_send_by_email;Enviar por e-enderezo
 error_report_send_by_github;Enviar por GitHub
@@ -226,8 +226,8 @@ Cmd parameter;Parámetro CMD
 New runner name;Nome do novo executable
 Can not be empty!;Non pode estar baleiro!
 Hosting;Hospedaxe
-Hosting this exe in 1Remote tab view?;¿Hospeda este exe na pestana 1Remote View?
-Caution: some exe can not be hosted in 1Remote.;Precaución: algúns exe non poden ser aloxados por 1Remote, proba por ti mesmo.
+Hosting this exe in RemoteX tab view?;¿Hospeda este exe na pestana RemoteX View?
+Caution: some exe can not be hosted in RemoteX.;Precaución: algúns exe non poden ser aloxados por RemoteX, proba por ti mesmo.
 Show environment variables;Mostrar variables do entorno
 Add environment variables;Engadir variables de entorno
 write permissions alert;"Non temos permisos de escritura para o cartafol '{0}' ! Por favor, intenta:

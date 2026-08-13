@@ -202,7 +202,7 @@
     <s:String x:Key="server_editor_remote_app_fullname_tag">Úplný popis umístění spustitelného souboru na serveru (např. C:\Aplikace\ahoj.exe)</s:String>
     <s:String x:Key="about_page_how_to_use">Jak používat</s:String>
     <s:String x:Key="about_page_feedback">Podněty vývojářům</s:String>
-    <s:String x:Key="guidance_introduce">1Remote umožňuje navazovat relace na vzdálené stroje – kdykoli a odkudkoli.</s:String>
+    <s:String x:Key="guidance_introduce">RemoteX umožňuje navazovat relace na vzdálené stroje – kdykoli a odkudkoli.</s:String>
     <s:String x:Key="guidance_feature_launcher_key">zavolat spouštěč prostřednictvím</s:String>
     <s:String x:Key="guidance_feature_launcher_select">vybrat položku prostřednictvím</s:String>
     <s:String x:Key="guidance_feature_launcher_connect">připojit prostřednictvím</s:String>
@@ -217,7 +217,7 @@
     <s:String x:Key="word_oops">Jejda…</s:String>
     <s:String x:Key="error_report_unexpected_error_occurred">Došlo k neočekávané chybě. Informace o chybě viz níže:</s:String>
     <s:String x:Key="error_report_to_clipboard">Zkopírovat do schránky</s:String>
-    <s:String x:Key="error_report_please_help_us_improve">Prosíme pomozte nám 1Remote vylepšit nahlášením této chyby.</s:String>
+    <s:String x:Key="error_report_please_help_us_improve">Prosíme pomozte nám RemoteX vylepšit nahlášením této chyby.</s:String>
     <s:String x:Key="error_report_how_help_us_improve">Stačí jen zkopírovat tuto chybovou hlášku a zvolit způsob jejíh nahlášení.</s:String>
     <s:String x:Key="error_report_send_by_email">Poslat e-mailem e-mail</s:String>
     <s:String x:Key="error_report_send_by_github">Poslat prostřednictvím portálu GitHub</s:String>
@@ -228,11 +228,11 @@
     <s:String x:Key="New runner name">Název pro nový spouštěč</s:String>
     <s:String x:Key="Can not be empty!">Je třeba vyplnit!</s:String>
     <s:String x:Key="Hosting">Hostování</s:String>
-    <s:String x:Key="Hosting this exe in 1Remote tab view?">Hostovat tento spustitelný soubor v 1Remote panelu windowView?</s:String>
-    <s:String x:Key="Caution: some exe can not be hosted in 1Remote.">Upozornění: hostování některých spustitelných souborů pomocí 1Remote nefunguje – je třeba si vyzkoušet.</s:String>
+    <s:String x:Key="Hosting this exe in RemoteX tab view?">Hostovat tento spustitelný soubor v RemoteX panelu windowView?</s:String>
+    <s:String x:Key="Caution: some exe can not be hosted in RemoteX.">Upozornění: hostování některých spustitelných souborů pomocí RemoteX nefunguje – je třeba si vyzkoušet.</s:String>
     <s:String x:Key="Show environment variables">Zobrazit proměnné prostředí</s:String>
     <s:String x:Key="Add environment variables">Přidat proměnné prostředí</s:String>
-    <s:String x:Key="write permissions alert">\nChybí oprávnění pro zápis do složky „{0}“!\nVyzkoušejte:\n1. spustit coby správce\n2. upravit práva na souboru a/nebo složce\n3. přesunout 1Remote do jiné složky</s:String>
+    <s:String x:Key="write permissions alert">\nChybí oprávnění pro zápis do složky „{0}“!\nVyzkoušejte:\n1. spustit coby správce\n2. upravit práva na souboru a/nebo složce\n3. přesunout RemoteX do jiné složky</s:String>
     <s:String x:Key="Follow system">Stejně jako v systému (podporovaný server: Windows Server 2012 R2 a novější)</s:String>
     <s:String x:Key="tag_tooltips">Kliknutí levým tlačítkem: nastavit tento štítek jako filter{0}Ctrl + kliknutí levým tlačítkem: přidat tento štítek do seznamu zahrnutých {0}Alt + kliknutí levým tlačítkem: přidat tento štítek do seznamu vynechaných</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">Opravdu chcete spojení zavřít?</s:String>

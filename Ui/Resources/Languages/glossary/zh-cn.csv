@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;服务端路径
 server_editor_remote_app_fullname_tag;被远程程序在服务器上的路径（如 ' C:\\Apps\\hello.exe'）
 about_page_how_to_use;帮助
 about_page_feedback;提意见/需求
-guidance_introduce;1Remote 为您管理远程会话，帮您通过启动器快速打开远程桌面
+guidance_introduce;RemoteX 为您管理远程会话，帮您通过启动器快速打开远程桌面
 guidance_feature_launcher_key;快速呼出启动器
 guidance_feature_launcher_select;选择项目
 guidance_feature_launcher_connect;启动会话
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;配置文件保存在 Windows Ap
 word_oops;哎哟喂...
 error_report_unexpected_error_occurred;程序发生了一些未知错误，详细信息如下：
 error_report_to_clipboard;保存到剪贴板
-error_report_please_help_us_improve;请通过反馈这个错误来帮助我们改进 1Remote。
+error_report_please_help_us_improve;请通过反馈这个错误来帮助我们改进 RemoteX。
 error_report_how_help_us_improve;只需要复制错误信息，下列任意方式都可进行错误反馈！（QQ群也行:168542318）
 error_report_send_by_email;通过邮件
 error_report_send_by_github;通过GitHub
@@ -226,15 +226,15 @@ Cmd parameter;命令行参数
 New runner name;新增 runner 名
 Can not be empty!;不能为空！
 Hosting;集成
-Hosting this exe in 1Remote tab view?;将该 exe 集成到 1Remote 的 tab 视图中?
-Caution: some exe can not be hosted in 1Remote.;警告: 某些应用程序无法被集成到 1Remote 中，请自行测试。
+Hosting this exe in RemoteX tab view?;将该 exe 集成到 RemoteX 的 tab 视图中?
+Caution: some exe can not be hosted in RemoteX.;警告: 某些应用程序无法被集成到 RemoteX 中，请自行测试。
 Show environment variables;显示环境变量
 Add environment variables;添加环境变量
 write permissions alert;"我们没有路径 `{0}` 的写入权限！
 请尝试用以下方法修复问题：
 1. 使用管理员权限运行程序
 2. 修改路径的权限设置 
-3. 将 1Remote 移动到其他目录"
+3. 将 RemoteX 移动到其他目录"
 Follow system;跟随系统(服务器要求Windows Server 2012 R2及以上)
 tag_tooltips;鼠标左键: 筛选出该标签{0}Ctrl + 鼠标左键 : 将该标签添加到筛选列表 {0}Alt + 鼠标左键 : 将该标签添加到排除列表
 Are you sure you want to close the connection?;确定要关闭连接么？

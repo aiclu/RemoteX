@@ -116,7 +116,7 @@ jobs:
       # artifact
       - uses: actions/upload-artifact@v4
         with:
-          name: 1Remote-${{env.BuildVersion}}-net9-x64
+          name: RemoteX-${{env.BuildVersion}}-net9-x64
           path: Ui/bin/Release/net9.0-windows/publish/win-x64
 
       # Publish the application net9.0
@@ -125,7 +125,7 @@ jobs:
       # artifact
       - uses: actions/upload-artifact@v4
         with:
-          name: 1Remote-${{env.BuildVersion}}-net9-x64-self-contained
+          name: RemoteX-${{env.BuildVersion}}-net9-x64-self-contained
           path: Ui/bin/Release/net9.0-windows-self-contained/publish/win-x64
 
     outputs:
@@ -133,8 +133,8 @@ jobs:
       PreRelease: ${{env.PreRelease}}
       # artifact_net48: 1Remote-${{env.BuildVersion}}-net4.8(not recommended)
       # artifact_net6x: 1Remote-${{env.BuildVersion}}-net6-x64
-      artifact_net9x: 1Remote-${{env.BuildVersion}}-net9-x64
-      artifact_net9xsc: 1Remote-${{env.BuildVersion}}-net9-x64-self-contained
+      artifact_net9x: RemoteX-${{env.BuildVersion}}-net9-x64
+      artifact_net9xsc: RemoteX-${{env.BuildVersion}}-net9-x64-self-contained
 
   # publish stable build, run only tag is not empty
   StableRelease:

@@ -66,7 +66,7 @@ namespace _1RM.View
 
             var patterns = new List<string>()
             {
-                @".?1remote-([\d|\.]*.*)-net",
+                @".?remotex-([\d|\.]*.*)-net",
                 @".?latest\sversion:\s*([\d|.]*)",
             };
             foreach (var pattern in patterns)

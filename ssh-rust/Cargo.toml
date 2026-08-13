@@ -2,7 +2,7 @@
 name = "ssh-rust"
 version = "0.1.0"
 edition = "2021"
-description = "1Remote Rust SSH core (FFI cdylib) — russh-backed SSH terminal core"
+description = "RemoteX Rust SSH core (FFI cdylib) — russh-backed SSH terminal core"
 license = "MIT"
 
 [lib]

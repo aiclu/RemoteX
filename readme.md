@@ -1,4 +1,4 @@
-# 1Remote
+# RemoteX
 
 English | [中文](https://github.com/1Remote/1Remote/wiki/Intro%E2%80%90ZhCn)
 
@@ -9,7 +9,7 @@ English | [中文](https://github.com/1Remote/1Remote/wiki/Intro%E2%80%90ZhCn)
 ![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fvshawn%2Fpremotem&count_bg=%23E83D61&title_bg=%23102B3E&icon=github.svg&icon_color=%23CED8E1&title=&edge_flat=false)<br>
 ![](https://github.com/1Remote/1Remote/actions/workflows/build-on-dev-push.yml/badge.svg)
 
-1Remote is a modern personal remote session manager and launcher. It is a single place to manage all your remote sessions supporting number of different protocols.
+RemoteX is a modern personal remote session manager and launcher. It is a single place to manage all your remote sessions supporting number of different protocols.
 
 ## Features
 
@@ -69,9 +69,9 @@ Latest Version: 1.2
     ↑ Customizable runners
 </p>
 
-## Make 1Remote Stronger
+## Make RemoteX Stronger
 
-If you like **1Remote**, help us make it stronger by doing any of the following:
+If you like **RemoteX**, help us make it stronger by doing any of the following:
 
 1. Simply star this repository
 2. [Help translation](https://1remote.github.io/usage/misc/help-translation/)

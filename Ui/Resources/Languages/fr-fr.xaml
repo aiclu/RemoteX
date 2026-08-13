@@ -202,7 +202,7 @@
     <s:String x:Key="server_editor_remote_app_fullname_tag">Chemin complet de l'éxecutable sur le serveur (par exemple C:\\Apps\\hello.exe)</s:String>
     <s:String x:Key="about_page_how_to_use">Comment utiliser</s:String>
     <s:String x:Key="about_page_feedback">Retour</s:String>
-    <s:String x:Key="guidance_introduce">1Remote vous permet d'ouvrir une session à distance à tout moment et de n'importe où.</s:String>
+    <s:String x:Key="guidance_introduce">RemoteX vous permet d'ouvrir une session à distance à tout moment et de n'importe où.</s:String>
     <s:String x:Key="guidance_feature_launcher_key">Appeler le lanceur par</s:String>
     <s:String x:Key="guidance_feature_launcher_select">Sélectionner l'élément par</s:String>
     <s:String x:Key="guidance_feature_launcher_connect">Se connecter par</s:String>
@@ -217,7 +217,7 @@
     <s:String x:Key="word_oops">Oops...</s:String>
     <s:String x:Key="error_report_unexpected_error_occurred">Une erreur inattendue s'est produite. Les informations sur l'erreur sont affichées ci-dessous :</s:String>
     <s:String x:Key="error_report_to_clipboard">Copier dans le presse-papier</s:String>
-    <s:String x:Key="error_report_please_help_us_improve">Veuillez nous aider à améliorer 1Remote en signalant cette erreur.</s:String>
+    <s:String x:Key="error_report_please_help_us_improve">Veuillez nous aider à améliorer RemoteX en signalant cette erreur.</s:String>
     <s:String x:Key="error_report_how_help_us_improve">Copiez simplement le message d'erreur et choisissez l'une des façons de le signaler.</s:String>
     <s:String x:Key="error_report_send_by_email">Envoyé par email</s:String>
     <s:String x:Key="error_report_send_by_github">Envoyer par GitHub</s:String>
@@ -228,11 +228,11 @@
     <s:String x:Key="New runner name">New runner name</s:String>
     <s:String x:Key="Can not be empty!">Ne peux pas être vide!</s:String>
     <s:String x:Key="Hosting">Hosting</s:String>
-    <s:String x:Key="Hosting this exe in 1Remote tab view?">Hébergement de cet exe dans la fenêtre de l'onglet 1RemoteView ?</s:String>
-    <s:String x:Key="Caution: some exe can not be hosted in 1Remote.">Attention : certains exe ne peuvent pas être hébergés par 1Remote, veuillez tester par vous-même.</s:String>
+    <s:String x:Key="Hosting this exe in RemoteX tab view?">Hébergement de cet exe dans la fenêtre de l'onglet RemoteXView ?</s:String>
+    <s:String x:Key="Caution: some exe can not be hosted in RemoteX.">Attention : certains exe ne peuvent pas être hébergés par RemoteX, veuillez tester par vous-même.</s:String>
     <s:String x:Key="Show environment variables">Afficher les variables d'environnement</s:String>
     <s:String x:Key="Add environment variables">Ajouter des variables d'environnement</s:String>
-    <s:String x:Key="write permissions alert">Nous n'avons pas les droits d'écriture pour le répertoire `{0}` !\nS'il vous plaît essayez:\n1. exécuter en tant qu'administrateur\n2. modifier les autorisations de répertoire ou de fichier\n3. déplacer 1Remote vers un autre dossier</s:String>
+    <s:String x:Key="write permissions alert">Nous n'avons pas les droits d'écriture pour le répertoire `{0}` !\nS'il vous plaît essayez:\n1. exécuter en tant qu'administrateur\n2. modifier les autorisations de répertoire ou de fichier\n3. déplacer RemoteX vers un autre dossier</s:String>
     <s:String x:Key="Follow system">Suivre le système(Serveur pris en charge: Windows Server 2012 R2 et supérieur)</s:String>
     <s:String x:Key="tag_tooltips">clic : définir cette balise comme filtre{0}Ctrl + clic : ajouter cette balise à la liste d'inclusion {0}Alt + clic : ajouter cette balise à la liste d'exclusion</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">Voulez-vous vraiment fermer la connexion?</s:String>

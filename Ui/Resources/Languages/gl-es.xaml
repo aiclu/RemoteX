@@ -202,7 +202,7 @@
     <s:String x:Key="server_editor_remote_app_fullname_tag">Ruta completa do exe no servidor (ex. C:\Apps\ola.exe)</s:String>
     <s:String x:Key="about_page_how_to_use">Como se usa</s:String>
     <s:String x:Key="about_page_feedback">Opinións</s:String>
-    <s:String x:Key="guidance_introduce">1Remote permíteche abrir unha sesión remota en calquera momento en calquer lugar</s:String>
+    <s:String x:Key="guidance_introduce">RemoteX permíteche abrir unha sesión remota en calquera momento en calquer lugar</s:String>
     <s:String x:Key="guidance_feature_launcher_key">chamar ao lanzador por</s:String>
     <s:String x:Key="guidance_feature_launcher_select">escoller obxecto por</s:String>
     <s:String x:Key="guidance_feature_launcher_connect">conectar por</s:String>
@@ -217,7 +217,7 @@
     <s:String x:Key="word_oops">Ups…</s:String>
     <s:String x:Key="error_report_unexpected_error_occurred">Ocorreu un erro inesperado. Móstrase máis información abaixo</s:String>
     <s:String x:Key="error_report_to_clipboard">Copiar ao portapapeis</s:String>
-    <s:String x:Key="error_report_please_help_us_improve">Por favor, axúdanos a mellorar 1Remote informando deste erro</s:String>
+    <s:String x:Key="error_report_please_help_us_improve">Por favor, axúdanos a mellorar RemoteX informando deste erro</s:String>
     <s:String x:Key="error_report_how_help_us_improve">Simplemente copia a mensaxe do error e excolle unha forma para informar.</s:String>
     <s:String x:Key="error_report_send_by_email">Enviar por e-enderezo</s:String>
     <s:String x:Key="error_report_send_by_github">Enviar por GitHub</s:String>
@@ -228,8 +228,8 @@
     <s:String x:Key="New runner name">Nome do novo executable</s:String>
     <s:String x:Key="Can not be empty!">Non pode estar baleiro!</s:String>
     <s:String x:Key="Hosting">Hospedaxe</s:String>
-    <s:String x:Key="Hosting this exe in 1Remote tab view?">¿Hospeda este exe na pestana 1Remote View?</s:String>
-    <s:String x:Key="Caution: some exe can not be hosted in 1Remote.">Precaución: algúns exe non poden ser aloxados por 1Remote, proba por ti mesmo.</s:String>
+    <s:String x:Key="Hosting this exe in RemoteX tab view?">¿Hospeda este exe na pestana RemoteX View?</s:String>
+    <s:String x:Key="Caution: some exe can not be hosted in RemoteX.">Precaución: algúns exe non poden ser aloxados por RemoteX, proba por ti mesmo.</s:String>
     <s:String x:Key="Show environment variables">Mostrar variables do entorno</s:String>
     <s:String x:Key="Add environment variables">Engadir variables de entorno</s:String>
     <s:String x:Key="write permissions alert">Non temos permisos de escritura para o cartafol '{0}' ! Por favor, intenta:\n1.executar coma administrador\n2. cambiar os permisos do cartafol ou do arquivo</s:String>

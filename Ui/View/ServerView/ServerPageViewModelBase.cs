@@ -453,7 +453,7 @@ namespace _1RM.View.ServerView
                             // 1Remote db
                             if (dataBase.TableExists("Configs").IsSuccess && dataBase.TableExists("Servers").IsSuccess)
                             {
-                                var ds = new SqliteSource("1Remote");
+                                var ds = new SqliteSource("RemoteX");
                                 var ss = ds.GetServers(true).Select(x => x.Server).ToList();
                                 if (ss.Count > 0)
                                 {

@@ -54,7 +54,7 @@
     <s:String x:Key="Font size">フォントサイズ</s:String>
     <s:String x:Key="Themes">テーマ</s:String>
     <s:String x:Key="Options">オプション</s:String>
-    <s:String x:Key="About">1Remoteについて</s:String>
+    <s:String x:Key="About">RemoteXについて</s:String>
     <s:String x:Key="Language">言語</s:String>
     <s:String x:Key="Startup">起動</s:String>
     <s:String x:Key="Tags">タグ</s:String>
@@ -191,7 +191,7 @@
     <s:String x:Key="server_editor_gateway_bypass_gateway_for_local_address">ローカル アドレスの RD ゲートウェイ サーバーをバイパスする</s:String>
     <s:String x:Key="How to select the specified monitors">どのようにモニターを使用するかを指定します</s:String>
     <s:String x:Key="mstsc.exe mode">mstsc.exe モード</s:String>
-    <s:String x:Key="In this mode RDP will start the session in the way mstsc.exe xxxx.rdp in CMD, it can offer more custom parameters.">このモードでは、1Remoteのウィンドウの代わりに、より多くのカスタムパラメーターを利用可能な 'mstsc.exe xxxx.rdp' という方法でRDPセッションを実行します。</s:String>
+    <s:String x:Key="In this mode RDP will start the session in the way mstsc.exe xxxx.rdp in CMD, it can offer more custom parameters.">このモードでは、RemoteXのウィンドウの代わりに、より多くのカスタムパラメーターを利用可能な 'mstsc.exe xxxx.rdp' という方法でRDPセッションを実行します。</s:String>
     <s:String x:Key="Note: This mode will be automatically enabled if there are 2+ monitors with different display scaling on your PC and you selected the full screen mode.">注: PC上に異なる表示スケーリングのモニターが2台以上あり、フルスクリーンモードを選択した場合には、このモードが自動的に有効になります。</s:String>
     <s:String x:Key="Additional settings">追加の設定</s:String>
     <s:String x:Key="Preview rdp file">rdpファイルをプレビュー</s:String>
@@ -202,7 +202,7 @@
     <s:String x:Key="server_editor_remote_app_fullname_tag">リモートコンピューター上のフルパス (例: C:\Apps\hello.exe)</s:String>
     <s:String x:Key="about_page_how_to_use">使い方</s:String>
     <s:String x:Key="about_page_feedback">フィードバック</s:String>
-    <s:String x:Key="guidance_introduce">1Remoteで、いつでもどこでもリモートセッションを開くことができます。</s:String>
+    <s:String x:Key="guidance_introduce">RemoteXで、いつでもどこでもリモートセッションを開くことができます。</s:String>
     <s:String x:Key="guidance_feature_launcher_key">ランチャーを呼び出すホットキー</s:String>
     <s:String x:Key="guidance_feature_launcher_select">選択</s:String>
     <s:String x:Key="guidance_feature_launcher_connect">接続</s:String>
@@ -217,7 +217,7 @@
     <s:String x:Key="word_oops">おっと…</s:String>
     <s:String x:Key="error_report_unexpected_error_occurred">予期しないエラーが発生しました。エラー情報は以下のとおりです。</s:String>
     <s:String x:Key="error_report_to_clipboard">クリップボードにコピー</s:String>
-    <s:String x:Key="error_report_please_help_us_improve">このエラーを報告して 1Remote の改善にご協力ください。</s:String>
+    <s:String x:Key="error_report_please_help_us_improve">このエラーを報告して RemoteX の改善にご協力ください。</s:String>
     <s:String x:Key="error_report_how_help_us_improve">エラー情報をコピーし、報告方法を選ぶだけです。</s:String>
     <s:String x:Key="error_report_send_by_email">電子メールで送信</s:String>
     <s:String x:Key="error_report_send_by_github">GitHubで送信</s:String>
@@ -228,11 +228,11 @@
     <s:String x:Key="New runner name">追加するランナーの名前</s:String>
     <s:String x:Key="Can not be empty!">記入が必要です</s:String>
     <s:String x:Key="Hosting">ホスティング</s:String>
-    <s:String x:Key="Hosting this exe in 1Remote tab view?">このexeを1Remoteのウィンドウでホストする</s:String>
-    <s:String x:Key="Caution: some exe can not be hosted in 1Remote.">注意: exeによっては1Remoteのウィンドウでホストできないかもしれません。ご自身でテストしてください。</s:String>
+    <s:String x:Key="Hosting this exe in RemoteX tab view?">このexeをRemoteXのウィンドウでホストする</s:String>
+    <s:String x:Key="Caution: some exe can not be hosted in RemoteX.">注意: exeによってはRemoteXのウィンドウでホストできないかもしれません。ご自身でテストしてください。</s:String>
     <s:String x:Key="Show environment variables">環境変数を表示する</s:String>
     <s:String x:Key="Add environment variables">環境変数を追加</s:String>
-    <s:String x:Key="write permissions alert">ディレクトリ `{0}` への書き込みが許可されていません\n以下をお試しください:\n1. 管理者として実行する\n2. ディレクトリまたはアクセス許可を変更する\n3. 1Remoteを別のフォルダーに移動する</s:String>
+    <s:String x:Key="write permissions alert">ディレクトリ `{0}` への書き込みが許可されていません\n以下をお試しください:\n1. 管理者として実行する\n2. ディレクトリまたはアクセス許可を変更する\n3. RemoteXを別のフォルダーに移動する</s:String>
     <s:String x:Key="Follow system">システムに従う (対応サーバー: Windows Server 2012 R2 以降)</s:String>
     <s:String x:Key="tag_tooltips">クリック : このタグを持つアイテムのみを表示{0}Ctrl + クリック : このタグを持つことをリスト条件に加える{0}Alt + クリック : このタグを持たないことをリスト条件に加える\n</s:String>
     <s:String x:Key="Are you sure you want to close the connection?">本当に接続を閉じてよろしいですか？</s:String>

@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;遠端應用程式路徑
 server_editor_remote_app_fullname_tag;遠端伺服器上的應用程式路徑 (例如 'C:\\Apps\\hello.exe')
 about_page_how_to_use;說明
 about_page_feedback;意見或需求反映
-guidance_introduce;1Remote 可協助您管理遠端連線，並在任何時候建立工作階段。
+guidance_introduce;RemoteX 可協助您管理遠端連線，並在任何時候建立工作階段。
 guidance_feature_launcher_key;快速呼叫啟動器
 guidance_feature_launcher_select;選擇項目
 guidance_feature_launcher_connect;開啟工作階段
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;設定檔案儲存在 Users AppD
 word_oops;糟糕...
 error_report_unexpected_error_occurred;應用程式發生了一些未知的問題，以下是詳細資訊：
 error_report_to_clipboard;複製到剪貼簿
-error_report_please_help_us_improve;請反映這些問題來協助我們改善 1Remote。
+error_report_please_help_us_improve;請反映這些問題來協助我們改善 RemoteX。
 error_report_how_help_us_improve;只需要複製錯誤訊息，並透過下列任意方式反映這個問題！
 error_report_send_by_email;透過電子郵件
 error_report_send_by_github;透過 GitHub
@@ -226,15 +226,15 @@ Cmd parameter;命令列參數
 New runner name;新增執行器名稱
 Can not be empty!;不能為空值！
 Hosting;嵌入
-Hosting this exe in 1Remote tab view?;在 1Remote 選項卡窗口中託管此 exe？
-Caution: some exe can not be hosted in 1Remote.;注意：部分exe無法被1Remote託管，請自行測試。
+Hosting this exe in RemoteX tab view?;在 RemoteX 選項卡窗口中託管此 exe？
+Caution: some exe can not be hosted in RemoteX.;注意：部分exe無法被RemoteX託管，請自行測試。
 Show environment variables;顯示環境變數
 Add environment variables;新增環境變數
 write permissions alert;"我們沒有對 `{0}` 的存取權限！
 請嘗試使用以下方式來解決此問題：
 1. 使用系統管理員身分執行
 2. 修改該目錄的權限設定
-3. 將 1Remote 移動到其他位置"
+3. 將 RemoteX 移動到其他位置"
 Follow system;與系統相同 (Windows Server 2012 R2 及以上的伺服器)
 tag_tooltips;滑鼠左鍵：過濾出該標籤{0}Ctrl + 滑鼠左鍵：將該標籤加入至過濾清單 {0}Alt + 滑鼠左鍵：將該標籤加入到排除清單
 Are you sure you want to close the connection?;確定要關閉連線嗎？

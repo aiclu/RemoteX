@@ -60,7 +60,7 @@ namespace _1RM.View.Settings.DataSource
             set => SetAndNotifyIfChanged(ref _port, value);
         }
 
-        private string _databaseName = "1Remote";
+        private string _databaseName = "RemoteX";
         public string DatabaseName
         {
             get => _databaseName;

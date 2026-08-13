@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Percorso applicazione
 server_editor_remote_app_fullname_tag;Percorso exe completo sul server (es. C:\programmi\ciao.exe)
 about_page_how_to_use;Come usare
 about_page_feedback;Feedback
-guidance_introduce;1Remote ti consente di aprire una sessione remota in qualsiasi momento e ovunque.
+guidance_introduce;RemoteX ti consente di aprire una sessione remota in qualsiasi momento e ovunque.
 guidance_feature_launcher_key;chiama l'avvio applicazione tramite
 guidance_feature_launcher_select;seleziona elemento tramite
 guidance_feature_launcher_connect;connetti tramite
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;Il profilo viene salvato nella c
 word_oops;Oops...
 error_report_unexpected_error_occurred;Si è verificato un errore imprevisto. Le informazioni sull'errore sono mostrate di seguito:
 error_report_to_clipboard;Copia negli appunti
-error_report_please_help_us_improve;Aiutaci a migliorare 1Remote segnalando questo errore.
+error_report_please_help_us_improve;Aiutaci a migliorare RemoteX segnalando questo errore.
 error_report_how_help_us_improve;È sufficiente copiare il messaggio di errore e scegliere un modo per segnalarlo.
 error_report_send_by_email;Invia tramite e-mail
 error_report_send_by_github;Invia tramite GitHub
@@ -226,15 +226,15 @@ Cmd parameter;Parametro CMD
 New runner name;Nuovo nome runner
 Can not be empty!;Non può essere vuoto !
 Hosting;Hosting
-Hosting this exe in 1Remote tab view?;Ospitare questo exe nella finestra della scheda 1Remote?
-Caution: some exe can not be hosted in 1Remote.;Attenzione: alcuni exe non possono essere ospitati da 1Remote, si prega di provare da soli.
+Hosting this exe in RemoteX tab view?;Ospitare questo exe nella finestra della scheda RemoteX?
+Caution: some exe can not be hosted in RemoteX.;Attenzione: alcuni exe non possono essere ospitati da RemoteX, si prega di provare da soli.
 Show environment variables;Mostra le variabili d'ambiente
 Add environment variables;Aggiungi variabili d'ambiente
 write permissions alert;"Non abbiamo i permessi di scrittura per la directory `{0}`
 Per favore prova:
 1. esegui come amministratore
 2. cambia i permessi della directory o del file
-3. sposta 1Remote in un'altra cartella"
+3. sposta RemoteX in un'altra cartella"
 Follow system;Segui il sistema (Server supportato: Windows Server 2012 R2 e versioni successive)
 tag_tooltips;click: imposta questo tag come filtro {0}Ctrl + click: aggiungi questo tag all'elenco {0} Alt click: aggiungi questo tag all'elenco da escludere
 Are you sure you want to close the connection?;Sei sicuro di voler chiudere la connessione?

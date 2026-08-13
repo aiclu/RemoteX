@@ -145,7 +145,7 @@
                                             </Hyperlink>
                                         </TextBlock>
                                         <TextBlock>
-                                            <Hyperlink NavigateUri="mailto::veckshawn@gmail.com?subject=1Remote" TextDecorations="{x:Null}" controls:HyperlinkHelper.IsOpenExternal="True">
+                                            <Hyperlink NavigateUri="mailto::veckshawn@gmail.com?subject=RemoteX" TextDecorations="{x:Null}" controls:HyperlinkHelper.IsOpenExternal="True">
                                                 (veckshawn@gmail.com)
                                             </Hyperlink>
                                         </TextBlock>

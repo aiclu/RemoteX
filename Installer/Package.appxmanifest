@@ -14,7 +14,7 @@
               Version="1.0.104.0" />
 
 	<Properties>
-		<DisplayName>1Remote</DisplayName>
+		<DisplayName>RemoteX</DisplayName>
 		<PublisherDisplayName>Shawn Veck</PublisherDisplayName>
 		<Logo>Images\PackageLogo.png</Logo>
 		<!-- https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization If you don't want virtualization of file system writes to the user's AppData folder, then include the property, and set it to disabled. https://docs.microsoft.com/zh-cn/windows/msix/desktop/flexible-virtualization -->
@@ -22,10 +22,10 @@
 		<desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
         <virtualization:FileSystemWriteVirtualization>
             <virtualization:ExcludedDirectories>
-                <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\1Remote</virtualization:ExcludedDirectory>
-                <virtualization:ExcludedDirectory>$(KnownFolder:RoamingAppData)\1Remote</virtualization:ExcludedDirectory>
-                <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\1Remote_Debug</virtualization:ExcludedDirectory>
-                <virtualization:ExcludedDirectory>$(KnownFolder:RoamingAppData)\1Remote_Debug</virtualization:ExcludedDirectory>
+                <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\RemoteX</virtualization:ExcludedDirectory>
+                <virtualization:ExcludedDirectory>$(KnownFolder:RoamingAppData)\RemoteX</virtualization:ExcludedDirectory>
+                <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\RemoteX_Debug</virtualization:ExcludedDirectory>
+                <virtualization:ExcludedDirectory>$(KnownFolder:RoamingAppData)\RemoteX_Debug</virtualization:ExcludedDirectory>
             </virtualization:ExcludedDirectories>
         </virtualization:FileSystemWriteVirtualization>
         <virtualization:RegistryWriteVirtualization>
@@ -49,11 +49,11 @@
 		  Executable="$targetnametoken$.exe"
 		  EntryPoint="$targetentrypoint$">
 			<uap:VisualElements
-			  DisplayName="1Remote"
+			  DisplayName="RemoteX"
 			  Description="Your remote manager." 
 			  Square150x150Logo="Images\Square150x150Logo.png" 
 			  BackgroundColor="transparent"  Square44x44Logo="Images\Square44x44Logo.png">
-				<uap:DefaultTile  Square71x71Logo="Images\SmallTile.png" ShortName="1Remote"   >
+				<uap:DefaultTile  Square71x71Logo="Images\SmallTile.png" ShortName="RemoteX"   >
 					<uap:ShowNameOnTiles>
 						<uap:ShowOn Tile="square150x150Logo"/>
 					</uap:ShowNameOnTiles>
@@ -68,13 +68,13 @@
 			<Extensions>
 				<desktop:Extension Category="windows.startupTask" EntryPoint="Windows.FullTrustApplication">
 					<desktop:StartupTask
-						TaskId="1Remote"
+						TaskId="RemoteX"
 						Enabled="true"
-						DisplayName="1Remote" />
+						DisplayName="RemoteX" />
 				</desktop:Extension>
 				<uap3:Extension Category="windows.appExecutionAlias" EntryPoint="Windows.FullTrustApplication">
 					<uap3:AppExecutionAlias>
-						<desktop:ExecutionAlias Alias="1Remote.exe" />
+						<desktop:ExecutionAlias Alias="RemoteX.exe" />
 					</uap3:AppExecutionAlias>
 				</uap3:Extension>
 			</Extensions>

@@ -119,7 +119,7 @@
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" FontSize="{Binding PuttyFontSize}" Foreground="{Binding Colour11}">1Remote</TextBlock>
+                            <TextBlock Grid.Column="0" FontSize="{Binding PuttyFontSize}" Foreground="{Binding Colour11}">RemoteX</TextBlock>
                             <TextBlock Grid.Column="1" FontSize="{Binding PuttyFontSize}" Foreground="{Binding Colour15}">cmake</TextBlock>
                             <TextBlock Grid.Column="2" FontSize="{Binding PuttyFontSize}" Foreground="{Binding Colour15}">packages</TextBlock>
                             <TextBlock Grid.Row="1" Grid.Column="0" FontSize="{Binding PuttyFontSize}" Foreground="{Binding Colour9}">data.zip</TextBlock>

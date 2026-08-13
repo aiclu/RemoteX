@@ -1,4 +1,4 @@
-//! ssh_rust — 1Remote SSH core FFI (cdylib).
+//! ssh_rust — RemoteX SSH core FFI (cdylib).
 //!
 //! Exposes a C ABI over a russh-backed SSH session. The design is:
 //!   - session-handle table (`HashMap<i64, SshSession>`), never raw pointers

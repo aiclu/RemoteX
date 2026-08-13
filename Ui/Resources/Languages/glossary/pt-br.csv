@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Caminho do APP
 server_editor_remote_app_fullname_tag;Caminho completo do .exe no servidor (ex.: C:\Apps\kernel.exe)
 about_page_how_to_use;Como usar
 about_page_feedback;Dê seu feedback
-guidance_introduce;O 1Remote permite que você abra uma sessão remota a qualquer hora e em qualquer lugar.
+guidance_introduce;O RemoteX permite que você abra uma sessão remota a qualquer hora e em qualquer lugar.
 guidance_feature_launcher_key;chame os atalhos por
 guidance_feature_launcher_select;selecionar item por
 guidance_feature_launcher_connect;conectar por
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;O perfil é salvo na sua pasta W
 word_oops;OOPAA...
 error_report_unexpected_error_occurred;Ocorreu um erro inesperado. As informações do erro são mostradas abaixo:
 error_report_to_clipboard;Copiar para área de transferência
-error_report_please_help_us_improve;Ajude-nos a melhorar o 1Remote relatando este erro.
+error_report_please_help_us_improve;Ajude-nos a melhorar o RemoteX relatando este erro.
 error_report_how_help_us_improve;Basta copiar a mensagem de erro e escolher uma forma de relatar.
 error_report_send_by_email;Enviar por email
 error_report_send_by_github;Enviar pelo GitHub
@@ -226,15 +226,15 @@ Cmd parameter;Parâmetro CMD
 New runner name;Novo nome do agente
 Can not be empty!;Não pode estar vazio!
 Hosting;Hospedar
-Hosting this exe in 1Remote tab view?;Hospedar este .exe na guia do 1Remote?
-Caution: some exe can not be hosted in 1Remote.;Atenção: alguns .exe não podem ser hospedados pelo 1Remote, por favor teste por conta própria.
+Hosting this exe in RemoteX tab view?;Hospedar este .exe na guia do RemoteX?
+Caution: some exe can not be hosted in RemoteX.;Atenção: alguns .exe não podem ser hospedados pelo RemoteX, por favor teste por conta própria.
 Show environment variables;Mostrar variáveis de ambiente
 Add environment variables;Adicionar variáveis de ambiente
 write permissions alert;"Não temos permissões de gravação para o diretório `{0}`!
 Por favor, tente:
 1. `Executar como administrador`
 2. Alterar as permissões de diretório/arquivo 
-3. Mover o 1Remote para outra pasta"
+3. Mover o RemoteX para outra pasta"
 Follow system;Seguir o sistema (Servidor Compatível com Windows Server 2012 R2 e superior)
 tag_tooltips;Clique com o botão esquerdo : defina esta tag como filtro{0}Ctrl + clique com o botão esquerdo : adicione esta tag à lista de inclusão {0}Alt + clique com o botão esquerdo : adicione esta tag à lista de exclusão
 Are you sure you want to close the connection?;Tem certeza de que deseja encerrar a conexão?

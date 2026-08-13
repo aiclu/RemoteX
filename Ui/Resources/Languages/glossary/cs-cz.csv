@@ -200,7 +200,7 @@ server_editor_remote_app_fullname;Popis umístění aplikace
 server_editor_remote_app_fullname_tag;Úplný popis umístění spustitelného souboru na serveru (např. C:\Aplikace\ahoj.exe)
 about_page_how_to_use;Jak používat
 about_page_feedback;Podněty vývojářům
-guidance_introduce;1Remote umožňuje navazovat relace na vzdálené stroje – kdykoli a odkudkoli.
+guidance_introduce;RemoteX umožňuje navazovat relace na vzdálené stroje – kdykoli a odkudkoli.
 guidance_feature_launcher_key;zavolat spouštěč prostřednictvím
 guidance_feature_launcher_select;vybrat položku prostřednictvím
 guidance_feature_launcher_connect;připojit prostřednictvím
@@ -215,7 +215,7 @@ Profile is saved in your Windows AppData folder;Profil je ukládán do složky A
 word_oops;Jejda…
 error_report_unexpected_error_occurred;Došlo k neočekávané chybě. Informace o chybě viz níže:
 error_report_to_clipboard;Zkopírovat do schránky
-error_report_please_help_us_improve;Prosíme pomozte nám 1Remote vylepšit nahlášením této chyby.
+error_report_please_help_us_improve;Prosíme pomozte nám RemoteX vylepšit nahlášením této chyby.
 error_report_how_help_us_improve;Stačí jen zkopírovat tuto chybovou hlášku a zvolit způsob jejíh nahlášení.
 error_report_send_by_email;Poslat e-mailem e-mail
 error_report_send_by_github;Poslat prostřednictvím portálu GitHub
@@ -226,8 +226,8 @@ Cmd parameter;parametry pro příkaz
 New runner name;Název pro nový spouštěč
 Can not be empty!;Je třeba vyplnit!
 Hosting;Hostování
-Hosting this exe in 1Remote tab view?;Hostovat tento spustitelný soubor v 1Remote panelu windowView?
-Caution: some exe can not be hosted in 1Remote.;Upozornění: hostování některých spustitelných souborů pomocí 1Remote nefunguje – je třeba si vyzkoušet.
+Hosting this exe in RemoteX tab view?;Hostovat tento spustitelný soubor v RemoteX panelu windowView?
+Caution: some exe can not be hosted in RemoteX.;Upozornění: hostování některých spustitelných souborů pomocí RemoteX nefunguje – je třeba si vyzkoušet.
 Show environment variables;Zobrazit proměnné prostředí
 Add environment variables;Přidat proměnné prostředí
 write permissions alert;"
@@ -235,7 +235,7 @@ Chybí oprávnění pro zápis do složky „{0}“!
 Vyzkoušejte:
 1. spustit coby správce
 2. upravit práva na souboru a/nebo složce
-3. přesunout 1Remote do jiné složky"
+3. přesunout RemoteX do jiné složky"
 Follow system;Stejně jako v systému (podporovaný server: Windows Server 2012 R2 a novější)
 tag_tooltips;Kliknutí levým tlačítkem: nastavit tento štítek jako filter{0}Ctrl + kliknutí levým tlačítkem: přidat tento štítek do seznamu zahrnutých {0}Alt + kliknutí levým tlačítkem: přidat tento štítek do seznamu vynechaných
 Are you sure you want to close the connection?;Opravdu chcete spojení zavřít?

@@ -9,7 +9,7 @@
         <UseWPF>true</UseWPF>
         <UseWindowsForms>True</UseWindowsForms>
         <RootNamespace>_1RM</RootNamespace>
-        <AssemblyName>1Remote</AssemblyName>
+        <AssemblyName>RemoteX</AssemblyName>
         <Configurations>Debug;Release;StoreDebug;StoreRelease;ReleaseNet48;ReleaseNet6</Configurations>
         <ApplicationManifest>app.manifest</ApplicationManifest>
 
@@ -85,8 +85,8 @@
         <FileVersion>$(AssemblyVersion)</FileVersion>
         <Version>$(AssemblyVersion)</Version>
         <Authors>Shawn Veck</Authors>
-        <Product>1Remote</Product>
-        <Description>1Remote is a modern personal remote session manager and launcher.</Description>
+        <Product>RemoteX</Product>
+        <Description>RemoteX is a modern personal remote session manager and launcher.</Description>
         <Copyright>1remote.github.io</Copyright>
     </PropertyGroup>
 
