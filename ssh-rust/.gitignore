@@ -1,0 +1,6 @@
+# Rust build output
+/target
+
+# .NET build output (ffi-smoke-test)
+**/bin/
+**/obj/

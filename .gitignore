@@ -336,6 +336,9 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
+# CodeBuddy IDE workspace data
+.codebuddy/
+
 # BeatPulse healthcheck temp database
 healthchecksdb
 /scripts/Test-Sandbox_Temp
