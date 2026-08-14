@@ -142,22 +142,23 @@
     </UserControl.Resources>
 
     <Grid Name="Grid" Background="Transparent">
-        <Grid Opacity="0.4" Background="{Binding Server.ColorHex,Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"></Grid>
+        <!-- thin server-color left bar instead of the full 40% overlay -->
+        <Border Width="3" HorizontalAlignment="Left" Margin="0 6"
+                Background="{Binding Server.ColorHex,Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"
+                CornerRadius="2"/>
 
         <Grid>
             <Grid.Margin>
-                <Thickness Right="{StaticResource ScrollBarWidthMouseOver}"></Thickness>
+                <Thickness Left="6" Right="{StaticResource ScrollBarWidthMouseOver}"></Thickness>
             </Grid.Margin>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Selector"></ColumnDefinition>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="Protocol"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Protocol" MinWidth="90"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Span"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Name"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="BriefNote"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="Address"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-
-
 
             <Path Height="14" Width="14" UseLayoutRounding="True" Stretch="Uniform">
                 <Path.Style>
@@ -174,7 +175,7 @@
             </Path>
 
             <CheckBox Name="CbSelected" 
-                      Grid.Column="0" Margin="10 0" 
+                      Grid.Column="0" Margin="8 0" 
                       Width="20" Height="20" 
                       HorizontalAlignment="Left" 
                       Style="{StaticResource SelectedCheckBoxStyle}"
@@ -182,15 +183,18 @@
                       IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
             </CheckBox>
 
-            <!--protocol name-->
-            <TextBlock Grid.Column="1" Margin="5 0 10 0" 
-                       Style="{StaticResource TextBlockBase}"
-                       Text="{Binding Server.ProtocolDisplayName}"
-                       FontSize="{DynamicResource GlobalFontSizeSubtitle}" FontWeight="Bold"
-                       Opacity="0.6"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center">
-            </TextBlock>
+            <!--protocol: icon + name side by side, name in secondary color -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="4 0 8 0"
+                        VerticalAlignment="Center">
+                <Image Width="22" Height="22" Margin="0 0 6 0"
+                       Source="{Binding Server.IconImg}" 
+                       RenderOptions.BitmapScalingMode="LowQuality"/>
+                <TextBlock Style="{StaticResource TextBlockBase}"
+                           Text="{Binding Server.ProtocolDisplayName}"
+                           FontSize="{DynamicResource GlobalFontSizeNormal}"
+                           Opacity="0.7"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
 
 
             <!-- setting menu button - VSCode-style more icon -->
@@ -208,19 +212,12 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
-            <!--icon-->
-            <Image Grid.Column="2" 
-                   Width="30" HorizontalAlignment="Center" Margin="5 0"
-                   Source="{Binding Server.IconImg}" 
-                   RenderOptions.BitmapScalingMode="LowQuality"
-                   ></Image>
-
             <!--display name-->
-            <TextBlock Grid.Column="3" ToolTip="{Binding DisplayName}" Background="Transparent" 
+            <TextBlock Grid.Column="3" Margin="5 0 10 0" VerticalAlignment="Center"
+                       ToolTip="{Binding DisplayName}" Background="Transparent" 
                        Style="{StaticResource TextBlockBase}"
                        FontSize="{DynamicResource GlobalFontSizeSubtitle}" 
-                       Margin="5 0 10 0" 
-                       VerticalAlignment="Center" 
+                       FontWeight="SemiBold"
                        TextTrimming="CharacterEllipsis" 
                        Text="{Binding Server.DisplayName}"></TextBlock>
 
@@ -251,7 +248,7 @@
                        Grid.Column="5"
                        Background="Transparent"
                        ToolTip="{Binding Server.SubTitle}"
-                       FontSize="{DynamicResource GlobalFontSizeSubtitle}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       FontSize="{DynamicResource GlobalFontSizeNormal}" Opacity="0.75" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                        Text="{Binding Server.SubTitle}">
             </TextBlock>
         </Grid>

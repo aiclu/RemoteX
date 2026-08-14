@@ -308,7 +308,7 @@
 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Selector"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Protocol" MinWidth="100"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Protocol" MinWidth="90"></ColumnDefinition>
                             <ColumnDefinition Width="40" SharedSizeGroup="Span"></ColumnDefinition>
                             <ColumnDefinition Width="{Binding NameWidth}" SharedSizeGroup="Name" MinWidth="50"
                                               MaxWidth="{Binding NoteWidth, Converter={StaticResource NameMaxWidthConverter}}"></ColumnDefinition>
