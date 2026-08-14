@@ -84,7 +84,7 @@ namespace _1RM.Service.RustSsh
             long handle,
             [Out] byte[] buf,
             int cap,
-            out int outLen);
+            out nint outLen);
 
         /// <summary>
         /// Notify the remote PTY of a resize.

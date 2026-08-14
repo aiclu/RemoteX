@@ -289,6 +289,14 @@ namespace _1RM
 
             SimpleLogHelper.WriteLogLevel = (SimpleLogHelper.EnumLogLevel)ConfigurationServiceObj.General.LogLevel;
 
+            // Re-apply the log file placement: the config (with an optional custom
+            // log path) is only available now, after the profile was loaded.
+            if (!string.IsNullOrWhiteSpace(ConfigurationServiceObj.General.LogFilePath))
+            {
+                SimpleLogHelper.LogFileName = AppPathHelper.Instance.LogFilePath;
+                AppPathHelper.CreateDirIfNotExist(SimpleLogHelper.LogFileName, true);
+            }
+
             // make sure path is not empty
             if (string.IsNullOrWhiteSpace(ConfigurationServiceObj.LocalDataSource.Path))
             {

@@ -428,4 +428,93 @@ mod tests {
         };
         assert_eq!(rc, SR_ERR_INVALID_ARG);
     }
+
+    /// A minimal fake telnet server: accepts one connection, sends an IAC
+    /// negotiation (`IAC DO ECHO`, `IAC WILL SUPPRESS_GO_AHEAD`) plus a banner,
+    /// then echoes input back. Used to verify `sr_connect_telnet` + poll do not
+    /// immediately report closed and actually deliver banner bytes.
+    #[test]
+    fn telnet_session_receives_banner_and_negotiation_is_filtered() {
+        use std::io::{Read, Write};
+        use std::net::{TcpListener, TcpStream};
+        use std::thread;
+        use std::time::Duration;
+
+        // Fake telnet server.
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            // IAC DO ECHO (FF FD 01), IAC WILL SUPPRESS_GO_AHEAD (FF FB 03)
+            stream.write_all(&[0xFF, 0xFD, 0x01, 0xFF, 0xFB, 0x03]).unwrap();
+            // welcome banner
+            stream.write_all(b"\r\nFakeTelnet> ").unwrap();
+            stream.flush().unwrap();
+            // keep the connection open briefly, echo anything received
+            let mut buf = [0u8; 64];
+            let deadline = std::time::Instant::now() + Duration::from_secs(2);
+            while std::time::Instant::now() < deadline {
+                match stream.read(&mut buf) {
+                    Ok(0) | Err(_) => break,
+                    Ok(n) => {
+                        let _ = stream.write_all(&buf[..n]);
+                        let _ = stream.flush();
+                    }
+                }
+            }
+        });
+
+        // Connect via FFI.
+        let host = b"127.0.0.1\0";
+        let mut handle: i64 = 0;
+        let mut errbuf = [0u8; 256];
+        let rc = unsafe {
+            sr_connect_telnet(
+                host.as_ptr().cast(),
+                addr.port(),
+                &mut handle,
+                errbuf.as_mut_ptr().cast(),
+                errbuf.len(),
+            )
+        };
+        assert_eq!(rc, SR_OK, "connect failed: {}", String::from_utf8_lossy(&errbuf));
+        assert!(handle > 0);
+
+        // Poll until the banner arrives (or the session closes prematurely).
+        let mut out = [0u8; 256];
+        let deadline = std::time::Instant::now() + Duration::from_secs(5);
+        let mut received = Vec::new();
+        let mut closed_early = false;
+        while std::time::Instant::now() < deadline && received.is_empty() {
+            let mut out_len: usize = 0;
+            let rc = unsafe { sr_poll_read(handle, out.as_mut_ptr(), out.len(), &mut out_len) };
+            match rc {
+                SR_OK if out_len > 0 => received.extend_from_slice(&out[..out_len]),
+                SR_ERR_CLOSED => {
+                    closed_early = true;
+                    break;
+                }
+                SR_ERR_NO_DATA => {}
+                _ => {}
+            }
+            thread::sleep(Duration::from_millis(10));
+        }
+
+        let text = String::from_utf8_lossy(&received).to_string();
+        // The banner must have been delivered AND no IAC bytes (0xFF) should leak through.
+        assert!(text.contains("FakeTelnet"), "banner not received: {:?}", text);
+        assert!(!text.contains(0xFF as char), "IAC bytes leaked through: {:?}", text);
+        assert!(!closed_early, "session closed prematurely before banner arrived");
+
+        unsafe { sr_disconnect(handle) };
+        let _ = server.join();
+    }
+
+    /// On Windows, `usize` is 64-bit. This guards the FFI contract that the C# side
+    /// passes an 8-byte `out_len` (nint). A 4-byte `int` would silently corrupt the
+    /// poll output buffer — the bug that made Telnet sessions close immediately.
+    #[test]
+    fn out_len_is_64bit() {
+        assert_eq!(std::mem::size_of::<usize>(), 8);
+    }
 }

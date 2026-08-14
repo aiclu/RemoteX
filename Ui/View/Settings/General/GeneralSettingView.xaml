@@ -175,6 +175,20 @@
                     </ComboBox>
                 </Grid>
 
+                <Grid Style="{StaticResource GridOneRow}" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
+                        <ColumnDefinition MinWidth="280" MaxWidth="500" SharedSizeGroup="GeneralColumn2"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Column3"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource system_options_general_log_file_path}"></TextBlock>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding LogFilePath}" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="400" Opacity="0.85"></TextBlock>
+                        <Button Style="{StaticResource ButtonPrimaryStyle}" Content="{DynamicResource Select}" Margin="6 0 0 0" Command="{Binding CmdSelectLogFilePath}" Padding="8 2"></Button>
+                        <Button Style="{StaticResource ButtonPrimaryStyle}" Content="{DynamicResource Reset}" Margin="6 0 0 0" Command="{Binding CmdResetLogFilePath}" Padding="8 2"></Button>
+                    </StackPanel>
+                </Grid>
+
 
 
                 <TextBlock Text="Tab" Style="{StaticResource BlockTitleColumn}" />

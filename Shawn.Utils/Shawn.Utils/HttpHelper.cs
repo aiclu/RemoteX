@@ -59,6 +59,9 @@
         public static async Task<string> GetAsync(string url, Encoding? encoding = null)
         {
             var client = new HttpClient();
+            // GitHub's API rejects requests without a User-Agent (403); most other
+            // hosts are fine with any reasonable agent string.
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd("RemoteX");
             var response = await client.GetByteArrayAsync(url);
             encoding ??= System.Text.Encoding.UTF8;
             var responseString = encoding.GetString(response, 0, response.Length - 1);

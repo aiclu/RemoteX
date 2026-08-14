@@ -102,6 +102,62 @@ namespace _1RM.View.Settings.General
 
         public string LogPath => SimpleLogHelper.GetFileFullName();
 
+        /// <summary>
+        /// Custom log file path; the default location is shown when none is set.
+        /// </summary>
+        public string LogFilePath
+        {
+            get
+            {
+                var custom = _configurationService.General.LogFilePath;
+                return string.IsNullOrWhiteSpace(custom) ? AppPathHelper.Instance.DefaultLogFilePath : custom;
+            }
+            set
+            {
+                if (SetAndNotifyIfChanged(ref _configurationService.General.LogFilePath, value))
+                {
+                    // Apply immediately: subsequent log entries go to the new file.
+                    SimpleLogHelper.LogFileName = AppPathHelper.Instance.LogFilePath;
+                    AppPathHelper.CreateDirIfNotExist(SimpleLogHelper.LogFileName, true);
+                    RaisePropertyChanged(nameof(LogPath));
+                    _configurationService.Save();
+                }
+            }
+        }
+
+        private RelayCommand? _cmdSelectLogFilePath = null;
+        public RelayCommand CmdSelectLogFilePath
+        {
+            get
+            {
+                return _cmdSelectLogFilePath ??= new RelayCommand((o) =>
+                {
+                    using var fbd = new System.Windows.Forms.FolderBrowserDialog
+                    {
+                        Description = IoC.Translate("Select"),
+                        ShowNewFolderButton = true,
+                    };
+                    if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    {
+                        var path = System.IO.Path.Combine(fbd.SelectedPath, $"{Assert.APP_NAME}.log.md");
+                        LogFilePath = path;
+                    }
+                });
+            }
+        }
+
+        private RelayCommand? _cmdResetLogFilePath = null;
+        public RelayCommand CmdResetLogFilePath
+        {
+            get
+            {
+                return _cmdResetLogFilePath ??= new RelayCommand((o) =>
+                {
+                    LogFilePath = "";
+                });
+            }
+        }
+
         public SimpleLogHelper.EnumLogLevel LogLevel
         {
             get => SimpleLogHelper.WriteLogLevel;

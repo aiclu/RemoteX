@@ -202,11 +202,9 @@ namespace _1RM.View.Host
 
         protected virtual void TabablzControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (Vm?.SelectedItem?.Content != null)
-            {
-                this.Icon = IoC.Get<ConfigurationService>().General.ShowSessionIconInSessionWindow ?
-                    Vm.SelectedItem.Content.ProtocolServer.IconImg : null;
-            }
+            // Taskbar icon always stays the app icon (RemoteX LOGO). Session icons
+            // are small and would look blurry when upscaled for the taskbar.
+            this.Icon = AppIcons.WindowIcon;
         }
 
         public TabWindowViewModel GetViewModel()

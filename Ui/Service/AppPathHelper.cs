@@ -65,7 +65,22 @@ namespace _1RM.Service
 
 
         #region Locality
-        public string LogFilePath => Path.Combine(BaseDirPathForLocality, ".logs", $"{Assert.APP_NAME}.log.md");
+        /// <summary>
+        /// Default log file path (used when <c>General.LogFilePath</c> is empty).
+        /// </summary>
+        public string DefaultLogFilePath => Path.Combine(BaseDirPathForLocality, ".logs", $"{Assert.APP_NAME}.log.md");
+        /// <summary>
+        /// Effective log file path. Honors <c>General.LogFilePath</c> (a custom
+        /// directory/file chosen in Settings -> General) when set.
+        /// </summary>
+        public string LogFilePath
+        {
+            get
+            {
+                var custom = IoC.TryGet<ConfigurationService>()?.General.LogFilePath;
+                return string.IsNullOrWhiteSpace(custom) ? DefaultLogFilePath : custom;
+            }
+        }
         public string LocalityDirPath => Path.Combine(BaseDirPathForLocality, ".locality");
         public string LocalityIconDirPath => Path.Combine(BaseDirPathForLocality, ".icons");
         #endregion

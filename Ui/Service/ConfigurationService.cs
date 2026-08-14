@@ -68,6 +68,11 @@ namespace _1RM.Service
         public bool ShowNoteFieldInListView = true;
 
         public int LogLevel = (int)SimpleLogHelper.EnumLogLevel.Warning;
+        /// <summary>
+        /// Custom log file path (file name, e.g. "D:\logs\RemoteX.log.md").
+        /// Empty means the default location (%AppData%\RemoteX\.logs).
+        /// </summary>
+        public string LogFilePath = "";
         #endregion
 
         // Misc

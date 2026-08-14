@@ -6,6 +6,7 @@ using _1RM.Model;
 using _1RM.Model.Protocol;
 using _1RM.Service;
 using _1RM.Service.Locality;
+using _1RM.Utils;
 using _1RM.View.Host.ProtocolHosts;
 using Shawn.Utils;
 using Shawn.Utils.Interface;
@@ -102,8 +103,9 @@ namespace _1RM.View.Host
                 if (this.IsLoaded && Host != null)
                 {
                     this.Title = Host.ProtocolServer.DisplayName + " - " + Host.ProtocolServer.SubTitle;
-                    this.Icon = IoC.Get<ConfigurationService>().General.ShowSessionIconInSessionWindow ?
-                        Host.ProtocolServer.IconImg : null;
+                    // Taskbar icon always stays the app icon (RemoteX LOGO); session
+                    // icons are small and look blurry upscaled for the taskbar.
+                    this.Icon = AppIcons.WindowIcon;
                     Host.SetParentWindow(this);
                 }
             });

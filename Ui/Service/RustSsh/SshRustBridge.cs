@@ -137,8 +137,8 @@ namespace _1RM.Service.RustSsh
             {
                 try
                 {
-                    int outLen;
-                    var rc = SshRustNative.sr_poll_read(_handle, buf, buf.Length, out outLen);
+                    var rc = SshRustNative.sr_poll_read(_handle, buf, buf.Length, out var outLenRaw);
+                    var outLen = (int)outLenRaw;
                     if (rc == SshRustNative.SR_OK && outLen > 0)
                     {
                         var frame = new byte[outLen];
