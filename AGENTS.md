@@ -14,7 +14,7 @@ RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / T
 | Path | Role |
 |---|---|
 | `Ui/` | Main WPF app. `Model/` protocol models, `View/` view+viewmodel pairs, `Service/` application services, `Utils/` helpers (incl. `mRemoteNG/` import, `PuTTY/`, `RdpFile/`), `Controls/` custom controls, `Resources/` themes / icons / language CSVs |
-| `Ui/View/Host/` | Session hosts: `ProtocolHosts/` (RDP `AxMsRdpClient09Host`, `VncHost`, `FileTransmitHost`, `IntegrateHost`), `TabWindowView`, `FullScreenWindowView` |
+| `Ui/View/Host/` | Session hosts: `ProtocolHosts/` (RDP `AxMsRdpClient10Host`, `VncHost`, `FileTransmitHost`, `IntegrateHost`), `TabWindowView`, `FullScreenWindowView` |
 | `Ui/Service/` | `ConfigurationService`, `DataSourceService`, `SessionControlService*` (session lifecycle), `LauncherService`, `ThemeService`, `LanguageService`, `TaskTrayService`, `KeywordMatchService` |
 | `Ui/Service/DataSource/` | Data-source layer: SQLite (default), MySQL, PostgreSQL via a DAO abstraction (`DAO/Dapper` and `DAO/freesql` implementations) |
 | `Shawn.Utils/` | Shared libraries (`Shawn.Utils`, `.Wpf`, `.WpfResources`) used by `Ui` |
@@ -38,7 +38,7 @@ RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / T
 - **Secrets**: non-`Debug` configurations run PreBuild/PostBuild targets that inject real secrets (App Center, Sentry, Salt) from `C:\RemoteX_Secret\` into `Ui/Assert.cs` and `Ui/AppVersion.cs`, then revert them. If that folder is missing the build fails — develop against the `Debug` configuration. Never commit real secrets.
 - **`App.Close()`** intentionally spawns a delayed `Environment.Exit(1)` workaround — do not "fix" it.
 - **GDI+ exceptions**: transient `ExternalException` failures from `WindowsFormsHost` painting are deliberately suppressed in `Bootstrapper.OnUnhandledException` (Windows 11 24H2 issue, ref #924). Preserve that filtering.
-- **RDP hosting**: RDP uses the `AxMsRdpClient09` ActiveX control hosted in WPF through Windows Forms interop; `lib/` interop assemblies are checked in (regenerate with `scripts/MSTSCLib-Maker.ps1`).
+- **RDP hosting**: RDP uses the `AxMsRdpClient10` ActiveX control hosted in WPF through Windows Forms interop; `lib/` interop assemblies are checked in (regenerate with `scripts/MSTSCLib-Maker.ps1`).
 - **Store builds**: `StoreDebug` / `StoreRelease` define `FOR_MICROSOFT_STORE_ONLY`, which activates UWP startup-activation code in `App.xaml.cs`.
 - **Server ids**: persisted ids are ULIDs; `TMP_SESSION_`-prefixed ids are unsaved temporary sessions (`ProtocolBase.IsTmpSession`).
 - **CI**: `.github/workflows/build-on-dev-push.yml` publishes net9.0 x64 (framework-dependent + self-contained) on push to master/main and tags. Commit messages containing `WIP` skip the build.

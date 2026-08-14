@@ -466,7 +466,7 @@
         <Page Update="View\Host\FullScreenWindowView.xaml">
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="View\Host\ProtocolHosts\AxMsRdpClient09Host.xaml">
+        <Page Update="View\Host\ProtocolHosts\AxMsRdpClient10Host.xaml">
             <SubType>Designer</SubType>
         </Page>
         <Page Update="View\Host\ProtocolHosts\FileTransmitHost.xaml">

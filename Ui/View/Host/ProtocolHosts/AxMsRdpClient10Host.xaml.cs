@@ -25,7 +25,7 @@ using Timer = System.Timers.Timer;
 
 namespace _1RM.View.Host.ProtocolHosts
 {
-    internal static class AxMsRdpClient9NotSafeForScriptingExAdd
+    internal static class AxMsRdpClient10NotSafeForScriptingExAdd
     {
         public static void SetExtendedProperty(this AxHost axHost, string propertyName, object value)
         {
@@ -40,7 +40,7 @@ namespace _1RM.View.Host.ProtocolHosts
         }
     }
 
-    internal class AxMsRdpClient9NotSafeForScriptingEx : AxMSTSCLib.AxMsRdpClient9NotSafeForScripting
+    internal class AxMsRdpClient10NotSafeForScriptingEx : AxMSTSCLib.AxMsRdpClient10NotSafeForScripting
     {
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
@@ -56,7 +56,7 @@ namespace _1RM.View.Host.ProtocolHosts
             {
                 if (!this.ContainsFocus)
                 {
-                    SimpleLogHelper.Debug("AxMsRdpClient9NotSafeForScriptingEx.WndProc: Focus");
+                    SimpleLogHelper.Debug("AxMsRdpClient10NotSafeForScriptingEx.WndProc: Focus");
                     this.Focus();
                 }
             }
@@ -65,9 +65,9 @@ namespace _1RM.View.Host.ProtocolHosts
     }
 
 
-    public sealed partial class AxMsRdpClient09Host : HostBase, IDisposable
+    public sealed partial class AxMsRdpClient10Host : HostBase, IDisposable
     {
-        private AxMsRdpClient9NotSafeForScriptingEx? _rdpClient = null;
+        private AxMsRdpClient10NotSafeForScriptingEx? _rdpClient = null;
         //private readonly DataSourceBase? _dataSource;
         private readonly RDP _rdpSettings;
         /// <summary>
@@ -90,17 +90,17 @@ namespace _1RM.View.Host.ProtocolHosts
         private readonly object _rdpClientDisposeLock = new object();
 
 
-        public static AxMsRdpClient09Host Create(RDP rdp, int width = 0, int height = 0)
+        public static AxMsRdpClient10Host Create(RDP rdp, int width = 0, int height = 0)
         {
-            AxMsRdpClient09Host? view = null;
+            AxMsRdpClient10Host? view = null;
             Execute.OnUIThreadSync(() =>
             {
-                view = new AxMsRdpClient09Host(rdp, width, height);
+                view = new AxMsRdpClient10Host(rdp, width, height);
             });
             return view!;
         }
 
-        private AxMsRdpClient09Host(RDP rdp, int width = 0, int height = 0) : base(rdp, true)
+        private AxMsRdpClient10Host(RDP rdp, int width = 0, int height = 0) : base(rdp, true)
         {
             InitializeComponent();
 
@@ -163,7 +163,7 @@ namespace _1RM.View.Host.ProtocolHosts
             GlobalEventHelper.OnScreenResolutionChanged += OnScreenResolutionChanged;
         }
 
-        ~AxMsRdpClient09Host()
+        ~AxMsRdpClient10Host()
         {
             SimpleLogHelper.Debug($"Release {this.GetType().Name}({this.GetHashCode()})");
             Dispose();
@@ -256,9 +256,9 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             lock (_rdpClientDisposeLock)
             {
-                _rdpClient = new AxMsRdpClient9NotSafeForScriptingEx();
+                _rdpClient = new AxMsRdpClient10NotSafeForScriptingEx();
 
-                SimpleLogHelper.Debug("RDP Host: init new AxMsRdpClient9NotSafeForScriptingEx()");
+                SimpleLogHelper.Debug("RDP Host: init new AxMsRdpClient10NotSafeForScriptingEx()");
 
                 ((System.ComponentModel.ISupportInitialize)(_rdpClient)).BeginInit();
                 _rdpClient.Dock = DockStyle.Fill;

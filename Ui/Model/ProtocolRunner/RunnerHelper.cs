@@ -200,7 +200,7 @@ namespace _1RM.Model.ProtocolRunner
                 case RDP rdp:
                     {
                         var size = tab?.GetTabContentSize(ColorAndBrushHelper.ColorIsTransparent(protocol.ColorHex) == true);
-                        return AxMsRdpClient09Host.Create(rdp, (int)(size?.Width ?? 0), (int)(size?.Height ?? 0));
+                        return AxMsRdpClient10Host.Create(rdp, (int)(size?.Width ?? 0), (int)(size?.Height ?? 0));
                     }
                 case VNC vnc:
                     {

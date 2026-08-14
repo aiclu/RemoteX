@@ -566,7 +566,7 @@ namespace _1RM.Model.Protocol
             return results;
         }
 
-        public void ApplyRdpControlAdditionalSettings(AxMSTSCLib.AxMsRdpClient9NotSafeForScripting _rdpClient)
+        public void ApplyRdpControlAdditionalSettings(AxMSTSCLib.AxMsRdpClient10NotSafeForScripting _rdpClient)
         {
             var sss = SplitAdditionalSettings(_rdpControlAdditionalSettings);
             var propertiesAxMsRdpClient10 = typeof(AxMSTSCLib.AxMsRdpClient10).GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanWrite && (p.PropertyType == typeof(int) || p.PropertyType == typeof(bool) || p.PropertyType == typeof(string))).ToArray();

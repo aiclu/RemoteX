@@ -29,6 +29,34 @@
 |---|---|---|
 | Code Page | Encoding CodePage | 终端字节流↔文本的编码数字（如 65001=UTF-8、936=GBK）。存于 `Telnet`/`Serial` 模型的 `EncodingCodePage`，C# 桥接层用 `Encoding.GetEncoding(cp)` 转换。 |
 
+## RDP 与 mstscax
+
+| 术语 | 英文 | 含义 |
+|---|---|---|
+| RDP ActiveX 控件 | mstscax | Windows 系统自带的远程桌面 ActiveX 控件（`%windir%\system32\mstscax.dll`），RDP 会话的渲染宿主。非第三方库，随系统更新升级。 |
+| 互操作程序集 | Interop Assembly | `lib/MSTSCLib.dll` 与 `lib/AxMSTSCLib.dll`，是 mstscax 的 .NET COM 互操作包装（编译期 `<Reference>`，运行时用系统控件）。由 `lib/BuildAxMSTSCLib.ps1`（aximp + SendKeys 补丁）重新生成。 |
+| 会话宿主 | AxMsRdpClient10Host | RDP 的 WPF host（`AxMSTSCLib.AxMsRdpClient10NotSafeForScripting` 子类，自定义 `WndProc` 修复 WM_GETOBJECT 崩溃/焦点问题），大量使用 `MSTSCLib` 的 COM 接口。 |
+| 高级设置透传 | AdvancedSettings passthrough | `RDP.cs` 通过反射遍历 `IMsRdpClientAdvancedSettings8` 的可写属性，将模型里自定义的键值对透传给控件。 |
+
+### mstscax 接口版本链（官方 Requirements）
+
+接口连续递进（每个继承前一个）：`IMsTscAx → IMsRdpClient → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10`。
+
+| 接口 | 最低客户端 Windows | 最低服务器 | 关键特性 |
+|---|---|---|---|
+| IMsRdpClient7 | Win7 SP1 + KB2574819 | Server 2008 R2 | RDP 8.0 |
+| IMsRdpClient8 | Win8 | Server 2012 | RDP 8.1 |
+| IMsRdpClient9 | Win8.1 | Server 2012 R2 | `SyncSessionDisplaySettings` 等 |
+| IMsRdpClient10 | **Win10（任意版本）** | Server 2016 | AVC-444、UDP 传输、DPI 缩放属性 |
+| Win11 | 仍为 Client10（无 Client11） | — | 系统组件升级新增扩展接口（如 `IMsRdpCameraRedirConfig`），主接口不变 |
+
+注意：AVC-444 属性接口（`IMsRdpClientAdvancedSettings8.H264AVC444EncodersPriority`）在 Win8 就有，但编解码真正生效需 Win10 服务端；UDP 传输在 `IMsRdpClientTransportSettings2/3`（Win8/8.1）已存在。Win10 1903 仅是 mstscax build 升级，并非接口版本。
+
+### 项目现状
+
+- Host 基类与高级设置透传全部用 **Client10**（`AxMsRdpClient10Host` + `AxMSTSCLib.AxMsRdpClient10NotSafeForScripting` + `AxMsRdpClient10` 反射），运行时在 Win10/11 上使用最新接口。
+- 决策：`lib/` 保持现状，不刷新互操作集（aximp 已废弃，风险大于收益）；不换 ActiveX 方案（微软专有协议，FreeRDP 等实现不完整）；不引入 `CODELAB.MSBUILD.MSTSCLIB` NuGet（第三方、更新不活跃）。
+
 ## 清理语境（历史遗留，已废弃）
 
 | 术语 | 说明 |

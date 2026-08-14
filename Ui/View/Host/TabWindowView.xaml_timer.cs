@@ -268,7 +268,7 @@ namespace _1RM.View.Host
                                       || System.Windows.Forms.Control.MouseButtons == MouseButtons.Middle;
                 var nowActivatedWindowHandle = GetForegroundWindow();
                 IntPtr rdpHandle = IntPtr.Zero;
-                if (Vm?.SelectedItem?.Content is AxMsRdpClient09Host rdpHost)
+                if (Vm?.SelectedItem?.Content is AxMsRdpClient10Host rdpHost)
                 {
                     rdpHandle = _myHandle;
                 }

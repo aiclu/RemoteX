@@ -17,7 +17,7 @@ using _1RM.Utils.Tracing;
 
 namespace _1RM.View.Host.ProtocolHosts
 {
-    public partial class AxMsRdpClient09Host : HostBase, IDisposable
+    public partial class AxMsRdpClient10Host : HostBase, IDisposable
     {
         private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
         {
