@@ -123,46 +123,12 @@
     <ItemGroup>
         <None Remove="LOGO_D.ico" />
         <None Remove="Resources\dummy.wav" />
-        <None Remove="Resources\Icons\000_OS\000_Win10_1.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win10_2.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win11_0.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win11_1.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2003.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2008.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2012.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2016.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2019.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2022.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2025.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win2025_white.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win7.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win7_2.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win8.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win8_0.png" />
-        <None Remove="Resources\Icons\000_OS\000_Win8_1.png" />
-        <None Remove="Resources\Icons\000_OS\001_Arch.png" />
-        <None Remove="Resources\Icons\000_OS\001_Centos.png" />
-        <None Remove="Resources\Icons\000_OS\001_Linux.png" />
-        <None Remove="Resources\Icons\000_OS\001_RaspberryPi.png" />
-        <None Remove="Resources\Icons\000_OS\001_RedHat.png" />
-        <None Remove="Resources\Icons\000_OS\001_Ubuntu.png" />
-        <None Remove="Resources\Icons\000_OS\002_Apple.png" />
-        <None Remove="Resources\Icons\001_APP\010_Docker1.png" />
-        <None Remove="Resources\Icons\001_APP\010_Docker2.png" />
-        <None Remove="Resources\Icons\001_APP\010_DotNet.png" />
-        <None Remove="Resources\Icons\001_APP\010_Gitlab.png" />
-        <None Remove="Resources\Icons\001_APP\010_Java.png" />
-        <None Remove="Resources\Icons\001_APP\010_PHP.png" />
-        <None Remove="Resources\Icons\001_APP\010_Python.png" />
-        <None Remove="Resources\Icons\001_APP\011_Gitea.png" />
-        <None Remove="Resources\Icons\001_APP\011_GitHub1.png" />
-        <None Remove="Resources\Icons\001_APP\011_GitHub2.png" />
-        <None Remove="Resources\Icons\001_APP\011_Gogs.png" />
-        <None Remove="Resources\Icons\001_APP\011_Nginx.png" />
-        <None Remove="Resources\Icons\001_APP\011_NoMachine.png" />
-        <None Remove="Resources\Icons\001_APP\011_Wordpress.png" />
         <None Remove="Resources\Image\Logo\logo32.png" />
         <None Remove="Resources\Theme\Default.xaml.exclude" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="Resources\Icons\000_OS\001_Debian.png" />
     </ItemGroup>
 
     <ItemGroup>

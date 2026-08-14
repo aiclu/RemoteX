@@ -14,15 +14,27 @@ namespace _1RM.Service.RustFtp
     /// JSON marshalling for directory listings, and progress callbacks for
     /// upload/download. Thread-safe: each operation takes the session lock so the
     /// blocking Rust calls never interleave (mirrors the old SemaphoreSlim).
+    ///
+    /// FTP and SFTP live in separate handle spaces on the Rust side (FTP handles
+    /// start at 1_000_000_000, SFTP at 2_000_000_000), so every instance method
+    /// must dispatch to the matching sr_ftp_* / sr_sftp_* export.
     /// </summary>
     internal sealed class RustFtpBridge : IDisposable
     {
+        private enum SessionKind
+        {
+            Ftp,
+            Sftp,
+        }
+
+        private readonly SessionKind _kind;
         private readonly long _handle;
         private readonly object _gate = new();
         private bool _disposed;
 
-        private RustFtpBridge(long handle)
+        private RustFtpBridge(SessionKind kind, long handle)
         {
+            _kind = kind;
             _handle = handle;
         }
 
@@ -32,7 +44,7 @@ namespace _1RM.Service.RustFtp
             var rc = FtpRustNative.sr_ftp_connect(host, port, user, password, out var handle, errBuf, errBuf.Length);
             if (rc != FtpRustNative.SR_OK)
                 throw new InvalidOperationException(ErrorText(rc, errBuf));
-            return new RustFtpBridge(handle);
+            return new RustFtpBridge(SessionKind.Ftp, handle);
         }
 
         public static RustFtpBridge ConnectSftp(string host, ushort port, string user, string? password, string? keyPath)
@@ -41,7 +53,7 @@ namespace _1RM.Service.RustFtp
             var rc = FtpRustNative.sr_sftp_connect(host, port, user, password, keyPath, out var handle, errBuf, errBuf.Length);
             if (rc != FtpRustNative.SR_OK)
                 throw new InvalidOperationException(ErrorText(rc, errBuf));
-            return new RustFtpBridge(handle);
+            return new RustFtpBridge(SessionKind.Sftp, handle);
         }
 
         public bool Exists(string path)
@@ -50,7 +62,9 @@ namespace _1RM.Service.RustFtp
             {
                 ThrowIfDisposed();
                 var errBuf = new byte[1024];
-                var rc = FtpRustNative.sr_ftp_exists(_handle, path, out var exists, errBuf, errBuf.Length);
+                var rc = _kind == SessionKind.Ftp
+                    ? FtpRustNative.sr_ftp_exists(_handle, path, out var exists, errBuf, errBuf.Length)
+                    : FtpRustNative.sr_sftp_exists(_handle, path, out exists, errBuf, errBuf.Length);
                 if (rc != FtpRustNative.SR_OK)
                     throw new InvalidOperationException(ErrorText(rc, errBuf));
                 return exists != 0;
@@ -64,7 +78,9 @@ namespace _1RM.Service.RustFtp
                 ThrowIfDisposed();
                 var errBuf = new byte[1024];
                 var outBuf = new byte[256 * 1024];
-                var rc = FtpRustNative.sr_ftp_list(_handle, path, outBuf, outBuf.Length, out var outLen, errBuf, errBuf.Length);
+                var rc = _kind == SessionKind.Ftp
+                    ? FtpRustNative.sr_ftp_list(_handle, path, outBuf, outBuf.Length, out var outLen, errBuf, errBuf.Length)
+                    : FtpRustNative.sr_sftp_list(_handle, path, outBuf, outBuf.Length, out outLen, errBuf, errBuf.Length);
                 if (rc != FtpRustNative.SR_OK)
                     throw new InvalidOperationException(ErrorText(rc, errBuf));
                 var json = Encoding.UTF8.GetString(outBuf, 0, (int)outLen);
@@ -92,7 +108,9 @@ namespace _1RM.Service.RustFtp
             {
                 ThrowIfDisposed();
                 var errBuf = new byte[1024];
-                var rc = FtpRustNative.sr_ftp_delete(_handle, path, errBuf, errBuf.Length);
+                var rc = _kind == SessionKind.Ftp
+                    ? FtpRustNative.sr_ftp_delete(_handle, path, errBuf, errBuf.Length)
+                    : FtpRustNative.sr_sftp_delete(_handle, path, errBuf, errBuf.Length);
                 if (rc != FtpRustNative.SR_OK)
                     throw new InvalidOperationException(ErrorText(rc, errBuf));
             }
@@ -104,7 +122,9 @@ namespace _1RM.Service.RustFtp
             {
                 ThrowIfDisposed();
                 var errBuf = new byte[1024];
-                var rc = FtpRustNative.sr_ftp_mkdir(_handle, path, errBuf, errBuf.Length);
+                var rc = _kind == SessionKind.Ftp
+                    ? FtpRustNative.sr_ftp_mkdir(_handle, path, errBuf, errBuf.Length)
+                    : FtpRustNative.sr_sftp_mkdir(_handle, path, errBuf, errBuf.Length);
                 if (rc != FtpRustNative.SR_OK)
                     throw new InvalidOperationException(ErrorText(rc, errBuf));
             }
@@ -116,7 +136,9 @@ namespace _1RM.Service.RustFtp
             {
                 ThrowIfDisposed();
                 var errBuf = new byte[1024];
-                var rc = FtpRustNative.sr_ftp_rename(_handle, path, newPath, errBuf, errBuf.Length);
+                var rc = _kind == SessionKind.Ftp
+                    ? FtpRustNative.sr_ftp_rename(_handle, path, newPath, errBuf, errBuf.Length)
+                    : FtpRustNative.sr_sftp_rename(_handle, path, newPath, errBuf, errBuf.Length);
                 if (rc != FtpRustNative.SR_OK)
                     throw new InvalidOperationException(ErrorText(rc, errBuf));
             }
@@ -135,7 +157,9 @@ namespace _1RM.Service.RustFtp
                     ThrowIfDisposed();
                     using var progressPtr = ProgressCallback.Create(progress, ct);
                     var errBuf = new byte[1024];
-                    var rc = FtpRustNative.sr_ftp_download(_handle, remotePath, localPath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length);
+                    var rc = _kind == SessionKind.Ftp
+                        ? FtpRustNative.sr_ftp_download(_handle, remotePath, localPath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length)
+                        : FtpRustNative.sr_sftp_download(_handle, remotePath, localPath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length);
                     if (rc != FtpRustNative.SR_OK)
                         throw new InvalidOperationException(ErrorText(rc, errBuf));
                 }
@@ -154,7 +178,9 @@ namespace _1RM.Service.RustFtp
                     ThrowIfDisposed();
                     using var progressPtr = ProgressCallback.Create(progress, ct);
                     var errBuf = new byte[1024];
-                    var rc = FtpRustNative.sr_ftp_upload(_handle, localPath, remotePath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length);
+                    var rc = _kind == SessionKind.Ftp
+                        ? FtpRustNative.sr_ftp_upload(_handle, localPath, remotePath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length)
+                        : FtpRustNative.sr_sftp_upload(_handle, localPath, remotePath, progressPtr.Pointer, progressPtr.CancelPointer, errBuf, errBuf.Length);
                     if (rc != FtpRustNative.SR_OK)
                         throw new InvalidOperationException(ErrorText(rc, errBuf));
                 }
@@ -168,7 +194,10 @@ namespace _1RM.Service.RustFtp
             {
                 if (_disposed) return;
                 _disposed = true;
-                FtpRustNative.sr_ftp_disconnect(_handle);
+                if (_kind == SessionKind.Ftp)
+                    FtpRustNative.sr_ftp_disconnect(_handle);
+                else
+                    FtpRustNative.sr_sftp_disconnect(_handle);
             }
         }
 
