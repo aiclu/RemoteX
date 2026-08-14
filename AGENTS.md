@@ -6,7 +6,7 @@ RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / T
 
 ## Commands
 
-- Build (CLI): `.\Invoke-Build.ps1 Clean, Build -aReleaseType Debug` — or open `1Remote.sln` in Visual Studio 2022 and build the `Debug` configuration. Available Invoke-Build tasks: `Deps`, `Build`, `BuildInSandbox`, `Clean` (see `prm.build.ps1`).
+- Build (CLI): `.\Invoke-Build.ps1 Clean, Build -aReleaseType Debug` — or open `RemoteX.sln` in Visual Studio 2022 and build the `Debug` configuration. Available Invoke-Build tasks: `Deps`, `Build`, `BuildInSandbox`, `Clean` (see `prm.build.ps1`).
 - Test: `dotnet test Tests\Tests.csproj` (MSTest, targets `net6.0-windows10.0.17763.0`, references the `Ui` project).
 
 ## Where things live
