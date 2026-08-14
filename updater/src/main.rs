@@ -326,7 +326,7 @@ fn run(args: &[String]) -> Result<()> {
     // 2. verify
     emit_stage("verify");
     let actual_sha = sha256_of(&zip_path)?;
-    if expected_sha != actual_sha {
+    if *expected_sha != actual_sha {
         return Err(UpdError::ShaMismatch {
             expected: expected_sha.clone(),
             got: actual_sha,
