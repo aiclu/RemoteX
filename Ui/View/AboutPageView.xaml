@@ -24,6 +24,7 @@
         <Grid Margin="10">
             <Grid.Resources>
                 <system:Double x:Key="BottomHeight">40</system:Double>
+                <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
                 <Style x:Key="RowGrid" TargetType="Grid">
                     <Setter Property="Height" Value="20"></Setter>
                     <Setter Property="Margin">
@@ -124,6 +125,26 @@
                                                 </Grid>
                                             </Hyperlink>
                                         </TextBlock>
+                                    </Grid>
+
+                                    <Grid Margin="0 -5 0 15" Visibility="{Binding IsUpdating, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Status" Margin="0" VerticalAlignment="Center"/>
+                                        <Grid Grid.Column="1" Margin="0 4 0 0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Text="{Binding UpdateStatus}" TextWrapping="Wrap" Margin="0 0 0 4"/>
+                                            <ProgressBar Grid.Row="1"
+                                                         Height="6"
+                                                         Minimum="0" Maximum="100"
+                                                         Value="{Binding UpdateProgress}"
+                                                         IsIndeterminate="{Binding UpdateIsIndeterminate}"/>
+                                        </Grid>
                                     </Grid>
                                 </StackPanel>
                             </StackPanel>
