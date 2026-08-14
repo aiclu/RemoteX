@@ -16,3 +16,9 @@ UI 升级需求含三个独立目标轴：**性能优化、内存占用、视觉
 - **Mica/Acrylic 仅限非会话区**：RDP/SSH 终端区是 HwndHost/WindowsFormsHost，Airspace 限制下不可用。
 - **图标策略**：服务器品牌图标（141 PNG）保留，仅 UI 操作图标换 Segoe Fluent glyph。
 - 改动拆分为独立 PR（插桩基线 → 加载异步化 → 模板减重 → 视觉批次1/2），主分支渐进合并，CI 每推必验；数据/配置零破坏，可随时回退。
+
+**验证结果（实测，2026-08）**:
+- DEV-only 插桩（`PerfTracer` → `.logs/RemoteX.perf.md`）链路闭环：`ReloadAll: DB read` / `BuildView: UI commit` / `CalcServerVisibleAndRefresh: filter` 全部可测。
+- 启动路径 DB read ~34-48ms（SQLite 首次连接初始化，一次性，保留同步——托盘菜单依赖数据）。
+- **`MatchKeywords` 反优化修复**（原 `Task.Run`+`ConcurrentQueue`+`IndexOf` O(n²)）：首次 filter 峰值 275.7→83.3ms（-70%，余量为 JIT 首次编译），后续 0.2-2.3ms 稳定。
+- 内存优化（图标共享缓存 + NoteIcon 双惰性）后无功能回归，Note 悬停/图标显示正常。
