@@ -135,14 +135,15 @@
 
 
     <Style x:Key="ButtonPrimaryStyle" BasedOn="{StaticResource ButtonBaseStyle}" TargetType="Button">
+        <!-- VSCode-like secondary button: transparent fill, light border, hover/press fill accent fade -->
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource AccentMidBrush}"/>
+        <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
         <Setter Property="attachProperty:VisionElement.ForegroundAccent" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource PrimaryMidBrush}"/>
+        <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentMidBrush}"/>
         <Setter Property="attachProperty:VisionElement.ForegroundOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource PrimaryMidBrush}"/>
+        <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
     </Style>
 
     <Style x:Key="ButtonAccentStyle" BasedOn="{StaticResource ButtonBaseStyle}" TargetType="Button">

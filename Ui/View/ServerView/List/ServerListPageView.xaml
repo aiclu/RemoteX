@@ -38,12 +38,14 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBoxItem">
-                            <Grid Name="Grid" FocusVisualStyle="{x:Null}" 
+                            <Grid Name="Grid" FocusVisualStyle="{x:Null}"
                                   PreviewMouseDown="ServerList_OnPreviewMouseDown"
                                   Background="{DynamicResource BackgroundBrush}"
                                   Visibility="{Binding Server.Id, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter='0'}">
 
                                 <Border x:Name="GridContainer"></Border>
+                                <Border x:Name="SelectedIndicator" Background="{DynamicResource AccentMidBrush}" Opacity="0.18" Visibility="Collapsed"/>
+                                <Border x:Name="SelectedAccent" Background="{DynamicResource AccentMidBrush}" Width="3" HorizontalAlignment="Left" Visibility="Collapsed"/>
                                 <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
                                                   ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
@@ -52,8 +54,10 @@
                                                   SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Grid>
                             <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="IsSelected" Value="True" />
+                                <!-- VSCode-like selected: faint accent fill + 3px accent left bar -->
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="SelectedIndicator" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="SelectedAccent" Property="Visibility" Value="Visible"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
