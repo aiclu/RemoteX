@@ -24,11 +24,11 @@ RemoteX 是一款现代化的个人远程会话管理与启动器。它可以在
 
 ## 🚩安装
 
-最新版本：1.0.7
+最新版本：1.0.8
 
 ### 🔻[下载](https://github.com/aiclu/RemoteX/releases)
 
-在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-1.0.7-net9-x64.zip`（框架依赖版）或 `RemoteX-1.0.7-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
+在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-1.0.8-net9-x64.zip`（框架依赖版）或 `RemoteX-1.0.8-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
 
 ## 👓概览
 
