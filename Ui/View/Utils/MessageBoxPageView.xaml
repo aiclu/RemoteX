@@ -48,22 +48,17 @@
 
 
                 <!--TITLE-->
-                <Border Background="{DynamicResource AccentMidBrush}" Grid.ColumnSpan="3" ClipToBounds="True">
-                    <Border.CornerRadius>
-                        <CornerRadius TopLeft="{StaticResource DefaultCornerRadiusValue}" TopRight="{StaticResource DefaultCornerRadiusValue}"></CornerRadius>
-                    </Border.CornerRadius>
-                </Border>
-
-
                 <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" 
-                      Background="Transparent" Width="20" Height="20" 
-                      Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                      Margin="12 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                      Width="20" Height="20">
                     <Image Source="/Resources/Image/Logo/logo32.png"></Image>
                 </Grid>
                 <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" 
                            Text="{Binding DisplayName}" 
-                           Foreground="{DynamicResource AccentTextBrush}"
-                           Margin=" 30 0 10 0" TextTrimming="CharacterEllipsis"/>
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           FontWeight="SemiBold"
+                           Margin=" 40 0 10 0" TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center"/>
 
 
 
@@ -99,7 +94,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Text}" Margin="8,25,15,30" TextWrapping="Wrap" TextAlignment="{Binding TextAlignment}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Text}" Margin="8,12,15,16" TextWrapping="Wrap" TextAlignment="{Binding TextAlignment}"/>
 
 
 
@@ -175,8 +170,8 @@
 
             <Border Margin="0,0,0,0"
                     MinWidth="160" MaxWidth="485"
-                    BorderBrush="{DynamicResource AccentMidBrush}"
-                    BorderThickness="2" 
+                    BorderBrush="{DynamicResource DefaultBorderBrush}"
+                    BorderThickness="1" 
                     CornerRadius="{StaticResource DefaultCornerRadius}" ClipToBounds="True">
             </Border>
         </Grid>
