@@ -96,6 +96,11 @@ jobs:
         run: cd ssh-rust && call build-release.cmd
 
       # Build the Rust self-updater (updater.exe, standalone binary).
+      # ring (pulled by rustls) needs NASM on Windows to build; the default
+      # windows-latest runner does not include it, so install it explicitly.
+      - name: Install NASM (for rustls/ring)
+        shell: pwsh
+        run: choco install nasm --no-progress -y
       - name: Build Rust self-updater (release)
         shell: cmd
         run: cd updater && call build-release.cmd
