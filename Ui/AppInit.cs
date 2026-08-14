@@ -291,9 +291,14 @@ namespace _1RM
 
             // Re-apply the log file placement: the config (with an optional custom
             // log path) is only available now, after the profile was loaded.
+            // NB: read the path from the freshly loaded config directly — the IoC
+            // container is not initialized yet at this point, so the
+            // AppPathHelper.LogFilePath getter (which resolves ConfigurationService
+            // through IoC.TryGet) would fall back to the default location and
+            // silently discard the user's custom path.
             if (!string.IsNullOrWhiteSpace(ConfigurationServiceObj.General.LogFilePath))
             {
-                SimpleLogHelper.LogFileName = AppPathHelper.Instance.LogFilePath;
+                SimpleLogHelper.LogFileName = ConfigurationServiceObj.General.LogFilePath;
                 AppPathHelper.CreateDirIfNotExist(SimpleLogHelper.LogFileName, true);
             }
 
