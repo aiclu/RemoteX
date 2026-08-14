@@ -81,7 +81,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <AssemblyVersion>1.0.1.10813</AssemblyVersion>
+        <AssemblyVersion>1.0.4.10814</AssemblyVersion>
         <FileVersion>$(AssemblyVersion)</FileVersion>
         <Version>$(AssemblyVersion)</Version>
         <Authors>Shawn Veck</Authors>
