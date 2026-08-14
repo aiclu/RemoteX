@@ -13,6 +13,20 @@
 | 会话注册表 | Session Registry | Rust 侧 `i64` handle → `Box<dyn TermSession>` 的全局表，FFI 层通过 handle 分发调用。 |
 | 串口参数 | Serial Params | Serial 协议的 COMPort、BaudRate、DataBits、Parity、StopBits、FlowControl。C# 侧映射为枚举 int 传入 Rust。 |
 
+## 文件传输（FTP/SFTP）
+
+| 术语 | 英文 | 含义 |
+|---|---|---|
+| 传输器 | Transmitter | 文件传输会话的实现（`ITransmitter`）：`TransmitterFtp`、`TransmitterSFtp`。 |
+| Rust FTP 桥接 | RustFtpBridge | C# 侧封装 FTP/SFTP FFI 的桥接层（`Ui/Service/RustFtp/`）：session handle、JSON 列表、进度回调、取消。 |
+| 远程项 | RemoteItem | 文件列表中一项（名称/完整路径/大小/时间/目录/符号链接标记）。Rust 侧对应 `RemoteItemDto`（serde JSON）。 |
+| 进度回调 | ProgressCb | `extern "C" fn(u64)`，Rust 每 chunk 上报累计传输字节；C# 用 `Marshal.GetFunctionPointerForDelegate` + 托管委托保活。 |
+| 取消标志 | Cancel Flag | 1 字节 pinned buffer（与 Rust `AtomicBool` 布局兼容），C# 取消时 `Volatile.Write` 置 1，Rust 传输循环每 chunk 轮询。 |
+
+传输器实现：
+- **TransmitterFtp**：suppaftp（同步 API + native-tls FTPS，TLS 1.2，接受任意证书）。
+- **TransmitterSFtp**：russh-sftp（独立 SSH 连接，TOFU 策略，密码/密钥认证）。
+
 ## Runner
 
 | 术语 | 英文 | 含义 |

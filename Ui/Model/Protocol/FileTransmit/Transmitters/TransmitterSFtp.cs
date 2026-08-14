@@ -4,15 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using _1RM.Utils;
-using _1RM.Utils.Tracing;
-using Renci.SshNet;
-using Renci.SshNet.Sftp;
-using Shawn.Utils;
+using _1RM.Service.RustFtp;
 
 namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 {
+    /// <summary>
+    /// SFTP transmitter backed by the in-process Rust core (russh-sftp via FFI).
+    /// Replaces the SSH.NET implementation.
+    /// </summary>
     public class TransmitterSFtp : ITransmitter
     {
         public readonly string Hostname;
@@ -20,8 +19,8 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
         public readonly string Username;
         public readonly string Password;
         public readonly string SshKeyPath;
-        private Task SFtpConnection;
-        private SftpClient? _sftp = null;
+        private readonly Task _connection;
+        private RustFtpBridge? _sftp = null;
 
         public TransmitterSFtp(string host, int port, string username, string key, bool keyIsPassword)
         {
@@ -38,7 +37,12 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
                 Password = "";
                 SshKeyPath = key;
             }
-            SFtpConnection = InitClient();
+            _connection = Task.Run(() =>
+            {
+                _sftp = RustFtpBridge.ConnectSftp(host, (ushort)port, username,
+                    string.IsNullOrWhiteSpace(Password) ? null : Password,
+                    string.IsNullOrWhiteSpace(SshKeyPath) ? null : SshKeyPath);
+            });
         }
 
         ~TransmitterSFtp()
@@ -48,17 +52,12 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 
         public async Task Conn()
         {
-            await SFtpConnection;
+            await _connection;
         }
 
         public bool IsConnected()
         {
-            bool isConnected = true;
-            lock (this)
-            {
-                isConnected = _sftp?.IsConnected == true;
-            }
-            return isConnected;
+            return _sftp != null;
         }
 
         public ITransmitter Clone()
@@ -71,108 +70,72 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 
         public async Task<RemoteItem?> Get(string path)
         {
-            await SFtpConnection;
+            await Conn();
             if (_sftp == null) return null;
-            return await Exists(path) ? SftpFile2RemoteItem(_sftp.Get(path)) : null;
+            return await Exists(path) ? (await ListDirectoryItems(GetParentPath(path)))
+                .FirstOrDefault(x => string.Equals(x.FullName, path, StringComparison.OrdinalIgnoreCase)) : null;
+        }
+
+        private static string GetParentPath(string path)
+        {
+            var idx = path.LastIndexOf("/", StringComparison.Ordinal);
+            return idx <= 0 ? "/" : path.Substring(0, idx);
         }
 
         public async Task<List<RemoteItem>> ListDirectoryItems(string path)
         {
-            await SFtpConnection;
-            var ret = new List<RemoteItem>();
-            if (_sftp != null)
+            await Conn();
+            if (_sftp == null) return new List<RemoteItem>();
+            var items = _sftp.ListDirectoryItems(path);
+            foreach (var item in items)
             {
-                var items = _sftp!.ListDirectory(path);
-                var sftpFiles = items as ISftpFile[] ?? items.ToArray();
-                if (!sftpFiles.Any())
-                    return ret;
-
-                items = sftpFiles.OrderBy(x => x.Name);
-                foreach (var item in items)
+                if (item.IsDirectory)
                 {
-                    if (item.Name == "." || item.Name == "..")
-                        continue;
-                    ret.Add(SftpFile2RemoteItem(item));
+                    item.Icon = TransmitItemIconCache.GetDictIcon();
+                    item.FileType = "folder";
+                    if (item.IsSymlink)
+                        item.Icon = TransmitItemIconCache.GetDictIcon(Environment.GetFolderPath(Environment.SpecialFolder.Favorites));
+                }
+                else
+                {
+                    if (item.IsSymlink)
+                        item.FileType = ".lnk";
+                    if (item.Name.IndexOf(".", StringComparison.Ordinal) > 0)
+                    {
+                        var ext = item.Name.Substring(item.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLower();
+                        item.FileType = ext;
+                        item.Icon = TransmitItemIconCache.GetFileIcon(ext);
+                    }
+                    else
+                    {
+                        item.Icon = TransmitItemIconCache.GetFileIcon();
+                    }
                 }
             }
-            return ret;
+            return items;
         }
 
         public async Task<bool> Exists(string path)
         {
-            await SFtpConnection;
-            bool ret = false;
-            lock (this)
+            await Conn();
+            if (_sftp == null) return false;
+            try
             {
-                ret = _sftp?.Exists(path) == true;
+                return _sftp.Exists(path);
             }
-            return ret;
-        }
-
-        private RemoteItem SftpFile2RemoteItem(ISftpFile item)
-        {
-            var fn = item.FullName;
-            var newItem = new RemoteItem()
+            catch (Exception)
             {
-                Icon = null,
-                IsDirectory = item.IsDirectory,
-                Name = item.Name,
-                FullName = fn,
-                LastUpdate = item.LastWriteTime,
-                ByteSize = (ulong)Math.Max(item.Length, 0),
-            };
-            if (item.IsDirectory)
-            {
-                newItem.Icon = TransmitItemIconCache.GetDictIcon();
-                newItem.ByteSize = 0;
-                newItem.FileType = "folder";
-                if (item.IsSymbolicLink)
-                    newItem.Icon = TransmitItemIconCache.GetDictIcon(Environment.GetFolderPath(Environment.SpecialFolder.Favorites));
+                return false;
             }
-            else
-            {
-                if (item.IsSymbolicLink)
-                    newItem.FileType = ".lnk";
-
-                if (item.Name.IndexOf(".", StringComparison.Ordinal) > 0)
-                {
-                    var ext = item.Name.Substring(item.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLower();
-                    newItem.FileType = ext;
-                    newItem.Icon = TransmitItemIconCache.GetFileIcon(ext);
-                }
-                else
-                {
-                    newItem.Icon = TransmitItemIconCache.GetFileIcon();
-                }
-            }
-            return newItem;
         }
 
         public async Task Delete(string path)
         {
-            await SFtpConnection;
+            await Conn();
             if (_sftp == null) return;
             var item = await Get(path);
-            if (item != null)
-            {
-                if (item is { IsDirectory: true, IsSymlink: false }) // only delete sub files for normal directory, not symlink
-                {
-                    var sub = _sftp.ListDirectory(path) ?? new List<SftpFile>();
-                    foreach (var file in sub)
-                    {
-                        if (string.IsNullOrWhiteSpace(
-                                file.Name
-                                    .Replace('.', ' ')
-                                    .Replace('\\', ' ')
-                                    .Replace('/', ' ')))
-                            continue;
-                        await Delete((string)file.FullName);
-                    }
-                    _sftp.DeleteDirectory(path);
-                }
-                else
-                    _sftp.Delete(path);
-            }
+            if (item == null) return;
+            _sftp.Delete(item.FullName);
         }
 
         public async Task Delete(RemoteItem item)
@@ -182,17 +145,24 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 
         public async Task CreateDirectory(string path)
         {
-            await SFtpConnection;
+            await Conn();
             if (_sftp == null) return;
-            if (_sftp.Exists(path) == false)
-                _sftp.CreateDirectory(path);
+            try
+            {
+                if (!_sftp.Exists(path))
+                    _sftp.CreateDirectory(path);
+            }
+            catch (Exception)
+            {
+                // ignored: directory may already exist
+            }
         }
 
         public async Task RenameFile(string path, string newPath)
         {
-            await SFtpConnection;
-            if (_sftp == null) return;
-            if (_sftp != null && path != newPath && await Exists(path) == true)
+            await Conn();
+            if (_sftp == null || path == newPath) return;
+            if (await Exists(path))
                 _sftp.RenameFile(path, newPath);
         }
 
@@ -202,118 +172,23 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
             if (fi?.Exists != true)
                 return;
 
-            await SFtpConnection;
+            await Conn();
             if (_sftp == null) return;
-            try
-            {
-                // check parent
-                if (saveToRemotePath.LastIndexOf("/", StringComparison.Ordinal) > 0)
-                {
-                    var parent = saveToRemotePath.Substring(0,
-                        saveToRemotePath.LastIndexOf("/", StringComparison.Ordinal));
-                    if (_sftp.Exists(parent) == false)
-                        _sftp.CreateDirectory(parent);
-                }
-
-                using var fileStream = File.OpenRead(fi.FullName);
-                if (!fileStream.CanRead)
-                    return;
-
-                _sftp.UploadFile(fileStream, saveToRemotePath, obj =>
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        SimpleLogHelper.Debug("SFTP Upload: cancel by CancellationToken");
-                        fileStream.Close();
-                        fileStream.Dispose();
-                    }
-                    writeCallBack?.Invoke(obj);
-                });
-            }
-            catch (Exception)
-            {
-                if (cancellationToken.IsCancellationRequested == false)
-                    throw;
-            }
+            await _sftp.UploadFileAsync(localFilePath, saveToRemotePath, writeCallBack, cancellationToken);
         }
 
         public async Task DownloadFile(string remoteFilePath, string saveToLocalPath, Action<ulong> readCallBack, CancellationToken cancellationToken)
         {
-            await SFtpConnection;
+            await Conn();
             if (_sftp == null) return;
-            try
-            {
-                var fi = new FileInfo(saveToLocalPath);
-                if (fi.Exists)
-                    fi.Delete();
-                if (fi?.Directory?.Exists == false)
-                    fi.Directory.Create();
-                using var fileStream = File.OpenWrite(saveToLocalPath);
-                if (!fileStream.CanWrite)
-                    return;
-
-                _sftp.DownloadFile(remoteFilePath, fileStream, obj =>
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        fileStream.Close();
-                    readCallBack?.Invoke(obj);
-                });
-            }
-            catch (Exception)
-            {
-                if (cancellationToken.IsCancellationRequested == false)
-                    throw;
-            }
+            await _sftp.DownloadFileAsync(remoteFilePath, saveToLocalPath, readCallBack, cancellationToken);
         }
 
         public void Release()
         {
-            if (SFtpConnection?.IsCompleted == true)
-            {
-                SFtpConnection?.Dispose();
-            }
-            ReleaseSftp();
-        }
-
-        private void ReleaseSftp()
-        {
-            lock (this)
-            {
-                _sftp?.Disconnect();
-                _sftp?.Dispose();
-                _sftp = null;
-            }
-        }
-
-        private async Task InitClient()
-        {
-            await Task.Run(() =>
-            {
-                if (IsConnected() != true)
-                {
-                    RetryHelper.Try(() =>
-                    {
-                        ReleaseSftp();
-                        if (string.IsNullOrEmpty(Password)
-                            && string.IsNullOrEmpty(SshKeyPath) == false
-                            && File.Exists(SshKeyPath))
-                        {
-                            try
-                            {
-                                var connectionInfo = new ConnectionInfo(Hostname, Port, Username, new PrivateKeyAuthenticationMethod(Username, new PrivateKeyFile(SshKeyPath)));
-                                _sftp = new SftpClient(connectionInfo);
-                            }
-                            catch (Exception e)
-                            {
-                                UnifyTracing.Error(e);
-                            }
-                        }
-                        _sftp ??= new SftpClient(new ConnectionInfo(Hostname, Port, Username, new PasswordAuthenticationMethod(Username, Password)));
-                        //_sftp.KeepAliveInterval = new TimeSpan(0, 0, 10);
-                        _sftp.Connect();
-                    });
-                }
-            });
+            var sftp = _sftp;
+            _sftp = null;
+            sftp?.Dispose();
         }
     }
 }

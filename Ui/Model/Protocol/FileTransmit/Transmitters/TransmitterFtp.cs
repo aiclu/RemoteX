@@ -1,24 +1,25 @@
-﻿using FluentFTP;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentFTP.Client.BaseClient;
+using _1RM.Service.RustFtp;
 
 namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 {
+    /// <summary>
+    /// FTP/FTPS transmitter backed by the in-process Rust core (suppaftp via FFI).
+    /// Replaces the FluentFTP implementation.
+    /// </summary>
     public class TransmitterFtp : ITransmitter
     {
         public readonly string Hostname;
         public readonly int Port;
         public readonly string Username;
         public readonly string Password;
-        private Task FtpConnection;
-        private SemaphoreSlim FtpSemaphoe;
-        private AsyncFtpClient? _ftp = null;
+        private readonly Task _connection;
+        private RustFtpBridge? _ftp = null;
 
         public TransmitterFtp(string host, int port, string username, string password)
         {
@@ -26,22 +27,25 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
             Port = port;
             Username = username;
             Password = password;
-            FtpSemaphoe = new SemaphoreSlim(1, 1);
-            FtpConnection = InitClient();
+            _connection = Task.Run(() =>
+            {
+                _ftp = RustFtpBridge.ConnectFtp(host, (ushort)port, username, password);
+            });
         }
 
         ~TransmitterFtp()
         {
             Release();
         }
+
         public async Task Conn()
         {
-            await FtpConnection;
+            await _connection;
         }
 
         public bool IsConnected()
         {
-            return _ftp?.IsConnected == true;
+            return _ftp != null;
         }
 
         public ITransmitter Clone()
@@ -51,99 +55,72 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 
         public async Task<RemoteItem?> Get(string path)
         {
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return null;
-            return await Exists(path) ? FtpListItem2RemoteItem(await _ftp.GetObjectInfo(path)) : null;
+            return await Exists(path) ? (await ListDirectoryItems(GetParentPath(path)))
+                .FirstOrDefault(x => string.Equals(x.FullName, path, StringComparison.OrdinalIgnoreCase)) : null;
+        }
+
+        private static string GetParentPath(string path)
+        {
+            var idx = path.LastIndexOf("/", StringComparison.Ordinal);
+            return idx <= 0 ? "/" : path.Substring(0, idx);
         }
 
         public async Task<List<RemoteItem>> ListDirectoryItems(string path)
         {
-            await FtpConnection;
-            var ret = new List<RemoteItem>();
-            if (_ftp != null)
+            await Conn();
+            if (_ftp == null) return new List<RemoteItem>();
+            var items = _ftp.ListDirectoryItems(path);
+            foreach (var item in items)
             {
-                IEnumerable<FtpListItem> items = await _ftp.GetListing(path);
-                if (!items.Any())
-                    return ret;
-
-                items = items.OrderBy(x => x.Name);
-                foreach (var item in items)
+                if (item.IsDirectory)
                 {
-                    if (item.Name == "." || item.Name == "..")
-                        continue;
-                    ret.Add(FtpListItem2RemoteItem(item));
+                    item.Icon = TransmitItemIconCache.GetDictIcon();
+                    item.FileType = "folder";
+                    if (item.IsSymlink)
+                        item.Icon = TransmitItemIconCache.GetDictIcon(Environment.GetFolderPath(Environment.SpecialFolder.Favorites));
+                }
+                else
+                {
+                    if (item.IsSymlink)
+                        item.FileType = ".lnk";
+                    if (item.Name.IndexOf(".", StringComparison.Ordinal) > 0)
+                    {
+                        var ext = item.Name.Substring(item.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLower();
+                        item.FileType = ext;
+                        item.Icon = TransmitItemIconCache.GetFileIcon(ext);
+                    }
+                    else
+                    {
+                        item.Icon = TransmitItemIconCache.GetFileIcon();
+                    }
                 }
             }
-            return ret;
+            return items;
         }
 
         public async Task<bool> Exists(string path)
         {
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return false;
-            if (await _ftp.FileExists(path))
-                return true;
-            if (await _ftp.DirectoryExists(path))
-                return true;
-            return false;
-        }
-
-        private RemoteItem FtpListItem2RemoteItem(FtpListItem item)
-        {
-            var fn = item.FullName;
-            var newItem = new RemoteItem()
+            try
             {
-                Icon = null,
-                IsDirectory = item.Type == FtpObjectType.Directory,
-                Name = item.Name,
-                FullName = fn,
-                LastUpdate = item.RawModified,
-                ByteSize = (ulong)Math.Max(item.Size, 0),
-                IsSymlink = item.Type == FtpObjectType.Link,
-            };
-            if (item.Type == FtpObjectType.Directory)
-            {
-                newItem.Icon = TransmitItemIconCache.GetDictIcon();
-                newItem.ByteSize = 0;
-                newItem.FileType = "folder";
-                if (newItem.IsSymlink)
-                    newItem.Icon = TransmitItemIconCache.GetDictIcon(Environment.GetFolderPath(Environment.SpecialFolder.Favorites));
+                return _ftp.Exists(path);
             }
-            else
+            catch (Exception)
             {
-                if (newItem.IsSymlink)
-                    newItem.FileType = ".lnk";
-
-                if (item.Name.IndexOf(".", StringComparison.Ordinal) > 0)
-                {
-                    var ext = item.Name.Substring(item.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLower();
-                    newItem.FileType = ext;
-                    newItem.Icon = TransmitItemIconCache.GetFileIcon(ext);
-                }
-                else
-                {
-                    newItem.Icon = TransmitItemIconCache.GetFileIcon();
-                }
+                return false;
             }
-            return newItem;
         }
 
         public async Task Delete(string path)
         {
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return;
             var item = await Get(path);
-            if (item != null)
-            {
-                if (item.IsDirectory)
-                {
-                    await _ftp.DeleteDirectory(path);
-                }
-                else
-                {
-                    await _ftp.DeleteFile(path);
-                }
-            }
+            if (item == null) return;
+            _ftp.Delete(item.FullName);
         }
 
         public async Task Delete(RemoteItem item)
@@ -153,17 +130,25 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
 
         public async Task CreateDirectory(string path)
         {
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return;
-            if (await _ftp.DirectoryExists(path) == false)
-                await _ftp.CreateDirectory(path);
+            try
+            {
+                if (!_ftp.Exists(path))
+                    _ftp.CreateDirectory(path);
+            }
+            catch (Exception)
+            {
+                // ignored: directory may already exist
+            }
         }
 
         public async Task RenameFile(string path, string newPath)
         {
-            await FtpConnection;
-            if (_ftp != null && path != newPath && await Exists(path))
-                await _ftp.Rename(path, newPath);
+            await Conn();
+            if (_ftp == null || path == newPath) return;
+            if (await Exists(path))
+                _ftp.RenameFile(path, newPath);
         }
 
         public async Task UploadFile(string localFilePath, string saveToRemotePath, Action<ulong> writeCallBack, CancellationToken cancellationToken)
@@ -172,96 +157,23 @@ namespace _1RM.Model.Protocol.FileTransmit.Transmitters
             if (fi?.Exists != true)
                 return;
 
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return;
-            await FtpSemaphoe.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                // check parent
-                if (saveToRemotePath.LastIndexOf("/", StringComparison.Ordinal) > 0)
-                {
-                    var parent = saveToRemotePath.Substring(0,
-                        saveToRemotePath.LastIndexOf("/", StringComparison.Ordinal));
-                    if (await _ftp.DirectoryExists(parent) == false)
-                        await _ftp.CreateDirectory(parent);
-                }
-
-                await _ftp.UploadFile(localFilePath, saveToRemotePath, FtpRemoteExists.Overwrite, true, FtpVerify.Delete,
-                    new Progress<FtpProgress>(progress =>
-                    {
-                        writeCallBack?.Invoke((ulong)progress.TransferredBytes);
-                    }), cancellationToken);
-            }
-            catch (Exception)
-            {
-                if (cancellationToken.IsCancellationRequested == false)
-                    throw;
-            }
-            finally
-            {
-                FtpSemaphoe.Release();
-            }
+            await _ftp.UploadFileAsync(localFilePath, saveToRemotePath, writeCallBack, cancellationToken);
         }
 
         public async Task DownloadFile(string remoteFilePath, string saveToLocalPath, Action<ulong> readCallBack, CancellationToken cancellationToken)
         {
-            await FtpConnection;
+            await Conn();
             if (_ftp == null) return;
-            await FtpSemaphoe.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await _ftp.DownloadFile(saveToLocalPath, remoteFilePath, FtpLocalExists.Overwrite, FtpVerify.None,
-                    new Progress<FtpProgress>(progress => readCallBack?.Invoke((ulong)progress.TransferredBytes)),
-                    cancellationToken);
-            }
-            catch (Exception)
-            {
-                if (cancellationToken.IsCancellationRequested == false)
-                    throw;
-            }
-            finally
-            {
-                FtpSemaphoe.Release();
-            }
+            await _ftp.DownloadFileAsync(remoteFilePath, saveToLocalPath, readCallBack, cancellationToken);
         }
 
         public void Release()
         {
             var ftp = _ftp;
-            if (ftp != null)
-            {
-                // Unsubscribe from event to prevent memory leak
-                ftp.ValidateCertificate -= OnValidateCertificate;
-            }
-            FtpSemaphoe?.Dispose();
-            FtpConnection?.Dispose();
-            ftp?.Disconnect();
-            ftp?.Dispose();
             _ftp = null;
-        }
-
-        private void OnValidateCertificate(BaseFtpClient control, FtpSslValidationEventArgs e)
-        {
-            // add logic to test if certificate is valid here
-            e.Accept = true;
-        }
-
-        private async Task InitClient()
-        {
-            _ftp?.Dispose();
-            _ftp = new AsyncFtpClient(Hostname, new System.Net.NetworkCredential(Username, Password), Port);
-            _ftp.Config.EncryptionMode = FtpEncryptionMode.Explicit;
-            _ftp.Config.SslProtocols = SslProtocols.Tls12;
-            _ftp.ValidateCertificate += OnValidateCertificate;
-            _ftp.Config.Noop = true;
-            await _ftp.AutoConnect();
-            if (!_ftp.IsConnected)
-            {
-                await _ftp.Disconnect();
-                _ftp.Dispose();
-                _ftp = null;
-                throw new Exception("Couldn't connect to the server.");
-            }
+            ftp?.Dispose();
         }
     }
 }
