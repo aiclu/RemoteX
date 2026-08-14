@@ -61,7 +61,8 @@ namespace _1RM.Service.DataSource
                     }
                     catch (Exception e)
                     {
-                        SimpleLogHelper.DebugWarning(e);
+                        SimpleLogHelper.Error(e);
+                        UnifyTracing.Error(e);
                     }
                 }
                 return ret;
@@ -84,7 +85,8 @@ namespace _1RM.Service.DataSource
                     }
                     catch (Exception e)
                     {
-                        SimpleLogHelper.DebugWarning(e);
+                        SimpleLogHelper.Error(e);
+                        UnifyTracing.Error(e);
                     }
                 }
                 return ret;
@@ -110,7 +112,8 @@ namespace _1RM.Service.DataSource
                     }
                     catch (Exception e)
                     {
-                        SimpleLogHelper.DebugWarning(e);
+                        SimpleLogHelper.Error(e);
+                        UnifyTracing.Error(e);
                     }
                 }
                 return ret;
