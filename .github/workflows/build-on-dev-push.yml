@@ -95,6 +95,11 @@ jobs:
         shell: cmd
         run: cd ssh-rust && call build-release.cmd
 
+      # Build the Rust self-updater (updater.exe, standalone binary).
+      - name: Build Rust self-updater (release)
+        shell: cmd
+        run: cd updater && call build-release.cmd
+
       # echo ${{env.BuildVersion}} and ${{env.PreRelease}}
       # - name: Echo Version
       #   shell: pwsh
@@ -125,6 +130,10 @@ jobs:
       # Publish the application net9.0
       - name: Publish the application net9
         run: dotnet publish $env:Main_Project -p:PublishProfile=./Ui/Properties/PublishProfiles/x64-net90.pubxml
+      # Copy the Rust self-updater into the publish dir so the zip ships with it
+      - name: Copy self-updater (net9)
+        shell: pwsh
+        run: Copy-Item ./updater/target/release/updater.exe ./Ui/bin/Release/net9.0-windows/publish/win-x64/
       # artifact
       - uses: actions/upload-artifact@v4
         with:
@@ -134,6 +143,10 @@ jobs:
       # Publish the application net9.0
       - name: Publish x64-net90-self-contained
         run: dotnet publish $env:Main_Project -p:PublishProfile=./Ui/Properties/PublishProfiles/x64-net90-self-contained.pubxml
+      # Copy the Rust self-updater into the publish dir so the zip ships with it
+      - name: Copy self-updater (self-contained)
+        shell: pwsh
+        run: Copy-Item ./updater/target/release/updater.exe ./Ui/bin/Release/net9.0-windows-self-contained/publish/win-x64/
       # artifact
       - uses: actions/upload-artifact@v4
         with:
