@@ -17,8 +17,6 @@ using _1RM.View.ServerView;
 using _1RM.View.Settings.General;
 using _1RM.View.Utils;
 using System.Collections.Generic;
-using _1RM.Utils.PuTTY.Model;
-using _1RM.Utils.PuTTY.Model;
 using _1RM.Utils.Tracing;
 
 namespace _1RM
@@ -69,7 +67,6 @@ namespace _1RM
             var dirPaths = new List<string>
             {
                 appPathHelper.BaseDirPath,
-                appPathHelper.PuttyDirPath,
                 appPathHelper.ProtocolRunnerDirPath,
                 appPathHelper.LocalityDirPath,
                 appPathHelper.LocalityIconDirPath,
@@ -251,7 +248,6 @@ namespace _1RM
                     AppPathHelper.CreateDirIfNotExist(paths.ProfileJsonPath, true);
                     AppPathHelper.CreateDirIfNotExist(paths.LogFilePath, true);
                     AppPathHelper.CreateDirIfNotExist(paths.SqliteDbDefaultPath, true);
-                    AppPathHelper.CreateDirIfNotExist(paths.PuttyDirPath, false);
                     AppPathHelper.CreateDirIfNotExist(paths.LocalityDirPath, false);
                 }
             }
@@ -376,9 +372,6 @@ namespace _1RM
                     }
                 });
             }
-
-            KittyConfig.CleanUpOldConfig();
-            PuttyConfig.CleanUpOldConfig();
 
             var mvm = IoC.Get<MainWindowViewModel>();
             if (AppStartupHelper.IsStartMinimized == false

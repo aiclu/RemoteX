@@ -13,9 +13,9 @@ namespace _1RM.Model.ProtocolRunner
     [JsonKnownType(typeof(Runner), nameof(Runner))]
     [JsonKnownType(typeof(ExternalRunner), nameof(ExternalRunner))]
     [JsonKnownType(typeof(InternalDefaultRunner), nameof(InternalDefaultRunner))]
-    [JsonKnownType(typeof(KittyRunner), nameof(KittyRunner))]
-    [JsonKnownType(typeof(PuttyRunner), nameof(PuttyRunner))]
     [JsonKnownType(typeof(RustSshRunner), nameof(RustSshRunner))]
+    [JsonKnownType(typeof(RustTelnetRunner), nameof(RustTelnetRunner))]
+    [JsonKnownType(typeof(RustSerialRunner), nameof(RustSerialRunner))]
     public class Runner : NotifyPropertyChangedBase, ICloneable
     {
         public Runner(string runnerName, string ownerProtocolName)

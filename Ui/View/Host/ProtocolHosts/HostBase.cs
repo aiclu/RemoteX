@@ -257,7 +257,7 @@ namespace _1RM.View.Host.ProtocolHosts
         }
 
         /// <summary>
-        /// call to focus the AxRdp or putty
+        /// call to focus the embedded host window
         /// </summary>
         public virtual void FocusOnMe()
         {

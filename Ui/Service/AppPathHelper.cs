@@ -68,8 +68,6 @@ namespace _1RM.Service
         public string LogFilePath => Path.Combine(BaseDirPathForLocality, ".logs", $"{Assert.APP_NAME}.log.md");
         public string LocalityDirPath => Path.Combine(BaseDirPathForLocality, ".locality");
         public string LocalityIconDirPath => Path.Combine(BaseDirPathForLocality, ".icons");
-        public string KittyDirPath => Path.Combine(BaseDirPathForLocality, "KiTTY");
-        public string PuttyDirPath => Path.Combine(BaseDirPathForLocality, "PuTTY");
         #endregion
     }
 }

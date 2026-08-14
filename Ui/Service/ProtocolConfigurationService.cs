@@ -60,11 +60,13 @@ namespace _1RM.Service
             ProtocolConfigs.Add(VNC.ProtocolName, InitProtocol(protocolFolderName, new VNC(), new InternalDefaultRunner(VNC.ProtocolName), $"Built-in VNC"));
 #if RUST_SSH
             ProtocolConfigs.Add(SSH.ProtocolName, InitProtocol(protocolFolderName, new SSH(), new RustSshRunner(SSH.ProtocolName), RustSshRunner.Name));
+            ProtocolConfigs.Add(Telnet.ProtocolName, InitProtocol(protocolFolderName, new Telnet(), new RustTelnetRunner(Telnet.ProtocolName), RustTelnetRunner.Name));
+            ProtocolConfigs.Add(Serial.ProtocolName, InitProtocol(protocolFolderName, new Serial(), new RustSerialRunner(Serial.ProtocolName), RustSerialRunner.Name));
 #else
-            ProtocolConfigs.Add(SSH.ProtocolName, InitProtocol(protocolFolderName, new SSH(), new PuttyRunner(SSH.ProtocolName), PuttyRunner.Name));
+            ProtocolConfigs.Add(SSH.ProtocolName, InitProtocol(protocolFolderName, new SSH(), new InternalDefaultRunner(SSH.ProtocolName), "Internal runner"));
+            ProtocolConfigs.Add(Telnet.ProtocolName, InitProtocol(protocolFolderName, new Telnet(), new InternalDefaultRunner(Telnet.ProtocolName), "Internal runner"));
+            ProtocolConfigs.Add(Serial.ProtocolName, InitProtocol(protocolFolderName, new Serial(), new InternalDefaultRunner(Serial.ProtocolName), "Internal runner"));
 #endif
-            ProtocolConfigs.Add(Telnet.ProtocolName, InitProtocol(protocolFolderName, new Telnet(), new PuttyRunner(Telnet.ProtocolName), PuttyRunner.Name));
-            ProtocolConfigs.Add(Serial.ProtocolName, InitProtocol(protocolFolderName, new Serial(), new PuttyRunner(Serial.ProtocolName), PuttyRunner.Name));
             ProtocolConfigs.Add(SFTP.ProtocolName, InitProtocol(protocolFolderName, new SFTP(), new InternalDefaultRunner(SFTP.ProtocolName), $"Built-in SFTP"));
             ProtocolConfigs.Add(FTP.ProtocolName, InitProtocol(protocolFolderName, new FTP(), new InternalDefaultRunner(FTP.ProtocolName), $"Built-in FTP"));
 
@@ -243,18 +245,6 @@ namespace _1RM.Service
                 }
                 if (SSH.ProtocolName == protocolName)
                 {
-#if RUST_SSH
-                    // In net9, PuTTY is an optional runner alongside the Rust default.
-                    if (c.Runners.All(x => x.Name != PuttyRunner.Name))
-                        c.Runners.Add(new PuttyRunner(SSH.ProtocolName));
-#endif
-                    if (c.Runners.All(x => x.Name != "Putty"))
-                        c.Runners.Add(new ExternalRunnerForSSH("Putty", protocolName)
-                        {
-                            ExePath = @"D:\PuTTY.exe",
-                            Arguments = @"-ssh %1RM_HOSTNAME% -P %1RM_PORT% -l %1RM_USERNAME% -pw %1RM_PASSWORD% -%SSH_VERSION% -cmd ""%STARTUP_AUTO_COMMAND%""",
-                            ArgumentsForPrivateKey = @"-w 1 new-tab --title ""%1RM_HOSTNAME%"" --suppressApplicationTitle plink -ssh %1RM_HOSTNAME% -P %1RM_PORT% -%SSH_VERSION% -C -X -no-antispoof -l %1RM_USERNAME% -i %1RM_PRIVATE_KEY_PATH%",
-                        });
                     if (c.Runners.All(x => x.Name != "Windows Terminal"))
                         c.Runners.Add(new ExternalRunnerForSSH("Windows Terminal", protocolName)
                         {
@@ -274,6 +264,13 @@ namespace _1RM.Service
 
             // 最后赋值，确保无论是从配置加载的还是上面初始化的 InternalDefaultRunner 名称正确
             c.Runners.First(x => x is InternalDefaultRunner).Name = defaultRunnerName;
+
+            // 兼容升级：老配置里 SelectedRunnerName 可能指向已删除的 runner（如 PuTTY/KiTTY），
+            // 或指向一个不再存在的 runner。此时回退到默认 runner，避免运行时找不到启动器。
+            if (c.Runners.All(x => x.Name != c.SelectedRunnerName))
+            {
+                c.SelectedRunnerName = defaultRunnerName;
+            }
             return c;
         }
 

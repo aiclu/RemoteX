@@ -16,7 +16,7 @@ namespace _1RM.Model.ProtocolRunner.Default
     }
 
     /// <summary>
-    /// for built-in putty \ kitty
+    /// for external exe runners (custom external programs)
     /// </summary>
     /// <param name="ownerProtocolName"></param>
     public abstract class InternalExeRunner(string ownerProtocolName) : InternalDefaultRunner(ownerProtocolName)

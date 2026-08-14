@@ -215,102 +215,6 @@ public static class AppArgumentHelper
         return null;
     }
 
-    private static LocalApp? GetPuttyArgumentList(string path)
-    {
-        if (path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == false) return null;
-        if (path.IndexOf("putty", StringComparison.OrdinalIgnoreCase) >= 0
-            || path.IndexOf("kitty", StringComparison.OrdinalIgnoreCase) >= 0)
-        {
-            var argumentList = new List<AppArgument>
-            {
-                new AppArgument()
-                {
-                    Type = AppArgumentType.Const,
-                    Name = "Host",
-                    Key = "-ssh",
-                    IsNullable = false,
-                    Description = "The host name or IP address to connect to.",
-                    Value = ProtocolBaseWithAddressPort.MACRO_HOST_NAME,
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                },
-                new AppArgument()
-                {
-                    Type = AppArgumentType.Const,
-                    Name = "Port",
-                    Key = "-P",
-                    IsNullable = false,
-                    Description = "The port number to connect to.",
-                    Value = ProtocolBaseWithAddressPort.MACRO_PORT,
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                },
-                new AppArgument()
-                {
-                    Type = AppArgumentType.Const,
-                    Name = "User Name",
-                    Key = "-l",
-                    IsNullable = true,
-                    Description = "The user name to log in as on the remote machine.",
-                    Value = ProtocolBaseWithAddressPortUserPwd.MACRO_USERNAME,
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                },
-                new AppArgument()
-                {
-                    Type = AppArgumentType.Const,
-                    Name = "Password",
-                    Key = "-pw",
-                    IsNullable = true,
-                    Description = "The password to use for authentication.",
-                    Value = ProtocolBaseWithAddressPortUserPwd.MACRO_PASSWORD,
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                },
-                new AppArgument()
-                {
-                    Type = AppArgumentType.Selection,
-                    Name = "SSH Version",
-                    Key = "",
-                    IsNullable = false,
-                    Selections = new Dictionary<string, string>()
-                    {
-                        {"-1", "V1"},
-                        {"-2", "V2"},
-                    },
-                    Value = "-2",
-                    Description = "The SSH protocol version to use.",
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                },
-            };
-            // add auto cmd if kitty
-            if (path.IndexOf("kitty", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                argumentList.Add(new AppArgument()
-                {
-                    Type = AppArgumentType.Normal,
-                    Name = "Auto Command",
-                    Key = "-cmd",
-                    IsNullable = true,
-                    Description = "Run command after connected.",
-                    AddBlankAfterKey = true,
-                    AddBlankAfterValue = true,
-                });
-            }
-            var app = new LocalApp()
-            {
-                DisplayName = "PuTTY",
-                AppProtocolDisplayName = "PuTTY",
-                RunWithHosting = true,
-                ArgumentList = new ObservableCollection<AppArgument>(argumentList),
-            };
-            return app;
-        }
-        return null;
-    }
-
-
     private static LocalApp? GetWindowsTerminalArgumentList(string path)
     {
         if (path.ToLower() == "wt"
@@ -708,8 +612,7 @@ public static class AppArgumentHelper
     public static LocalApp? GetPresetArgumentList(string exePath)
     {
         exePath = exePath.ToLower();
-        return GetPuttyArgumentList(exePath)
-               ?? GetWindowsTerminalArgumentList(exePath)
+        return GetWindowsTerminalArgumentList(exePath)
                ?? GetChrome(exePath)
                ?? GetFreeRdp(exePath)
                ?? GetWinScp(exePath)

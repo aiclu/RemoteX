@@ -1,14 +1,12 @@
 ﻿using System;
 using Newtonsoft.Json;
 using _1RM.Model.Protocol.Base;
-using _1RM.Utils.PuTTY;
-using _1RM.Utils.PuTTY;
 using Shawn.Utils;
 
 namespace _1RM.Model.Protocol
 {
     // ReSharper disable once InconsistentNaming
-    public class SSH : ProtocolBaseWithAddressPortUserPwd, IPuttyConnectable
+    public class SSH : ProtocolBaseWithAddressPortUserPwd
     {
         public static string ProtocolName = "SSH";
         public SSH() : base(SSH.ProtocolName, $"Putty.{SSH.ProtocolName}.V1", SSH.ProtocolName)
@@ -34,21 +32,6 @@ namespace _1RM.Model.Protocol
             get => _startupAutoCommand;
             set => SetAndNotifyIfChanged(ref _startupAutoCommand, value);
         }
-
-        private string _externalKittySessionConfigPath = "";
-        public string ExternalKittySessionConfigPath
-        {
-            get => _externalKittySessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalKittySessionConfigPath, value);
-        }
-
-        private string _externalSessionConfigPath = "";
-        public string ExternalSessionConfigPath
-        {
-            get => string.IsNullOrEmpty(_externalSessionConfigPath) ? _externalKittySessionConfigPath : _externalSessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalSessionConfigPath, value);
-        }
-
 
         private bool _openSftpOnConnected = false;
         public bool OpenSftpOnConnected
@@ -81,10 +64,6 @@ namespace _1RM.Model.Protocol
             // https://github.com/kovidgoyal/kitty
             return 2;
         }
-
-        [JsonIgnore]
-        public ProtocolBase ProtocolBase => this;
-
 
         public override Credential GetCredential()
         {

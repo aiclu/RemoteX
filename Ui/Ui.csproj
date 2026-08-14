@@ -209,13 +209,13 @@
             <Visible>false</Visible>
         </None>
     </ItemGroup>
-    <!-- Exclude the Rust-SSH host XAML from net6/net48 builds (its code-behind
+    <!-- Exclude the Rust terminal host XAML from net6/net48 builds (its code-behind
          and TerminalControl dependency only exist under RUST_SSH). The .cs files
-         under Service\RustSsh and RustSshHost.xaml.cs are self-gated with
+         under Service\RustSsh and RustTerminalHost.xaml.cs are self-gated with
          `#if RUST_SSH` so they compile to empty on net6/net48. -->
     <ItemGroup Condition="$(Configuration.Contains('Net6')) or $(Configuration.Contains('Net48'))">
-        <Page Remove="View\Host\ProtocolHosts\RustSshHost.xaml" />
-        <Compile Remove="View\Host\ProtocolHosts\RustSshHost.xaml.cs" />
+        <Page Remove="View\Host\ProtocolHosts\RustTerminalHost.xaml" />
+        <Compile Remove="View\Host\ProtocolHosts\RustTerminalHost.xaml.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -377,9 +377,6 @@
         <Resource Include="Resources\Image\Logo\logo256.png" />
         <Resource Include="Resources\Image\Logo\logo32.png" />
         <Resource Include="Resources\Image\Logo\logo64.png" />
-        <Resource Include="Resources\KiTTY\kitty_portable.exe" />
-        <Resource Include="Resources\KiTTY\PuttyThemes.json" />
-        <Resource Include="Resources\PuTTY\putty.exe" Condition="Exists('Resources\PuTTY\putty.exe')" />
         <Resource Include="View\Guidance\Resources\demo.png" />
         <Resource Include="View\Guidance\Resources\launcher_main1.png" />
     </ItemGroup>
@@ -509,9 +506,6 @@
             <SubType>Designer</SubType>
         </Page>
         <Page Update="View\Settings\ProtocolConfig\ExternalRunnerSettings.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="View\Settings\ProtocolConfig\KittyRunnerSettings.xaml">
             <SubType>Designer</SubType>
         </Page>
         <Page Update="View\Settings\ProtocolConfig\ProtocolRunnerSettingsPageView.xaml">

@@ -41,6 +41,33 @@ namespace _1RM.Service.RustSsh
             int errCap);
 
         /// <summary>
+        /// Allocate a new telnet session handle (raw TCP with minimal IAC negotiation).
+        /// </summary>
+        [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf8)]
+        internal static partial int sr_connect_telnet(
+            string host,
+            ushort port,
+            out long handle,
+            [Out] byte[] errBuf,
+            int errCap);
+
+        /// <summary>
+        /// Allocate a new serial port session handle. Parity/stop bits/flow control
+        /// are encoded as integers by the caller (see <c>Serial.cs</c>).
+        /// </summary>
+        [LibraryImport(DllName, StringMarshalling = StringMarshalling.Utf8)]
+        internal static partial int sr_connect_serial(
+            string portName,
+            uint baudRate,
+            byte dataBits,
+            byte parity,
+            byte stopBits,
+            byte flowControl,
+            out long handle,
+            [Out] byte[] errBuf,
+            int errCap);
+
+        /// <summary>
         /// Send bytes to the remote (terminal input).
         /// </summary>
         [LibraryImport(DllName)]

@@ -18,7 +18,7 @@ use std::panic::{self, AssertUnwindSafe};
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::Duration;
 
-use session::{SshSession, sessions};
+use session::{SerialSession, SshSession, TelnetSession, sessions};
 
 // ---------------------------------------------------------------------------
 // Error codes (stable contract with C# side)
@@ -163,7 +163,7 @@ pub unsafe extern "C" fn sr_connect(
         ) {
             Ok(session) => {
                 let handle = NEXT_HANDLE.fetch_add(1, Ordering::SeqCst);
-                sessions().lock().unwrap().insert(handle, session);
+                sessions().lock().unwrap().insert(handle, Box::new(session));
                 // SAFETY: handle_out validated non-null above.
                 unsafe {
                     *handle_out = handle;
@@ -280,6 +280,112 @@ pub extern "C" fn sr_disconnect(handle: i64) -> i32 {
             SR_OK
         } else {
             SR_ERR_INVALID_HANDLE
+        }
+    })
+}
+
+/// Establish a raw TCP telnet session (minimal IAC negotiation) and return its
+/// handle. Same out-param contract as [`sr_connect`].
+///
+/// # Safety
+/// `handle_out` must be a valid writable `i64`; `host` must be null or a valid
+/// NUL-terminated string.
+#[no_mangle]
+pub unsafe extern "C" fn sr_connect_telnet(
+    host: *const c_char,
+    port: u16,
+    handle_out: *mut i64,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if handle_out.is_null() {
+            // SAFETY: caller must provide a valid out-param.
+            unsafe { write_err(err_buf, err_cap, "null handle_out") };
+            return SR_ERR_INVALID_ARG;
+        }
+        // SAFETY: validated non-null above.
+        unsafe { *handle_out = 0 };
+
+        // SAFETY: host is required.
+        let Some(host) = (unsafe { cstr_to_owned(host) }) else {
+            unsafe { write_err(err_buf, err_cap, "null host") };
+            return SR_ERR_INVALID_ARG;
+        };
+
+        match TelnetSession::connect(host, port, Duration::from_secs(15)) {
+            Ok(session) => {
+                let handle = NEXT_HANDLE.fetch_add(1, Ordering::SeqCst);
+                sessions().lock().unwrap().insert(handle, Box::new(session));
+                // SAFETY: handle_out validated non-null above.
+                unsafe {
+                    *handle_out = handle;
+                    write_err(err_buf, err_cap, "");
+                }
+                SR_OK
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                // SAFETY: err_buf provided by caller.
+                unsafe { write_err(err_buf, err_cap, &msg) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Establish a serial port session and return its handle. `parity`/`stop_bits`/
+/// `flow_control` are encoded as integers by the C# side (see `Serial.cs`).
+/// Same out-param contract as [`sr_connect`].
+///
+/// # Safety
+/// `handle_out` must be a valid writable `i64`; `port_name` must be null or a
+/// valid NUL-terminated string.
+#[no_mangle]
+pub unsafe extern "C" fn sr_connect_serial(
+    port_name: *const c_char,
+    baud_rate: u32,
+    data_bits: u8,
+    parity: u8,
+    stop_bits: u8,
+    flow_control: u8,
+    handle_out: *mut i64,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if handle_out.is_null() {
+            // SAFETY: caller must provide a valid out-param.
+            unsafe { write_err(err_buf, err_cap, "null handle_out") };
+            return SR_ERR_INVALID_ARG;
+        }
+        // SAFETY: validated non-null above.
+        unsafe { *handle_out = 0 };
+
+        // SAFETY: port_name is required.
+        let Some(port_name) = (unsafe { cstr_to_owned(port_name) }) else {
+            unsafe { write_err(err_buf, err_cap, "null port_name") };
+            return SR_ERR_INVALID_ARG;
+        };
+
+        match SerialSession::connect(port_name, baud_rate, data_bits, parity, stop_bits, flow_control)
+        {
+            Ok(session) => {
+                let handle = NEXT_HANDLE.fetch_add(1, Ordering::SeqCst);
+                sessions().lock().unwrap().insert(handle, Box::new(session));
+                // SAFETY: handle_out validated non-null above.
+                unsafe {
+                    *handle_out = handle;
+                    write_err(err_buf, err_cap, "");
+                }
+                SR_OK
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                // SAFETY: err_buf provided by caller.
+                unsafe { write_err(err_buf, err_cap, &msg) };
+                SR_ERR_CONNECT
+            }
         }
     })
 }

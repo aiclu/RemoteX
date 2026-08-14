@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using _1RM.Model.Protocol.Base;
-using _1RM.Utils.PuTTY;
-using _1RM.Utils.PuTTY;
+using _1RM.Utils;
 using Shawn.Utils;
 
 namespace _1RM.Model.Protocol
 {
-    public class Telnet : ProtocolBaseWithAddressPort, IPuttyConnectable
+    public class Telnet : ProtocolBaseWithAddressPort
     {
         public static string ProtocolName = "Telnet";
         public Telnet() : base(Telnet.ProtocolName, "Putty.Telnet.V1", "Telnet")
@@ -47,23 +47,15 @@ namespace _1RM.Model.Protocol
             set => SetAndNotifyIfChanged(ref _startupAutoCommand, value);
         }
 
+        private int _encodingCodePage = 65001; // UTF-8
+        public int EncodingCodePage
+        {
+            get => _encodingCodePage;
+            set => SetAndNotifyIfChanged(ref _encodingCodePage, value);
+        }
+
+        /// <summary>Supported code pages for decoding the telnet byte stream.</summary>
         [JsonIgnore]
-        public ProtocolBase ProtocolBase => this;
-
-        private string _externalKittySessionConfigPath = "";
-        public string ExternalKittySessionConfigPath
-        {
-            get => _externalKittySessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalKittySessionConfigPath, value);
-        }
-
-
-
-        private string _externalSessionConfigPath = "";
-        public string ExternalSessionConfigPath
-        {
-            get => string.IsNullOrEmpty(_externalSessionConfigPath) ? _externalKittySessionConfigPath : _externalSessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalSessionConfigPath, value);
-        }
+        public Dictionary<int, string> CodePages => EnumEncodingHelper.SupportedCodePages;
     }
 }

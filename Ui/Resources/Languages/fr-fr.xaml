@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <s:String x:Key="key">fr-fr</s:String>
     <s:String x:Key="language_code-ISO">fr-FR</s:String>
     <s:String x:Key="language_code-google">fr</s:String>
@@ -178,7 +178,7 @@
     <s:String x:Key="server_editor_advantage_smart_cards">Carte à puce</s:String>
     <s:String x:Key="server_editor_advantage_ssh_version">Version SSH</s:String>
     <s:String x:Key="server_editor_advantage_ssh_startup_auto_command">Commande automatique</s:String>
-    <s:String x:Key="server_editor_advantage_ssh_startup_auto_kitty_session_tip">prendre en charge la configuration externe en sélectionnant un chemin de fichier de session de KiTTY</s:String>
+    <s:String x:Key="server_editor_character_set">Jeu de caractères</s:String>
     <s:String x:Key="server_editor_advantage_sftp_startup_path">Chemin de démarrage</s:String>
     <s:String x:Key="server_editor_gateway_mode">Connexion</s:String>
     <s:String x:Key="server_editor_gateway_mode_automatically_detect">Détecter automatiquement les paramètres du serveur RD Gateway</s:String>

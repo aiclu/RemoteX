@@ -10,7 +10,6 @@ using _1RM.Model.Protocol.Base;
 using _1RM.Model.ProtocolRunner.Default;
 using _1RM.Service;
 using _1RM.Utils;
-using _1RM.Utils.PuTTY;
 using _1RM.View.Host;
 using _1RM.View.Host.ProtocolHosts;
 using Shawn.Utils;
@@ -192,8 +191,10 @@ namespace _1RM.Model.ProtocolRunner
             {
 #if RUST_SSH
                 case SSH ssh when runner is RustSshRunner:
+                case Telnet telnet when runner is RustTelnetRunner:
+                case Serial serial when runner is RustSerialRunner:
                     {
-                        return RustSshHost.Create(ssh);
+                        return RustTerminalHost.Create(protocol);
                     }
 #endif
                 case RDP rdp:

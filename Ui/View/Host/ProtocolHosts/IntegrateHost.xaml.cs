@@ -15,9 +15,6 @@ using _1RM.Model.Protocol.Base;
 using _1RM.Model.ProtocolRunner;
 using _1RM.Model.ProtocolRunner.Default;
 using _1RM.Utils;
-using _1RM.Utils.PuTTY;
-using _1RM.Utils.PuTTY.Model;
-using _1RM.Utils.PuTTY;
 using Shawn.Utils;
 using Stylet;
 using Path = System.IO.Path;
@@ -216,25 +213,6 @@ namespace _1RM.View.Host.ProtocolHosts
             _panel.SizeChanged += PanelOnSizeChanged;
 
             FormsHost.Child = _panel;
-
-
-            if (runner is PuttyRunner)
-            {
-                RunAfterConnected += () =>
-                {
-                    try
-                    {
-                        PuttyConfig.CleanUpOldConfig();
-                        var path = PuttyRunner.GetAutoCommandFilePath(ProtocolServer);
-                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
-                            File.Delete(path);
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                };
-            }
         }
 
         #region Resize
@@ -432,14 +410,6 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             RunBeforeConnect?.Invoke();
             var exeFullName = ExeFullName;
-
-            if (ProtocolServer is IPuttyConnectable kittyConnectable && _runner is PuttyRunner putty)
-            {
-                if (PuttyRunner.GetAutoCommandFilePath(ProtocolServer) != "")
-                    putty.SaveAutoCommandFile(ProtocolServer, 30); // save auto command file
-                var sshPrivateKeyPath = putty.GetPrivateKeyPath(ProtocolServer); // prepare ssh key path
-                putty.ConfigPutty(kittyConnectable, _sessionId, sshPrivateKeyPath);
-            }
 
             if (Path.IsPathRooted(exeFullName)
                 && File.Exists(ExeFullName) == false)

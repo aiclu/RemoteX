@@ -13,7 +13,7 @@ namespace _1RM.Service.RustSsh
     ///
     /// Owns the session-handle lifecycle and a background poll thread that drains
     /// remote output via <c>sr_poll_read</c> and forwards it to <see cref="OnData"/>.
-    /// Consumed by <c>RustSshHost</c> (the WPF terminal host).
+    /// Consumed by <c>RustTerminalHost</c> (the WPF terminal host).
     ///
     /// Only compiled into net9.0-windows builds.
     /// </summary>
@@ -38,8 +38,10 @@ namespace _1RM.Service.RustSsh
 
         public bool IsConnected => !_disposed && _handle != 0;
 
+        private delegate int ConnectFfi(byte[] errBuf, out long handle);
+
         /// <summary>
-        /// Establish a session. <paramref name="password"/> and <paramref name="keyPath"/>
+        /// Establish an SSH session. <paramref name="password"/> and <paramref name="keyPath"/>
         /// are mutually exclusive; pass null for whichever is not used.
         /// </summary>
         /// <returns>null on success, otherwise a human-readable error message.</returns>
@@ -51,16 +53,46 @@ namespace _1RM.Service.RustSsh
             string? keyPath,
             int connectTimeoutMs = 10000)
         {
+            return ConnectCore((errBuf, out handle) =>
+                SshRustNative.sr_connect(host, port, user, password, keyPath, out handle, errBuf, errBuf.Length));
+        }
+
+        /// <summary>
+        /// Establish a raw TCP telnet session (minimal IAC negotiation).
+        /// </summary>
+        /// <returns>null on success, otherwise a human-readable error message.</returns>
+        public string? ConnectTelnet(string host, ushort port)
+        {
+            return ConnectCore((errBuf, out handle) =>
+                SshRustNative.sr_connect_telnet(host, port, out handle, errBuf, errBuf.Length));
+        }
+
+        /// <summary>
+        /// Establish a serial port session.
+        /// </summary>
+        /// <returns>null on success, otherwise a human-readable error message.</returns>
+        public string? ConnectSerial(string portName, uint baudRate, byte dataBits, byte parity, byte stopBits, byte flowControl)
+        {
+            return ConnectCore((errBuf, out handle) =>
+                SshRustNative.sr_connect_serial(portName, baudRate, dataBits, parity, stopBits, flowControl, out handle, errBuf, errBuf.Length));
+        }
+
+        /// <summary>
+        /// Shared session-establishment path: invokes a protocol-specific connect
+        /// FFI, then starts the poll loop on success.
+        /// </summary>
+        private string? ConnectCore(ConnectFfi connect)
+        {
             if (_disposed) return "bridge is disposed";
 
             // Rust cdylib is x64-only for now.
             if (Environment.Is64BitProcess == false)
             {
-                return "Rust SSH core is not available on 32-bit processes.";
+                return "Rust core is not available on 32-bit processes.";
             }
 
             var errBuf = new byte[1024];
-            var rc = SshRustNative.sr_connect(host, port, user, password, keyPath, out var handle, errBuf, errBuf.Length);
+            var rc = connect(errBuf, out var handle);
             if (rc != SshRustNative.SR_OK)
             {
                 return ErrorText(rc, errBuf);

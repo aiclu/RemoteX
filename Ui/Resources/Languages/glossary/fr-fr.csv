@@ -176,7 +176,7 @@ server_editor_advantage_printers;Imprimantes
 server_editor_advantage_smart_cards;Carte à puce
 server_editor_advantage_ssh_version;Version SSH
 server_editor_advantage_ssh_startup_auto_command;Commande automatique
-server_editor_advantage_ssh_startup_auto_kitty_session_tip;prendre en charge la configuration externe en sélectionnant un chemin de fichier de session de KiTTY
+server_editor_character_set;Jeu de caractères
 server_editor_advantage_sftp_startup_path;Chemin de démarrage
 server_editor_gateway_mode;Connexion
 server_editor_gateway_mode_automatically_detect;Détecter automatiquement les paramètres du serveur RD Gateway

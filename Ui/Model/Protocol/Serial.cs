@@ -2,15 +2,14 @@
 using System.Linq;
 using Newtonsoft.Json;
 using _1RM.Model.Protocol.Base;
-using _1RM.Utils.PuTTY;
 using Shawn.Utils;
 using System.Collections.Generic;
 using _1RM.Service;
-using _1RM.Utils.PuTTY;
+using _1RM.Utils;
 
 namespace _1RM.Model.Protocol
 {
-    public class Serial : ProtocolBase, IPuttyConnectable
+    public class Serial : ProtocolBase
     {
         public static string ProtocolName = "Serial";
         public Serial() : base(Serial.ProtocolName, "Putty.Serial.V1", "Serial")
@@ -151,24 +150,18 @@ namespace _1RM.Model.Protocol
         }
 
         [JsonIgnore]
-        public ProtocolBase ProtocolBase => this;
-
-        [JsonIgnore]
         public List<string> SerialPorts => System.IO.Ports.SerialPort.GetPortNames().ToList();
 
-        private string _externalKittySessionConfigPath = "";
-        public string ExternalKittySessionConfigPath
+        private int _encodingCodePage = 65001; // UTF-8
+        public int EncodingCodePage
         {
-            get => _externalKittySessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalKittySessionConfigPath, value);
+            get => _encodingCodePage;
+            set => SetAndNotifyIfChanged(ref _encodingCodePage, value);
         }
 
-        private string _externalSessionConfigPath = "";
-        public string ExternalSessionConfigPath
-        {
-            get => string.IsNullOrEmpty(_externalSessionConfigPath) ? _externalKittySessionConfigPath : _externalSessionConfigPath;
-            set => SetAndNotifyIfChanged(ref _externalSessionConfigPath, value);
-        }
+        /// <summary>Supported code pages for decoding the serial byte stream.</summary>
+        [JsonIgnore]
+        public Dictionary<int, string> CodePages => EnumEncodingHelper.SupportedCodePages;
 
         #region IDataErrorInfo
         [JsonIgnore]

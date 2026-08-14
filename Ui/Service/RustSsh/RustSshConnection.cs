@@ -18,20 +18,23 @@ namespace _1RM.Service.RustSsh
     internal sealed class RustSshConnection : ITerminalConnection
     {
         private readonly SshRustBridge _bridge;
+        private readonly Encoding _encoding;
 
         /// <summary>Fired by the terminal control with data to send to the remote.</summary>
         public event EventHandler<TerminalOutputEventArgs>? TerminalOutput;
 
-        public RustSshConnection(SshRustBridge bridge)
+        public RustSshConnection(SshRustBridge bridge, Encoding? encoding = null)
         {
             _bridge = bridge;
+            // SSH/Telnet default to UTF-8; Serial passes a user-configured code page.
+            _encoding = encoding ?? Encoding.UTF8;
         }
 
         /// <summary>Keystrokes / input from the terminal, forwarded to the remote shell.</summary>
         public void WriteInput(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
-            var bytes = Encoding.UTF8.GetBytes(data);
+            var bytes = _encoding.GetBytes(data);
             _bridge.Write(bytes);
         }
 
@@ -58,8 +61,10 @@ namespace _1RM.Service.RustSsh
         public void PushRemoteData(byte[] data)
         {
             if (data == null || data.Length == 0) return;
-            // TerminalControl expects UTF-16 text; convert the UTF-8 SSH stream.
-            var text = Encoding.UTF8.GetString(data);
+            // TerminalControl expects UTF-16 text; decode the remote byte stream
+            // using the session's encoding (UTF-8 for SSH/Telnet, configurable
+            // code page for Serial).
+            var text = _encoding.GetString(data);
             TerminalOutput?.Invoke(this, new TerminalOutputEventArgs(text));
         }
     }

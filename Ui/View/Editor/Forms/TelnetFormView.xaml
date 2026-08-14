@@ -47,6 +47,18 @@
                     </Grid>
                 </StackPanel>
             </Grid>
+
+            <Grid Style="{StaticResource EditorRowGrid}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_character_set}"></TextBlock>
+                    <Grid Style="{StaticResource EditorRowGridInput}">
+                        <ComboBox ItemsSource="{Binding New.CodePages}"
+                                  SelectedValue="{Binding New.EncodingCodePage}"
+                                  DisplayMemberPath="Value"
+                                  SelectedValuePath="Key"></ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </StackPanel>
 </UserControl>
