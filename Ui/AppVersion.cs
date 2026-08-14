@@ -42,5 +42,16 @@ namespace _1RM
                     "https://github.com/aiclu/RemoteX/releases/latest",
                     "https://github.com/aiclu/RemoteX",
                 };
+
+        /// <summary>
+        /// GitHub repo for the self-updater (API + asset naming).
+        /// </summary>
+        public static string GitHubApiReleasesLatest => "https://api.github.com/repos/aiclu/RemoteX/releases/latest";
+
+        /// <summary>
+        /// The self-contained artifact is the one the updater downloads: it needs no
+        /// pre-installed .NET runtime. CI asset name: RemoteX-{ver}-net9-x64-self-contained.zip
+        /// </summary>
+        public static string ReleaseAssetNameSuffix => "-net9-x64-self-contained.zip";
     }
 }

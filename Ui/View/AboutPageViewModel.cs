@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Timers;
 using _1RM.Service;
+using _1RM.Utils;
 using _1RM.View.Utils;
 using _1RM.View.Utils.MaskAndPop;
 using Shawn.Utils;
@@ -159,22 +160,94 @@ namespace _1RM.View
         {
             get
             {
-                return _cmdUpdate ??= new RelayCommand((o) =>
+                return _cmdUpdate ??= new RelayCommand(async (o) =>
                 {
                     if (IsBreakingNewVersion)
                     {
                         MaskLayerController.ShowProcessingRing();
                         IoC.Get<IWindowManager>().ShowDialog(IoC.Get<BreakingChangeUpdateViewModel>(), ownerViewModel: IoC.Get<MainWindowViewModel>());
                         MaskLayerController.HideMask();
+                        return;
                     }
-                    else
-                    {
 #if FOR_MICROSOFT_STORE_ONLY
-                        HyperlinkHelper.OpenUriBySystem("ms-windows-store://review/?productid=9PNMNF92JNFP");
+                    HyperlinkHelper.OpenUriBySystem("ms-windows-store://review/?productid=9PNMNF92JNFP");
 #else
+                    if (!SelfUpdateService.UpdaterExists())
+                    {
+                        // No updater shipped (e.g. dev build): fall back to the browser.
                         HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
-#endif
+                        return;
                     }
+
+                    var maskId = MaskLayerController.ShowProcessingRing("Checking update...");
+                    try
+                    {
+                        var zipUrl = await SelfUpdateService.GetLatestSelfContainedZipUrlAsync();
+                        if (string.IsNullOrEmpty(zipUrl))
+                        {
+                            MessageBoxHelper.ErrorAlert("Cannot locate the update package. Please download it manually.");
+                            HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                            return;
+                        }
+
+                        var pvm = IoC.Get<ProcessingRingViewModel>();
+                        var progress = new Progress<(string stage, double pct)>(p =>
+                        {
+                            var (stage, pct) = p;
+                            switch (stage)
+                            {
+                                case "download":
+                                    pvm.ProcessingRingMessage = $"Downloading update... {pct:F0}%";
+                                    break;
+                                case "verify":
+                                    pvm.ProcessingRingMessage = "Verifying update...";
+                                    break;
+                                case "extract":
+                                    pvm.ProcessingRingMessage = "Extracting update...";
+                                    break;
+                                case "wait-exit":
+                                    pvm.ProcessingRingMessage = "Waiting for RemoteX to exit...";
+                                    break;
+                                case "swap":
+                                    pvm.ProcessingRingMessage = "Installing update...";
+                                    break;
+                                case "swapped":
+                                    pvm.ProcessingRingMessage = "Update installed. Restarting...";
+                                    break;
+                                case "error":
+                                    pvm.ProcessingRingMessage = "Update failed.";
+                                    break;
+                            }
+                        });
+
+                        var ok = await SelfUpdateService.RunUpdaterAsync(zipUrl, progress, onWaitExit: () =>
+                        {
+                            // updater has downloaded+verified+extracted; close the app so it can
+                            // swap the exe and restart us. The updater runs detached (no parent wait).
+                            Execute.OnUIThreadSync(() => App.Close());
+                        });
+                        if (ok)
+                        {
+                            // If the app is still alive after updater exits, it means the updater
+                            // failed to restart us; just inform the user.
+                            MaskLayerController.HideMask(maskId);
+                            MessageBoxHelper.ErrorAlert("Update finished but the app did not restart automatically. Please restart RemoteX.");
+                        }
+                        else
+                        {
+                            MaskLayerController.HideMask(maskId);
+                            MessageBoxHelper.ErrorAlert("Update failed. Please try downloading it manually.");
+                            HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SimpleLogHelper.Error(ex);
+                        MaskLayerController.HideMask(maskId);
+                        MessageBoxHelper.ErrorAlert("Update failed. Please try downloading it manually.");
+                        HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                    }
+#endif
                 });
             }
         }
