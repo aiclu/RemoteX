@@ -187,6 +187,7 @@ namespace _1RM.View
                         var zipUrl = await SelfUpdateService.GetLatestSelfContainedZipUrlAsync();
                         if (string.IsNullOrEmpty(zipUrl))
                         {
+                            MaskLayerController.HideMask(maskId);
                             MessageBoxHelper.ErrorAlert("Cannot locate the update package. Please download it manually.");
                             HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
                             return;
