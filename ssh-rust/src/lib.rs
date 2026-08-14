@@ -10,14 +10,18 @@
 //!   - sr_connect / sr_write / sr_poll_read / sr_resize / sr_disconnect
 //!   - sr_set_log_callback (tracing -> C#)
 
-mod session;
+mod ftp;
 mod log;
+mod session;
+mod sftp;
 
 use std::ffi::{CStr, c_char};
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::Duration;
 
+use ftp::{ProgressCb, connect as ftp_connect, delete as ftp_delete, disconnect as ftp_disconnect, download as ftp_download, exists as ftp_exists, list as ftp_list, mkdir as ftp_mkdir, rename as ftp_rename, upload as ftp_upload};
+use sftp::{ProgressCb as SftpProgressCb, connect as sftp_connect, delete as sftp_delete, disconnect as sftp_disconnect, download as sftp_download, exists as sftp_exists, list as sftp_list, mkdir as sftp_mkdir, rename as sftp_rename, upload as sftp_upload};
 use session::{SerialSession, SshSession, TelnetSession, sessions};
 
 // ---------------------------------------------------------------------------
@@ -289,6 +293,483 @@ pub extern "C" fn sr_disconnect(handle: i64) -> i32 {
 ///
 /// # Safety
 /// `handle_out` must be a valid writable `i64`; `host` must be null or a valid
+// ---------------------------------------------------------------------------
+// FTP/FTPS FFI
+// ---------------------------------------------------------------------------
+
+/// Establish an FTPS (explicit) session and return its handle.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_connect(
+    host: *const c_char,
+    port: u16,
+    user: *const c_char,
+    password: *const c_char,
+    handle_out: *mut i64,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if handle_out.is_null() {
+            unsafe { write_err(err_buf, err_cap, "null handle_out") };
+            return SR_ERR_INVALID_ARG;
+        }
+        unsafe { *handle_out = 0 };
+        let (Some(host), Some(user), Some(password)) = (
+            unsafe { cstr_to_owned(host) },
+            unsafe { cstr_to_owned(user) },
+            unsafe { cstr_to_owned(password) },
+        ) else {
+            unsafe { write_err(err_buf, err_cap, "null string param") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_connect(&host, port, &user, &password) {
+            Ok(h) => {
+                unsafe { *handle_out = h };
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Disconnect and free an FTP session handle. Idempotent.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_disconnect(handle: i64) -> i32 {
+    guard(|| {
+        ftp_disconnect(handle);
+        SR_OK
+    })
+}
+
+/// List a directory. JSON array of `RemoteItemDto` is written to the output
+/// buffer; `out_len` receives the byte length (0 when the buffer is too small).
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_list(
+    handle: i64,
+    path: *const c_char,
+    out_buf: *mut u8,
+    out_cap: usize,
+    out_len: *mut usize,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_list(handle, &path) {
+            Ok(json) => {
+                let bytes = json.as_bytes();
+                if out_buf.is_null() || bytes.len() > out_cap {
+                    unsafe { *out_len = bytes.len() };
+                    return SR_ERR_INVALID_ARG; // buffer too small
+                }
+                unsafe {
+                    std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
+                    *out_len = bytes.len();
+                }
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Test whether a remote path exists (file or directory).
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_exists(
+    handle: i64,
+    path: *const c_char,
+    out_exists: *mut u8,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_exists(handle, &path) {
+            Ok(b) => {
+                unsafe { *out_exists = b as u8 };
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Delete a remote path (file).
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_delete(
+    handle: i64,
+    path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_delete(handle, &path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Create a remote directory if it does not exist.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_mkdir(
+    handle: i64,
+    path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_mkdir(handle, &path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Rename a remote path.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_rename(
+    handle: i64,
+    path: *const c_char,
+    new_path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(path), Some(new_path)) = (unsafe { cstr_to_owned(path) }, unsafe { cstr_to_owned(new_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_rename(handle, &path, &new_path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Download a remote file to a local path. `progress` (nullable) is invoked with
+/// cumulative transferred bytes; `cancel` (nullable) is an `AtomicBool` checked
+/// per chunk.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_download(
+    handle: i64,
+    remote_path: *const c_char,
+    local_path: *const c_char,
+    progress: Option<ProgressCb>,
+    cancel: *const std::sync::atomic::AtomicBool,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(remote), Some(local)) = (unsafe { cstr_to_owned(remote_path) }, unsafe { cstr_to_owned(local_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_download(handle, &remote, &local, progress, unsafe { cancel.as_ref() }) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Upload a local file to a remote path. `progress` (nullable) is invoked with
+/// cumulative transferred bytes; `cancel` (nullable) is an `AtomicBool`.
+#[no_mangle]
+pub unsafe extern "C" fn sr_ftp_upload(
+    handle: i64,
+    local_path: *const c_char,
+    remote_path: *const c_char,
+    progress: Option<ProgressCb>,
+    cancel: *const std::sync::atomic::AtomicBool,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(local), Some(remote)) = (unsafe { cstr_to_owned(local_path) }, unsafe { cstr_to_owned(remote_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match ftp_upload(handle, &local, &remote, progress, unsafe { cancel.as_ref() }) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+// ---------------------------------------------------------------------------
+// SFTP FFI
+// ---------------------------------------------------------------------------
+
+/// Establish an SFTP session over a fresh SSH connection and return its handle.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_connect(
+    host: *const c_char,
+    port: u16,
+    user: *const c_char,
+    password: *const c_char,
+    key_path: *const c_char,
+    handle_out: *mut i64,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if handle_out.is_null() {
+            unsafe { write_err(err_buf, err_cap, "null handle_out") };
+            return SR_ERR_INVALID_ARG;
+        }
+        unsafe { *handle_out = 0 };
+        let (Some(host), Some(user)) = (unsafe { cstr_to_owned(host) }, unsafe { cstr_to_owned(user) }) else {
+            unsafe { write_err(err_buf, err_cap, "null string param") };
+            return SR_ERR_INVALID_ARG;
+        };
+        let password = unsafe { cstr_to_owned(password) };
+        let key_path = unsafe { cstr_to_owned(key_path) };
+        match sftp_connect(&host, port, &user, password, key_path, Duration::from_secs(15)) {
+            Ok(h) => {
+                unsafe { *handle_out = h };
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Disconnect and free an SFTP session handle. Idempotent.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_disconnect(handle: i64) -> i32 {
+    guard(|| {
+        sftp_disconnect(handle);
+        SR_OK
+    })
+}
+
+/// List a directory. JSON array of `SftpRemoteItemDto` written to the output buffer.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_list(
+    handle: i64,
+    path: *const c_char,
+    out_buf: *mut u8,
+    out_cap: usize,
+    out_len: *mut usize,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_list(handle, &path) {
+            Ok(json) => {
+                let bytes = json.as_bytes();
+                if out_buf.is_null() || bytes.len() > out_cap {
+                    unsafe { *out_len = bytes.len() };
+                    return SR_ERR_INVALID_ARG; // buffer too small
+                }
+                unsafe {
+                    std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
+                    *out_len = bytes.len();
+                }
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Test whether a remote path exists.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_exists(
+    handle: i64,
+    path: *const c_char,
+    out_exists: *mut u8,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_exists(handle, &path) {
+            Ok(b) => {
+                unsafe { *out_exists = b as u8 };
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Delete a remote path.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_delete(
+    handle: i64,
+    path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_delete(handle, &path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Create a remote directory if it does not exist.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_mkdir(
+    handle: i64,
+    path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let Some(path) = (unsafe { cstr_to_owned(path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_mkdir(handle, &path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Rename a remote path.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_rename(
+    handle: i64,
+    path: *const c_char,
+    new_path: *const c_char,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(path), Some(new_path)) = (unsafe { cstr_to_owned(path) }, unsafe { cstr_to_owned(new_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_rename(handle, &path, &new_path) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Download a remote file to a local path with progress + cancellation.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_download(
+    handle: i64,
+    remote_path: *const c_char,
+    local_path: *const c_char,
+    progress: Option<SftpProgressCb>,
+    cancel: *const std::sync::atomic::AtomicBool,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(remote), Some(local)) = (unsafe { cstr_to_owned(remote_path) }, unsafe { cstr_to_owned(local_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_download(handle, &remote, &local, progress, unsafe { cancel.as_ref() }) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Upload a local file to a remote path with progress + cancellation.
+#[no_mangle]
+pub unsafe extern "C" fn sr_sftp_upload(
+    handle: i64,
+    local_path: *const c_char,
+    remote_path: *const c_char,
+    progress: Option<SftpProgressCb>,
+    cancel: *const std::sync::atomic::AtomicBool,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        let (Some(local), Some(remote)) = (unsafe { cstr_to_owned(local_path) }, unsafe { cstr_to_owned(remote_path) }) else {
+            unsafe { write_err(err_buf, err_cap, "null path") };
+            return SR_ERR_INVALID_ARG;
+        };
+        match sftp_upload(handle, &local, &remote, progress, unsafe { cancel.as_ref() }) {
+            Ok(()) => SR_OK,
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
 /// NUL-terminated string.
 #[no_mangle]
 pub unsafe extern "C" fn sr_connect_telnet(
