@@ -154,6 +154,8 @@ namespace _1RM.Model.Protocol.Base
             }
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, BitmapSource> IconImgCache = new System.Collections.Concurrent.ConcurrentDictionary<string, BitmapSource>();
+
         private BitmapSource? _iconCache = null;
         [JsonIgnore]
         public BitmapSource? IconImg
@@ -162,9 +164,16 @@ namespace _1RM.Model.Protocol.Base
             {
                 if (_iconCache != null)
                     return _iconCache;
+                if (string.IsNullOrEmpty(_iconBase64))
+                    return null;
                 try
                 {
-                    _iconCache = Convert.FromBase64String(_iconBase64).BitmapFromBytes().ToBitmapSource();
+                    _iconCache = IconImgCache.GetOrAdd(_iconBase64, key =>
+                    {
+                        var bmp = Convert.FromBase64String(key).BitmapFromBytes().ToBitmapSource();
+                        bmp?.Freeze();
+                        return bmp;
+                    });
                 }
                 catch (Exception)
                 {

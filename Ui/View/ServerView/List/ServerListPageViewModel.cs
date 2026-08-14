@@ -56,11 +56,14 @@ namespace _1RM.View.ServerView
         {
             Execute.OnUIThread(() =>
             {
-                foreach (var item in VmServerList.Where(x => x.HoverNoteDisplayControl != null))
+                foreach (var item in VmServerList)
                 {
-                    if (item.HoverNoteDisplayControl != null)
+                    // Access the backing field directly: the getter lazily creates the NoteIcon
+                    // (heavy Markdown control tree), which we must not trigger here.
+                    var noteIcon = item.NoteIconInstance;
+                    if (noteIcon != null)
                     {
-                        item.HoverNoteDisplayControl.IsBriefNoteShown = BriefNoteVisibility == Visibility.Visible;
+                        noteIcon.IsBriefNoteShown = BriefNoteVisibility == Visibility.Visible;
                     }
                 }
             });

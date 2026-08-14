@@ -137,14 +137,6 @@ namespace _1RM.View
             
             // 初始化 CustomOrder
             CustomOrder = LocalityListViewService.Settings.ServerCustomOrder.GetValueOrDefault(psb.Id, 0);
-
-            if (ConverterNoteToVisibility.IsVisible(Server.Note))
-            {
-                Execute.OnUIThreadSync(() =>
-                {
-                    HoverNoteDisplayControl = new NoteIcon(this.Server);
-                });
-            }
         }
 
         private ServerTitleViewModel? _launcherMainTitleViewModel;
@@ -165,9 +157,14 @@ namespace _1RM.View
         private NoteIcon? _hoverNoteDisplayControl = null;
         public NoteIcon? HoverNoteDisplayControl
         {
-            get => _hoverNoteDisplayControl;
+            get => _hoverNoteDisplayControl ??= ConverterNoteToVisibility.IsVisible(Server.Note) ? new NoteIcon(Server) : null;
             set => SetAndNotifyIfChanged(ref _hoverNoteDisplayControl, value);
         }
+
+        /// <summary>
+        /// Direct field access - does NOT trigger the lazy creation in <see cref="HoverNoteDisplayControl"/>.
+        /// </summary>
+        internal NoteIcon? NoteIconInstance => _hoverNoteDisplayControl;
 
         private bool _isSelected = false;
         /// <summary>

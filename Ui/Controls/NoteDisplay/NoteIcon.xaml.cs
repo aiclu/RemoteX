@@ -51,17 +51,20 @@ namespace _1RM.Controls.NoteDisplay
             Server = server;
             InitializeComponent();
             IsBriefNoteShown = false;
-            Execute.OnUIThreadSync(() =>
-            {
-                _noteDisplayAndEditor = new NoteDisplayAndEditor()
-                {
-                    Server = Server,
-                    Width = 400,
-                    Height = 300,
-                    CloseButtonVisibility = Visibility.Collapsed,
-                };
-            });
         }
+
+        /// <summary>
+        /// Lazily created on first hover (the Markdown viewer/editor is a heavy control tree,
+        /// so we avoid materializing it until it is actually shown). UI-thread only.
+        /// </summary>
+        private NoteDisplayAndEditor NoteDisplayEditor =>
+            _noteDisplayAndEditor ??= new NoteDisplayAndEditor()
+            {
+                Server = Server,
+                Width = 400,
+                Height = 300,
+                CloseButtonVisibility = Visibility.Collapsed,
+            };
 
         private void NoteTest(FrameworkElement button, MouseEventArgs args)
         {
@@ -109,10 +112,9 @@ namespace _1RM.Controls.NoteDisplay
 
         private async void ButtonShowNote_OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (PopupNoteContent.Content is not NoteDisplayAndEditor
-                && _noteDisplayAndEditor != null)
+            if (PopupNoteContent.Content is not NoteDisplayAndEditor)
             {
-                PopupNoteContent.Content = _noteDisplayAndEditor;
+                PopupNoteContent.Content = NoteDisplayEditor;
             }
             await Task.Yield();
             PopupNote.IsOpen = false;
