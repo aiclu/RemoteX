@@ -19,6 +19,10 @@ namespace _1RM
             string.IsNullOrEmpty(PreRelease)
                 ? new[]
                 {
+                    // The releases page lazy-loads its asset list, so the HTML no longer
+                    // contains "RemoteX-{ver}-..." filenames for the regex to match. Query
+                    // the GitHub API instead; it returns {"tag_name":"v1.0.4",...}.
+                    "https://api.github.com/repos/aiclu/RemoteX/releases/latest",
                     "https://github.com/aiclu/RemoteX/releases",
                     "https://github.com/aiclu/RemoteX",
                 }

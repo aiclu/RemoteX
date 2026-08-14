@@ -67,6 +67,8 @@ namespace _1RM.View
 
             var patterns = new List<string>()
             {
+                // GitHub API /releases/latest -> {"tag_name":"v1.0.4",...} (lowercased by HttpHelper).
+                @"tag_name[^0-9]*([\d.]+)",
                 @".?remotex-([\d.]+)",
                 @".?latest\sversion:\s*([\d|.]*)",
             };
