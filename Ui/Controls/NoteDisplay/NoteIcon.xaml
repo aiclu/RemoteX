@@ -12,19 +12,41 @@
         <noteDisplay:ConverterNoteToSingleLineNote x:Key="ConverterNoteToSingleLineNote" />
     </UserControl.Resources>
     <Grid Visibility="{Binding Server.Note, Converter={StaticResource ConverterNoteToVisibility}}">
-        <!--icon button show note-->
+        <!--icon button show note - VSCode-style icon button: rounded hover fill + fluent glyph-->
         <Border Height="30" Width="30" Name="GridParent" HorizontalAlignment="Left" >
             <Grid Name="ButtonShowNote"
-                  Width="20" Height="20"
-                  Margin="5"
+                  Width="22" Height="22"
+                  Margin="4"
                   Background="Transparent"
                   MouseEnter="ButtonShowNote_OnMouseEnter"
             >
-                <Path Data="{StaticResource NoteGeometry}"
-                      Width="16" Height="16"
-                      Stroke="{DynamicResource BackgroundTextBrush}"
-                      Fill="{DynamicResource BackgroundTextBrush}"
-                      StrokeThickness="0" Stretch="Uniform" />
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+                                <Setter Property="attachProperty:VisionElement.BorderCornerRadius" Value="4"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock Text="&#xE70F;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="14"
+                           Foreground="{DynamicResource BackgroundTextBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource BackgroundTextBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=ButtonShowNote}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentMidBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Grid>
         </Border>
         <Grid Name="GridBriefNote" Visibility="Collapsed" MouseEnter="ButtonShowNote_OnMouseEnter">
