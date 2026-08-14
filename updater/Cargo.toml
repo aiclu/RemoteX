@@ -10,8 +10,10 @@ name = "updater"
 path = "src/main.rs"
 
 [dependencies]
-# HTTP client with streaming progress support
-reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+# HTTP client with streaming progress support.
+# native-tls (schannel) instead of rustls: rustls pulls in ring, whose Windows
+# build requires NASM which GitHub Actions runners do not have.
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "native-tls"] }
 # SHA-256 verification
 sha2 = "0.10"
 # zip extraction
