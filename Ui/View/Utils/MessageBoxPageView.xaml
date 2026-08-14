@@ -117,34 +117,33 @@
                                         CommandParameter="{Binding Value}">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource ButtonAccentStyle}">
+                                            <!-- Primary (default) keeps solid accent; hover/press brighten/darken come from ButtonAccentStyle -->
                                             <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
                                             <Setter Property="Background" Value="{DynamicResource AccentMidBrush}"/>
-                                            <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource AccentTextBrush}"/>
-                                            <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource AccentTextBrush}"/>
                                             <Setter Property="attachProperty:VisionElement.ForegroundAccent" Value="{DynamicResource AccentTextBrush}"/>
-                                            <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentMidBrush}"/>
                                             <Setter Property="attachProperty:VisionElement.ForegroundOnMouseDown" Value="{DynamicResource AccentTextBrush}"/>
-                                            <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Value}" Value="{x:Static MessageBoxResult.No}">
+                                                    <!-- Secondary: VSCode outline button - transparent fill, accent border -->
                                                     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource AccentMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
                                                     <Setter Property="attachProperty:VisionElement.ForegroundAccent" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource PrimaryMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentMidBrush}"/>
                                                     <Setter Property="attachProperty:VisionElement.ForegroundOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource PrimaryMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding Value}" Value="{x:Static MessageBoxResult.Cancel}">
+                                                    <!-- Secondary: VSCode outline button - transparent fill, accent border -->
                                                     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource AccentMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
                                                     <Setter Property="attachProperty:VisionElement.ForegroundAccent" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource PrimaryMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentMidBrush}"/>
                                                     <Setter Property="attachProperty:VisionElement.ForegroundOnMouseDown" Value="{DynamicResource PrimaryTextBrush}"/>
-                                                    <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource PrimaryMidBrush}"/>
+                                                    <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

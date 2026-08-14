@@ -147,17 +147,20 @@
     </Style>
 
     <Style x:Key="ButtonAccentStyle" BasedOn="{StaticResource ButtonBaseStyle}" TargetType="Button">
+        <!-- VSCode primary button: solid accent fill that brightens on hover and darkens on press -->
         <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
         <Setter Property="Background" Value="{DynamicResource AccentMidBrush}"/>
         <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseOver" Value="{DynamicResource AccentTextBrush}"/>
         <Setter Property="attachProperty:VisionElement.BorderBrushOnMouseDown" Value="{DynamicResource AccentTextBrush}"/>
         <Setter Property="attachProperty:VisionElement.ForegroundAccent" Value="{DynamicResource AccentTextBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentMidBrush}"/>
+        <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource AccentLightBrush}"/>
         <Setter Property="attachProperty:VisionElement.ForegroundOnMouseDown" Value="{DynamicResource AccentTextBrush}"/>
-        <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentMidBrush}"/>
+        <Setter Property="attachProperty:VisionElement.BackgroundOnMouseDown" Value="{DynamicResource AccentDarkBrush}"/>
     </Style>
 
-    <Style TargetType="Button" BasedOn="{StaticResource ButtonAccentStyle}" />
+    <!-- VSCode philosophy: the default button is a restrained outline button;
+         explicit accent fills (ButtonAccentStyle) are reserved for primary actions. -->
+    <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimaryStyle}" />
 
 
 
