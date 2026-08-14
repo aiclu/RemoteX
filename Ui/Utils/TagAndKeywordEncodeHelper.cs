@@ -207,26 +207,15 @@ namespace _1RM.Utils
             {
                 return servers.Select(_ => new Tuple<bool, MatchResults?>(true, null)).ToList();
             }
-            var taskCount = Math.Max(servers.Count / 10, 2);
-            var results = new ConcurrentDictionary<int, Tuple<bool, MatchResults?>>();
-            var caches = new ConcurrentQueue<ProtocolBase>(servers);
-            var tasks = new List<Task>();
-            for (var i = 0; i < taskCount; i++)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    while (caches.TryDequeue(out var cache))
-                    {
-                        var r = MatchKeywords(cache, keywordDecoded, matchSubTitle);
-                        results.TryAdd(servers.IndexOf(cache), r);
-                    }
-                }));
-            }
-            // Wait for all tasks to finish.
-            Task.WaitAll(tasks.ToArray());
+
+            // Parallel.For with an index-based buffer: preserves the multi-core intent of the
+            // previous Task.Run implementation while removing its overheads - O(n^2) IndexOf,
+            // per-call thread-pool task creation + WaitAll, and a final OrderBy.
+            var results = new Tuple<bool, MatchResults?>[servers.Count];
+            Parallel.For(0, servers.Count, i => results[i] = MatchKeywords(servers[i], keywordDecoded, matchSubTitle));
 
             // Return the results in the original order.
-            return results.OrderBy(x => x.Key).Select(r => r.Value).ToList();
+            return results.ToList();
         }
     }
 }
