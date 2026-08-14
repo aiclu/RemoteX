@@ -104,13 +104,6 @@ namespace _1RM.View
                     _server = value;
                     _server.Tags = _server.Tags.Select(x => x.ToLower()).ToList();
 
-                    if (ConverterNoteToVisibility.IsVisible(_server.Note))
-                    {
-                        Execute.OnUIThreadSync(() =>
-                        {
-                            HoverNoteDisplayControl = new NoteIcon(_server);
-                        });
-                    }
                     LastConnectTime = LocalityConnectRecorder.ConnectTimeGet(_server);
                     TagString = string.Join(" ", _server.Tags.Select(x => "#" + x));
                     RaisePropertyChanged(nameof(TagString));
