@@ -68,22 +68,36 @@
 
 
                 <!--CONTENT-->
-                <Image Grid.Row="1" Grid.Column="1"
-                       Source="{Binding ImageIcon, Converter={x:Static xaml:IconToBitmapSourceConverter.Instance}}"
-                       Visibility="{Binding ImageIcon, Converter={x:Static xaml:BoolToVisibilityConverter.Instance}}">
-                    <Image.Style>
-                        <Style TargetType="Image">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Margin" Value="19,0,0,0"/>
+                <!-- Fluent-style vector icon (Segoe MDL2 Assets glyph) instead of the legacy SystemIcons bitmap -->
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="28"
+                           Foreground="{DynamicResource AccentMidBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Margin="19,0,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="&#xE946;"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding TextIsMultiline}" Value="True">
-                                    <Setter Property="VerticalAlignment" Value="Top"/>
-                                    <Setter Property="Margin" Value="19,25,0,0"/>
+                                <DataTrigger Binding="{Binding Icon}" Value="{x:Static MessageBoxImage.Error}">
+                                    <Setter Property="Text" Value="&#xE783;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Icon}" Value="{x:Static MessageBoxImage.Question}">
+                                    <Setter Property="Text" Value="&#xE9CE;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Icon}" Value="{x:Static MessageBoxImage.Information}">
+                                    <Setter Property="Text" Value="&#xE946;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Icon}" Value="{x:Static MessageBoxImage.Exclamation}">
+                                    <Setter Property="Text" Value="&#xE7BA;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Icon}" Value="{x:Static MessageBoxImage.None}">
+                                    <Setter Property="Text" Value=""/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Image.Style>
-                </Image>
+                    </TextBlock.Style>
+                </TextBlock>
 
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Text}" Margin="8,25,15,30" TextWrapping="Wrap" TextAlignment="{Binding TextAlignment}"/>
 

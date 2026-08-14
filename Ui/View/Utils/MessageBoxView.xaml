@@ -17,5 +17,10 @@
                   FlowDirection="{Binding PageViewModel.FlowDirection}"
                   ShowInTaskbar="False"
                   MinWidth="160" MaxWidth="485">
-    <ContentControl s:View.Model="{Binding PageViewModel}"></ContentControl>
+    <Grid Margin="16">
+        <Grid.Effect>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.35" Color="#000000"/>
+        </Grid.Effect>
+        <ContentControl s:View.Model="{Binding PageViewModel}"></ContentControl>
+    </Grid>
 </styles:WindowChromeBase>
