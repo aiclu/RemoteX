@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:attachProperty="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
              xmlns:view="clr-namespace:_1RM.View"
              xmlns:model="clr-namespace:_1RM.Model"
              xmlns:dao="clr-namespace:_1RM.Service.DataSource.DAO"
@@ -122,6 +123,10 @@
         </Style>
 
         <Style x:Key="LineItemSettingMenuStyle" TargetType="Button" BasedOn="{StaticResource ButtonAccentStyle}">
+            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource BackgroundTextBrush}"></Setter>
+            <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{DynamicResource PrimaryMidBrush}"></Setter>
+            <Setter Property="attachProperty:VisionElement.BorderCornerRadius" Value="4"></Setter>
             <Setter Property="Visibility" Value="Hidden"></Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ElementName=Grid,Path=IsMouseOver}" Value="True">
@@ -129,9 +134,8 @@
                 </DataTrigger>
                 <DataTrigger Binding="{Binding ElementName=PopupCardSettingMenu, Path=IsOpen}" Value="True">
                     <Setter Property="Visibility" Value="Visible"></Setter>
-                    <Setter Property="Background" Value="{StaticResource PrimaryMidBrush}"></Setter>
-                    <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"></Setter>
-                    <Setter Property="Padding" Value="4"></Setter>
+                    <Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"></Setter>
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"></Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -189,17 +193,19 @@
             </TextBlock>
 
 
-            <!-- setting menu button -->
+            <!-- setting menu button - VSCode-style more icon -->
             <Button Grid.Column="1" 
                     x:Name="BtnSettingMenu"
                     Margin="0 0 10 0"
-                    Width="20" Height="20" HorizontalAlignment="Right"
+                    Width="22" Height="22" HorizontalAlignment="Right"
+                    Padding="0"
                     Style="{StaticResource LineItemSettingMenuStyle}"
                     Click="BtnSettingMenu_OnClick">
-                <Path Name="Symbol" Margin="2"
-                      Data="F1 M 20 6.25 L 0 6.25 L 0 5 L 20 5 L 20 6.25 Z M 20 16.25 L 0 16.25 L 0 15 L 20 15 L 20 16.25 Z M 20 11.25 L 0 11.25 L 0 10 L 20 10 L 20 11.25 Z "
-                      Fill="{DynamicResource AccentTextBrush}"
-                      Stretch="Uniform" />
+                <TextBlock Text="&#xE712;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="12"
+                           Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
             <!--icon-->

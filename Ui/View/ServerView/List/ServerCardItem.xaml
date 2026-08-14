@@ -136,9 +136,11 @@
         </Style>
 
         <Style x:Key="ButtonSettingStyle" TargetType="Button" BasedOn="{StaticResource ButtonBarAccentStyle}">
-            <Setter Property="Background" Value="{StaticResource AccentMidBrush}"></Setter>
+            <Setter Property="Background" Value="Transparent"></Setter>
             <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"></Setter>
             <Setter Property="Visibility" Value="Hidden"></Setter>
+            <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{StaticResource PrimaryMidBrush}"></Setter>
+            <Setter Property="attachProperty:VisionElement.BorderCornerRadius" Value="4"></Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ElementName=CardRealBorder,Path=IsMouseOver}" Value="True">
                     <Setter Property="Visibility" Value="Visible"></Setter>
@@ -258,17 +260,20 @@
                         </TextBlock>
                     </Grid>
                     <Grid>
-                        <!-- setting menu button -->
+                        <!-- setting menu button - VSCode-style more icon -->
                         <Button x:Name="BtnSettingMenu"
-                                Width="20" HorizontalAlignment="Right" 
+                                Width="22" Height="22"
+                                Margin="0 0 4 4"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                 BorderThickness="0"
+                                Padding="0"
                                 Style="{StaticResource ButtonSettingStyle}"
                                 Click="BtnSettingMenu_OnClick">
-                            <Path Margin="4 5 4 2"
-                                  Name="Symbol"
-                                  Data="M 2.707031 0 L 49.97266 0 L 49.97266 5 L 2.707031 5 Z M 2.707031 20 L 49.97266 20 L 49.97266 25 L 2.707031 25 Z M 2.707031 40 L 49.97266 40 L 49.97266 45 L 2.707031 45 Z"
-                                  Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
-                                  Stretch="Uniform" />
+                            <TextBlock Text="&#xE712;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="12"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Button>
                         <Popup Name="PopupCardSettingMenu"
                                AllowsTransparency="True"
