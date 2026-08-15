@@ -24,11 +24,11 @@ RemoteX is a modern personal remote session manager and launcher. It is a single
 
 ## 🚩Installation
 
-Latest Version: 1.0.8
+Latest Version: 1.0.9
 
 ### 🔻[Download](https://github.com/aiclu/RemoteX/releases)
 
-Grab the `RemoteX-1.0.8-net9-x64.zip` (framework-dependent) or `RemoteX-1.0.8-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
+Grab the `RemoteX-1.0.9-net9-x64.zip` (framework-dependent) or `RemoteX-1.0.9-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
 
 ## 👓Overview
 
