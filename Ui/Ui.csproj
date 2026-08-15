@@ -127,6 +127,19 @@
         <None Remove="Resources\Theme\Default.xaml.exclude" />
     </ItemGroup>
 
+    <!-- The vendored VariableKeywordMatcher sources live under Ui/Libs and are
+         compiled by their own project (Ui/Libs/VariableKeywordMatcher/
+         VariableKeywordMatcher.csproj). The WPF SDK would otherwise auto-include
+         every .cs/.xaml under Ui/Libs into the Ui assembly, duplicating types and
+         pulling in unneeded upstream demo/test code — exclude it all here. -->
+    <ItemGroup>
+        <Compile Remove="Libs\VariableKeywordMatcher\**\*.cs" />
+        <None Remove="Libs\VariableKeywordMatcher\**\*" />
+        <Page Remove="Libs\VariableKeywordMatcher\**\*.xaml" />
+        <ApplicationDefinition Remove="Libs\VariableKeywordMatcher\**\*.xaml" />
+        <Resource Remove="Libs\VariableKeywordMatcher\**\*.xaml" />
+    </ItemGroup>
+
     <ItemGroup>
         <Resource Include="Resources\Icons\000_OS\001_Debian.png" />
     </ItemGroup>
@@ -148,12 +161,12 @@
         <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
 
         <PackageReference Include="System.IO.Ports" Version="10.0.11" />
-        <PackageReference Include="VariableKeywordMatcherIn1" Version="1.0.12" />
         <PackageReference Include="VirtualizingWrapPanel" Version="2.5.4" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Dragablz\Dragablz\Dragablz.csproj" />
+        <ProjectReference Include="Libs\VariableKeywordMatcher\RemoteX.VariableKeywordMatcher.csproj" />
         <ProjectReference Include="..\Shawn.Utils\Shawn.Utils.WpfResources\Shawn.Utils.WpfResources.csproj" />
         <ProjectReference Include="..\Shawn.Utils\Shawn.Utils.Wpf\Shawn.Utils.Wpf.csproj" />
         <ProjectReference Include="..\Shawn.Utils\Shawn.Utils\Shawn.Utils.csproj" />

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Vendor a single aggregated assembly from the MIT-licensed
+         VShawn/VariableKeywordMatcher sources (git subtree, see docs/adr/0009).
+         Namespaces are preserved so KeywordMatchService works unchanged. -->
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>VariableKeywordMatcher</AssemblyName>
+    <RootNamespace>VariableKeywordMatcher</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <!-- Only the library projects are compiled; demo / nuget-test / unit-test
+       projects that ship with the upstream repo are excluded. -->
+  <ItemGroup>
+    <Compile Remove="Demo\**\*.cs" />
+    <Compile Remove="NugetTest\**\*.cs" />
+    <Compile Remove="VariableKeywordMatcherTests\**\*.cs" />
+    <!-- Japanese Romaji provider needs the external KawazuConverter package;
+         the app does not use it, so it is omitted. -->
+    <Compile Remove="Providers\VariableKeywordMatcher.Provider.JapaneseRomaji\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ToolGood.Words.Pinyin" Version="3.0.1.4" />
+    <PackageReference Include="ToolGood.Words.FirstPinyin" Version="3.0.1.4" />
+  </ItemGroup>
+
+</Project>
