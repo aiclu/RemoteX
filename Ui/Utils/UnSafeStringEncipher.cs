@@ -1,8 +1,13 @@
 ﻿using System;
-using System.Text;
+using _1RM.Service.RustFtp;
 
 namespace _1RM.Utils
 {
+    /// <summary>
+    /// String encryption backed by the in-process Rust core (ssh_rust.dll).
+    /// Re-implements the `1Remote.Security` algorithms so all previously stored
+    /// ciphertexts remain decryptable (see docs/adr/0009).
+    /// </summary>
     public static class UnSafeStringEncipher
     {
         private static string? _salt = null;
@@ -11,19 +16,17 @@ namespace _1RM.Utils
             if (_salt == null)
             {
                 _salt = slat;
-                _1Remote.Security.Config.SetSalt(slat);
             }
         }
         public static string SimpleEncrypt(string txt)
         {
-            return _1Remote.Security.SimpleStringEncipher.Encrypt(txt);
+            if (_salt == null) throw new InvalidOperationException("UnSafeStringEncipher.Init() must be called first");
+            return RustStringEncipher.Encrypt(txt, _salt);
         }
         public static string? SimpleDecrypt(string encryptString)
         {
-            var ret = _1Remote.Security.SimpleStringEncipher.Decrypt(encryptString);
-            if(ret.IsSuccess)
-                return ret.PlainText;
-            return null;
+            if (_salt == null) throw new InvalidOperationException("UnSafeStringEncipher.Init() must be called first");
+            return RustStringEncipher.Decrypt(encryptString, _salt);
         }
 
         public static string EncryptOnce(string str)

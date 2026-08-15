@@ -132,7 +132,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="1Remote.Security" Version="1.1.0" />
         <PackageReference Include="1Remote.VncSharpCore" Version="1.2.1" />
         <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
         <PackageReference Include="Dapper" Version="2.1.79" />

@@ -10,6 +10,7 @@
 //!   - sr_connect / sr_write / sr_poll_read / sr_resize / sr_disconnect
 //!   - sr_set_log_callback (tracing -> C#)
 
+mod encrypt;
 mod ftp;
 mod log;
 mod session;
@@ -528,6 +529,130 @@ pub unsafe extern "C" fn sr_ftp_upload(
             Ok(()) => SR_OK,
             Err(e) => {
                 unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+// ---------------------------------------------------------------------------
+// String encryption FFI (1Remote.Security re-implementation)
+// ---------------------------------------------------------------------------
+
+/// Encrypt `plain` with the given salt (and optional secondary key).
+/// The ciphertext is written into `out_buf`; `out_len` receives the byte length.
+/// Returns SR_ERR_INVALID_ARG when the buffer is too small.
+///
+/// # Safety
+/// string params must be null or valid NUL-terminated strings; `out_buf`/`out_cap`
+/// describe a writable buffer (or null when cap==0); `out_len` must be valid.
+#[no_mangle]
+pub unsafe extern "C" fn sr_string_encrypt(
+    plain: *const c_char,
+    salt: *const c_char,
+    secondary_key: *const c_char,
+    out_buf: *mut u8,
+    out_cap: usize,
+    out_len: *mut usize,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if out_len.is_null() || (out_cap > 0 && out_buf.is_null()) {
+            // SAFETY: out_len validated non-null.
+            unsafe { write_err(err_buf, err_cap, "null out_len/buf") };
+            return SR_ERR_INVALID_ARG;
+        }
+        // SAFETY: validated non-null above.
+        unsafe { *out_len = 0 };
+        let (Some(plain), Some(salt)) = (
+            unsafe { cstr_to_owned(plain) },
+            unsafe { cstr_to_owned(salt) },
+        ) else {
+            // SAFETY: required params.
+            unsafe { write_err(err_buf, err_cap, "null string param") };
+            return SR_ERR_INVALID_ARG;
+        };
+        // SAFETY: optional param.
+        let secondary_key = unsafe { cstr_to_owned(secondary_key) };
+        match encrypt::encrypt(&plain, &salt, secondary_key.as_deref()) {
+            Ok(cipher) => {
+                let bytes = cipher.as_bytes();
+                if out_buf.is_null() || bytes.len() > out_cap {
+                    // SAFETY: out_len validated non-null.
+                    unsafe { *out_len = bytes.len() };
+                    return SR_ERR_INVALID_ARG; // buffer too small
+                }
+                // SAFETY: copy into validated writable buffer.
+                unsafe {
+                    std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
+                    *out_len = bytes.len();
+                }
+                SR_OK
+            }
+            Err(e) => {
+                // SAFETY: err_buf provided by caller.
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Decrypt `cipher` with the given salt (and optional secondary key).
+/// On success the plaintext is written into `out_buf` (`out_len` = byte length).
+/// On failure (wrong salt/key/ciphertext) returns SR_ERR_CONNECT with an error
+/// message in `err_buf`; the caller treats that as "not decryptable".
+///
+/// # Safety
+/// same contract as [`sr_string_encrypt`].
+#[no_mangle]
+pub unsafe extern "C" fn sr_string_decrypt(
+    cipher: *const c_char,
+    salt: *const c_char,
+    secondary_key: *const c_char,
+    out_buf: *mut u8,
+    out_cap: usize,
+    out_len: *mut usize,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if out_len.is_null() || (out_cap > 0 && out_buf.is_null()) {
+            // SAFETY: out_len validated non-null.
+            unsafe { write_err(err_buf, err_cap, "null out_len/buf") };
+            return SR_ERR_INVALID_ARG;
+        }
+        // SAFETY: validated non-null above.
+        unsafe { *out_len = 0 };
+        let (Some(cipher), Some(salt)) = (
+            unsafe { cstr_to_owned(cipher) },
+            unsafe { cstr_to_owned(salt) },
+        ) else {
+            // SAFETY: required params.
+            unsafe { write_err(err_buf, err_cap, "null string param") };
+            return SR_ERR_INVALID_ARG;
+        };
+        // SAFETY: optional param.
+        let secondary_key = unsafe { cstr_to_owned(secondary_key) };
+        match encrypt::decrypt(&cipher, &salt, secondary_key.as_deref()) {
+            Some(plain) => {
+                let bytes = plain.as_bytes();
+                if out_buf.is_null() || bytes.len() > out_cap {
+                    // SAFETY: out_len validated non-null.
+                    unsafe { *out_len = bytes.len() };
+                    return SR_ERR_INVALID_ARG; // buffer too small
+                }
+                // SAFETY: copy into validated writable buffer.
+                unsafe {
+                    std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
+                    *out_len = bytes.len();
+                }
+                SR_OK
+            }
+            None => {
+                // SAFETY: err_buf provided by caller.
+                unsafe { write_err(err_buf, err_cap, "decrypt failed") };
                 SR_ERR_CONNECT
             }
         }
