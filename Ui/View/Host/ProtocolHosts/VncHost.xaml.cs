@@ -140,7 +140,16 @@ namespace _1RM.View.Host.ProtocolHosts
 
         public override void Close()
         {
-            Status = ProtocolHostStatus.Disconnected;
+            // Close() may be invoked from a background thread (e.g. the session
+            // cleanup timer in SessionControlService), while Status and the
+            // VncImage dependency property are bound to the UI thread. Delegate
+            // the UI-touching part back to the dispatcher.
+            Execute.OnUIThread(() =>
+            {
+                Status = ProtocolHostStatus.Disconnected;
+                VncImage.Source = null;
+                _bitmap = null;
+            });
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
@@ -149,8 +158,6 @@ namespace _1RM.View.Host.ProtocolHosts
                 VncRustNative.sr_vnc_disconnect(_handle);
                 _handle = 0;
             }
-            VncImage.Source = null;
-            _bitmap = null;
             base.Close();
         }
 
