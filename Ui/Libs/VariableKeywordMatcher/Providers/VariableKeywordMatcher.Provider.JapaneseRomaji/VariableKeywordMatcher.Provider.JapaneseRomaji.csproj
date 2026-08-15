@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net5.0-windows;netcoreapp3.1;netstandard2.0;net48;</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageIcon>icon-100.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Description>VariableKeywordMatcher.Provider.JapaneseRomaji is the Japanese Romaji matcher(plugin) for VariableKeywordMatcher or VariableKeywordMatcherIn1. e.g. "konni" will hit "こんにちは".</Description>
+		<RepositoryUrl>https://github.com/VShawn/VariableKeywordMatcher</RepositoryUrl>
+		<PackageTags>Keyword matcher highlight Japanese</PackageTags>
+		<Version>1.0.10</Version>
+		<PackageProjectUrl>https://github.com/VShawn/VariableKeywordMatcher</PackageProjectUrl>
+		<Authors>VShawn</Authors>
+		<Product>VariableKeywordMatcher</Product>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\AUTHORS" />
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\char.bin" />
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\COPYING" />
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\matrix.bin" />
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\sys.dic" />
+		<Content Remove="C:\Users\Shawn\.nuget\packages\kawazu\1.0.0\contentFiles\any\netcoreapp3.1\unk.dic" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Kawazu" Version="1.0.1" />
+		<PackageReference Include="LibNMeCab" Version="0.10.1" />
+		<PackageReference Include="LibNMeCab.IpaDicBin" Version="0.10.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\doc\icons\icon-100.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="..\..\readme.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\unk.dic" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\sys.dic" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\matrix.bin" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\COPYING" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\char.bin" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\AUTHORS" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\VariableKeywordMatcher.I\VariableKeywordMatcher.I.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="C:\Users\Shawn\.nuget\packages\libnmecab.ipadicbin\0.10.0\build\..\content\IpaDic\char.bin">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>
