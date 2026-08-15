@@ -64,59 +64,102 @@ pub fn connect(
         // Wrap the entire connect+auth+sftp-init in a single timeout so a hung
         // SFTP handshake (the "sftp init Timeout" failure mode reported by users
         // on slower / non-default-configured servers) cannot wedge the call.
-        tokio::time::timeout(timeout, async {
-            let config = Arc::new(russh::client::Config {
-                inactivity_timeout: Some(Duration::from_secs(60 * 15)),
-                keepalive_interval: Some(Duration::from_secs(30)),
-                ..<_>::default()
-            });
-            let mut session = tokio::time::timeout(
-                Duration::from_secs(10),
-                russh::client::connect(config, (host, port), Handler {}),
-            )
-            .await
-            .map_err(|_| format!("tcp connect to {host}:{port} timed out"))?
-            .map_err(|e| format!("connect {host}:{port}: {e}"))?;
+        //
+        // The inner async block is the unit of work, retryed up to `SFTP_CONNECT_ATTEMPTS`
+        // times with a short back-off. The first attempt usually wins; retrying rescues
+        // servers whose SFTP subsystem is slow to come up (e.g. systemd-forked
+        // internal-sftp that needs ~2s of cold-start on the first connection).
+        const SFTP_CONNECT_ATTEMPTS: u32 = 3;
+        let mut last_err: Option<String> = None;
+        for attempt in 1..=SFTP_CONNECT_ATTEMPTS {
+            let attempt_result = tokio::time::timeout(timeout, async {
+                let config = Arc::new(russh::client::Config {
+                    inactivity_timeout: Some(Duration::from_secs(60 * 15)),
+                    keepalive_interval: Some(Duration::from_secs(30)),
+                    ..<_>::default()
+                });
+                let mut session = tokio::time::timeout(
+                    Duration::from_secs(20),
+                    russh::client::connect(config, (host, port), Handler {}),
+                )
+                .await
+                .map_err(|_| format!("tcp connect to {host}:{port} timed out"))?
+                .map_err(|e| format!("connect {host}:{port}: {e}"))?;
 
-            // Authenticate.
-            if let Some(pw) = &password {
-                session
-                    .authenticate_password(user, pw)
+                // Authenticate.
+                if let Some(pw) = &password {
+                    session
+                        .authenticate_password(user, pw)
+                        .await
+                        .map_err(|e| format!("auth: {e}"))?;
+                } else if let Some(key_path) = &key_path {
+                    let key = russh::keys::load_secret_key(key_path, None)
+                        .map_err(|e| format!("load key {key_path}: {e}"))?;
+                    let hash_alg = session
+                        .best_supported_rsa_hash()
+                        .await
+                        .map_err(|e| format!("rsa hash: {e}"))?
+                        .flatten();
+                    session
+                        .authenticate_publickey(user, russh::keys::PrivateKeyWithHashAlg::new(Arc::new(key), hash_alg))
+                        .await
+                        .map_err(|e| format!("auth publickey: {e}"))?;
+                } else {
+                    return Err("no password or key provided".to_string());
+                }
+                // Open a session channel and run SFTP over it.
+                let channel = session
+                    .channel_open_session()
                     .await
-                    .map_err(|e| format!("auth: {e}"))?;
-            } else if let Some(key_path) = &key_path {
-                let key = russh::keys::load_secret_key(key_path, None)
-                    .map_err(|e| format!("load key {key_path}: {e}"))?;
-                let hash_alg = session
-                    .best_supported_rsa_hash()
-                    .await
-                    .map_err(|e| format!("rsa hash: {e}"))?
-                    .flatten();
-                session
-                    .authenticate_publickey(user, russh::keys::PrivateKeyWithHashAlg::new(Arc::new(key), hash_alg))
-                    .await
-                    .map_err(|e| format!("auth publickey: {e}"))?;
-            } else {
-                return Err("no password or key provided".to_string());
+                    .map_err(|e| format!("channel: {e}"))?;
+                let stream = channel.into_stream();
+                // `russh_sftp::client::SftpSession::new` carries an internal
+                // timeout that is shorter than `timeout`. Treat any `Timeout`
+                // error from it as transient and retry at the outer level.
+                let sftp = match russh_sftp::client::SftpSession::new(stream).await {
+                    Ok(s) => s,
+                    Err(e) => {
+                        let msg = e.to_string();
+                        return Err(if msg.to_lowercase().contains("timeout") {
+                            format!("sftp init: {msg} (attempt {attempt}/{SFTP_CONNECT_ATTEMPTS})")
+                        } else {
+                            format!("sftp init: {msg}")
+                        });
+                    }
+                };
+                Ok::<_, String>((session, sftp))
+            })
+            .await;
+
+            match attempt_result {
+                Ok(Ok(v)) => return Ok::<_, String>(v),
+                Ok(Err(e)) => {
+                    let is_timeout = e.to_lowercase().contains("timeout");
+                    last_err = Some(e.clone());
+                    if is_timeout && attempt < SFTP_CONNECT_ATTEMPTS {
+                        eprintln!(
+                            "[ssh_rust] sftp connect to {host}:{port} attempt {attempt} timed out, retrying in 2s: {e}"
+                        );
+                        tokio::time::sleep(Duration::from_secs(2)).await;
+                        continue;
+                    }
+                    return Err(e);
+                }
+                Err(_) => {
+                    last_err = Some(format!(
+                        "sftp connect to {host}:{port} timed out after {}s (attempt {attempt}/{SFTP_CONNECT_ATTEMPTS}, check that the server allows the SFTP subsystem and is responsive)",
+                        timeout.as_secs()
+                    ));
+                    if attempt < SFTP_CONNECT_ATTEMPTS {
+                        eprintln!("[ssh_rust] {}", last_err.as_deref().unwrap_or(""));
+                        tokio::time::sleep(Duration::from_secs(2)).await;
+                        continue;
+                    }
+                    return Err(last_err.unwrap());
+                }
             }
-            // Open a session channel and run SFTP over it.
-            let channel = session
-                .channel_open_session()
-                .await
-                .map_err(|e| format!("channel: {e}"))?;
-            let stream = channel.into_stream();
-            let sftp = russh_sftp::client::SftpSession::new(stream)
-                .await
-                .map_err(|e| format!("sftp init: {e}"))?;
-            Ok::<_, String>((session, sftp))
-        })
-        .await
-        .map_err(|_| {
-            format!(
-                "sftp connect to {host}:{port} timed out after {}s (check that the server allows the SFTP subsystem and is responsive)",
-                timeout.as_secs()
-            )
-        })?
+        }
+        Err(last_err.unwrap_or_else(|| format!("sftp connect to {host}:{port} failed")))
     });
 
     let (session, sftp) = match connect_result {
