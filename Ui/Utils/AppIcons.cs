@@ -52,27 +52,18 @@ namespace _1RM.Utils
         /// Load an ICO file referenced by a pack URI and return the largest frame
         /// as a frozen <see cref="BitmapSource"/>. The largest frame is the
         /// sharpest fit for the taskbar (which renders at 32×32 or higher on
-        /// modern DPI settings).
+        /// modern DPI settings). The handle is owned by the <see cref="Icon"/>
+        /// and released by its Dispose — do not DestroyIcon it manually (that
+        /// would be a double-destroy).
         /// </summary>
         private static BitmapSource LoadMultiFrameIco(System.Uri uri)
         {
             var info = System.Windows.Application.GetResourceStream(uri);
             using var ico = new Icon(info.Stream, 256, 256);
-            var hIcon = ico.Handle;
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHIcon(
-                    hIcon,
-                    System.Windows.Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally
-            {
-                DestroyIcon(hIcon);
-            }
+            return Imaging.CreateBitmapSourceFromHIcon(
+                ico.Handle,
+                System.Windows.Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
         }
-
-        [DllImport("user32.dll")]
-        private static extern bool DestroyIcon(IntPtr hIcon);
     }
 }
