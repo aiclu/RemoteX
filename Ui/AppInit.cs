@@ -10,6 +10,7 @@ using _1RM.View.Guidance;
 using Shawn.Utils;
 using Shawn.Utils.Wpf.FileSystem;
 using _1RM.Service.DataSource;
+using _1RM.Service.RustLog;
 using _1RM.Utils;
 using _1RM.Utils.PRemoteM;
 using _1RM.Service.DataSource.DAO;
@@ -106,6 +107,9 @@ namespace _1RM
             UnSafeStringEncipher.Init(Assert.STRING_SALT);
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory); // in case user start app in a different working dictionary.
             UnifyTracing.Init();
+            // Wire the Rust core's tracing output into SimpleLogHelper so SSH /
+            // Telnet / Serial / FTP / SFTP / VNC sessions log to the same place.
+            RustLogBridge.Install();
         }
 
         public static LanguageService? LanguageServiceObj;

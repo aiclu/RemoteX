@@ -1002,6 +1002,7 @@ pub unsafe extern "C" fn sr_connect_serial(
 pub extern "C" fn sr_set_log_callback(
     cb: Option<extern "C" fn(level: i32, msg: *const c_char)>,
 ) -> i32 {
+    log::init(); // idempotent; installs the ForwardLayer subscriber
     log::set_callback(cb);
     SR_OK
 }

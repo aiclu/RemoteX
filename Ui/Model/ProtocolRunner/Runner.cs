@@ -17,6 +17,7 @@ namespace _1RM.Model.ProtocolRunner
     [JsonKnownType(typeof(RustSshRunner), nameof(RustSshRunner))]
     [JsonKnownType(typeof(RustTelnetRunner), nameof(RustTelnetRunner))]
     [JsonKnownType(typeof(RustSerialRunner), nameof(RustSerialRunner))]
+    [JsonKnownType(typeof(RustVncRunner), nameof(RustVncRunner))]
     public class Runner : NotifyPropertyChangedBase, ICloneable
     {
         /// <summary>
@@ -33,6 +34,7 @@ namespace _1RM.Model.ProtocolRunner
             nameof(RustSshRunner),
             nameof(RustTelnetRunner),
             nameof(RustSerialRunner),
+            nameof(RustVncRunner),
         };
 
         public Runner(string runnerName, string ownerProtocolName)

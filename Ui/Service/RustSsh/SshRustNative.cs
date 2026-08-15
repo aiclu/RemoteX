@@ -97,6 +97,16 @@ namespace _1RM.Service.RustSsh
         /// </summary>
         [LibraryImport(DllName)]
         internal static partial int sr_disconnect(long handle);
+
+        /// <summary>
+        /// Register the Rust -> C# log callback. Must be called once at startup
+        /// so Rust session logs flow into <see cref="SimpleLogHelper"/>.
+        /// </summary>
+        [LibraryImport(DllName)]
+        internal static partial int sr_set_log_callback(LogCallback? cb);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void LogCallback(int level, IntPtr msgPtr);
     }
 }
 #endif
