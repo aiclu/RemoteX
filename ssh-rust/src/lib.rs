@@ -562,7 +562,7 @@ pub unsafe extern "C" fn sr_sftp_connect(
         };
         let password = unsafe { cstr_to_owned(password) };
         let key_path = unsafe { cstr_to_owned(key_path) };
-        match sftp_connect(&host, port, &user, password, key_path, Duration::from_secs(15)) {
+        match sftp_connect(&host, port, &user, password, key_path, Duration::from_secs(60)) {
             Ok(h) => {
                 unsafe { *handle_out = h };
                 SR_OK
