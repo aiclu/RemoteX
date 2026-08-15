@@ -366,9 +366,10 @@ pub unsafe extern "C" fn sr_ftp_list(
         match ftp_list(handle, &path) {
             Ok(json) => {
                 let bytes = json.as_bytes();
+                // Two-phase protocol — see sr_string_encrypt.
                 if out_buf.is_null() || bytes.len() > out_cap {
                     unsafe { *out_len = bytes.len() };
-                    return SR_ERR_INVALID_ARG; // buffer too small
+                    return SR_OK;
                 }
                 unsafe {
                     std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
@@ -579,10 +580,14 @@ pub unsafe extern "C" fn sr_string_encrypt(
         match encrypt::encrypt(&plain, &salt, secondary_key.as_deref()) {
             Ok(cipher) => {
                 let bytes = cipher.as_bytes();
+                // Two-phase protocol: a first call with out_buf=IntPtr.Zero (out_cap=0)
+                // asks for the required size. A second call with a sized buffer writes
+                // the result. The "buffer too small" case reports SR_OK with the
+                // required length so the caller can size the buffer.
                 if out_buf.is_null() || bytes.len() > out_cap {
                     // SAFETY: out_len validated non-null.
                     unsafe { *out_len = bytes.len() };
-                    return SR_ERR_INVALID_ARG; // buffer too small
+                    return SR_OK;
                 }
                 // SAFETY: copy into validated writable buffer.
                 unsafe {
@@ -639,10 +644,11 @@ pub unsafe extern "C" fn sr_string_decrypt(
         match encrypt::decrypt(&cipher, &salt, secondary_key.as_deref()) {
             Some(plain) => {
                 let bytes = plain.as_bytes();
+                // Two-phase protocol — see sr_string_encrypt.
                 if out_buf.is_null() || bytes.len() > out_cap {
                     // SAFETY: out_len validated non-null.
                     unsafe { *out_len = bytes.len() };
-                    return SR_ERR_INVALID_ARG; // buffer too small
+                    return SR_OK;
                 }
                 // SAFETY: copy into validated writable buffer.
                 unsafe {
@@ -729,9 +735,10 @@ pub unsafe extern "C" fn sr_sftp_list(
         match sftp_list(handle, &path) {
             Ok(json) => {
                 let bytes = json.as_bytes();
+                // Two-phase protocol — see sr_string_encrypt.
                 if out_buf.is_null() || bytes.len() > out_cap {
                     unsafe { *out_len = bytes.len() };
-                    return SR_ERR_INVALID_ARG; // buffer too small
+                    return SR_OK;
                 }
                 unsafe {
                     std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_buf, bytes.len());
