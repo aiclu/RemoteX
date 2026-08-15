@@ -107,11 +107,18 @@ pub fn connect(
                 } else {
                     return Err("no password or key provided".to_string());
                 }
-                // Open a session channel and run SFTP over it.
+                // Open a session channel, request the "sftp" subsystem and run
+                // SFTP over it. NB: `request_subsystem` is mandatory — without it
+                // the server never starts the SFTP subsystem and the version
+                // exchange hangs until russh-sftp's internal request timeout.
                 let channel = session
                     .channel_open_session()
                     .await
                     .map_err(|e| format!("channel: {e}"))?;
+                channel
+                    .request_subsystem(true, "sftp")
+                    .await
+                    .map_err(|e| format!("request sftp subsystem: {e}"))?;
                 let stream = channel.into_stream();
                 // `russh_sftp::client::SftpSession::new` carries an internal
                 // timeout that is shorter than `timeout`. Treat any `Timeout`
