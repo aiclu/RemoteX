@@ -15,6 +15,7 @@ mod ftp;
 mod log;
 mod session;
 mod sftp;
+mod vnc;
 
 use std::ffi::{CStr, c_char};
 use std::panic::{self, AssertUnwindSafe};
@@ -1003,6 +1004,205 @@ pub extern "C" fn sr_set_log_callback(
 ) -> i32 {
     log::set_callback(cb);
     SR_OK
+}
+
+// ---------------------------------------------------------------------------
+// VNC (RFB) FFI
+// ---------------------------------------------------------------------------
+
+/// Connect a VNC server and return a session handle. `password` may be null.
+/// The handshake runs on a background thread; call `sr_vnc_poll` to wait for
+/// `connected`. Same out-param contract as `sr_connect`.
+#[no_mangle]
+pub unsafe extern "C" fn sr_vnc_connect(
+    host: *const c_char,
+    port: u16,
+    password: *const c_char,
+    timeout_secs: u64,
+    handle_out: *mut i64,
+    err_buf: *mut c_char,
+    err_cap: usize,
+) -> i32 {
+    guard(|| {
+        if handle_out.is_null() {
+            unsafe { write_err(err_buf, err_cap, "null handle_out") };
+            return SR_ERR_INVALID_ARG;
+        }
+        unsafe { *handle_out = 0 };
+        let Some(host) = (unsafe { cstr_to_owned(host) }) else {
+            unsafe { write_err(err_buf, err_cap, "null host") };
+            return SR_ERR_INVALID_ARG;
+        };
+        let password = unsafe { cstr_to_owned(password) };
+        match vnc::connect(
+            &host,
+            port,
+            password.as_deref(),
+            Duration::from_secs(timeout_secs.max(1)),
+        ) {
+            Ok(h) => {
+                unsafe { *handle_out = h };
+                SR_OK
+            }
+            Err(e) => {
+                unsafe { write_err(err_buf, err_cap, &e) };
+                SR_ERR_CONNECT
+            }
+        }
+    })
+}
+
+/// Poll the VNC session state. Returns:
+///   SR_OK         - connected and framebuffer ready
+///   SR_ERR_CLOSED - connection terminated (error string in err_buf if any)
+///   SR_ERR_CONNECT- still handshaking (not yet connected, not an error)
+#[no_mangle]
+pub unsafe extern "C" fn sr_vnc_poll(handle: i64, err_buf: *mut c_char, err_cap: usize) -> i32 {
+    guard(|| {
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        if session.closed.load(Ordering::SeqCst) {
+            let msg = session.error.lock().unwrap().clone().unwrap_or_default();
+            unsafe { write_err(err_buf, err_cap, &msg) };
+            return SR_ERR_CLOSED;
+        }
+        if session.connected.load(Ordering::SeqCst) {
+            SR_OK
+        } else {
+            SR_ERR_CONNECT
+        }
+    })
+}
+
+/// Get the framebuffer geometry. Writes width/height, returns SR_OK, or
+/// SR_ERR_CONNECT if not yet connected.
+#[no_mangle]
+pub unsafe extern "C" fn sr_vnc_get_size(handle: i64, w_out: *mut u32, h_out: *mut u32) -> i32 {
+    guard(|| {
+        if w_out.is_null() || h_out.is_null() {
+            return SR_ERR_INVALID_ARG;
+        }
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        if !session.connected.load(Ordering::SeqCst) {
+            return SR_ERR_CONNECT;
+        }
+        unsafe {
+            *w_out = *session.width.lock().unwrap();
+            *h_out = *session.height.lock().unwrap();
+        }
+        SR_OK
+    })
+}
+
+/// Copy the current BGRA framebuffer into `buf` (capacity `cap` bytes).
+/// Returns SR_OK and sets `out_len`; returns SR_ERR_CONNECT if not connected.
+#[no_mangle]
+pub unsafe extern "C" fn sr_vnc_get_frame(
+    handle: i64,
+    buf: *mut u8,
+    cap: usize,
+    out_len: *mut usize,
+) -> i32 {
+    guard(|| {
+        if out_len.is_null() || (cap > 0 && buf.is_null()) {
+            return SR_ERR_INVALID_ARG;
+        }
+        unsafe { *out_len = 0 };
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        if !session.connected.load(Ordering::SeqCst) {
+            return SR_ERR_CONNECT;
+        }
+        let pixels = session.pixels.lock().unwrap();
+        if cap < pixels.len() {
+            unsafe { *out_len = pixels.len() };
+            return SR_ERR_INVALID_ARG;
+        }
+        unsafe {
+            std::ptr::copy_nonoverlapping(pixels.as_ptr(), buf, pixels.len());
+            *out_len = pixels.len();
+        }
+        SR_OK
+    })
+}
+
+/// Return the monotonic frame sequence number (bumped after each framebuffer
+/// update). The C# side uses this to know when to re-blit.
+#[no_mangle]
+pub extern "C" fn sr_vnc_frame_seq(handle: i64, seq_out: *mut u64) -> i32 {
+    guard(|| {
+        if seq_out.is_null() {
+            return SR_ERR_INVALID_ARG;
+        }
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        unsafe { *seq_out = *session.frame_seq.lock().unwrap() };
+        SR_OK
+    })
+}
+
+/// Send a pointer (mouse) event.
+#[no_mangle]
+pub unsafe extern "C" fn sr_vnc_send_pointer(handle: i64, x: u16, y: u16, buttons: u8) -> i32 {
+    guard(|| {
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        let _ = session.cmd_tx.send(vnc::VncCommand::Pointer { x, y, buttons });
+        SR_OK
+    })
+}
+
+/// Send a keyboard event (X11 keysym).
+#[no_mangle]
+pub extern "C" fn sr_vnc_send_key(handle: i64, keysym: u32, down: bool) -> i32 {
+    guard(|| {
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        let _ = session.cmd_tx.send(vnc::VncCommand::Key { keysym, down });
+        SR_OK
+    })
+}
+
+/// Request an incremental framebuffer update.
+#[no_mangle]
+pub extern "C" fn sr_vnc_request_update(handle: i64) -> i32 {
+    guard(|| {
+        let sessions = vnc::sessions();
+        let sessions = sessions.lock().unwrap();
+        let Some(session) = sessions.get(&handle) else {
+            return SR_ERR_INVALID_HANDLE;
+        };
+        let _ = session.cmd_tx.send(vnc::VncCommand::RequestFbUpdate);
+        SR_OK
+    })
+}
+
+/// Disconnect and free a VNC session handle. Idempotent.
+#[no_mangle]
+pub extern "C" fn sr_vnc_disconnect(handle: i64) -> i32 {
+    guard(|| {
+        vnc::disconnect(handle);
+        SR_OK
+    })
 }
 
 #[cfg(test)]

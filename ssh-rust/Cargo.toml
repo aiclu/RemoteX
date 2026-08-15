@@ -34,6 +34,8 @@ pbkdf2 = "0.12"
 md-5 = "0.10"
 base64 = "0.22"
 rand = "0.8"
+flate2 = "1.0"
+des = "0.8"
 
 [profile.release]
 lto = true
