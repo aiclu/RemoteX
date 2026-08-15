@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net5.0-windows;netcoreapp3.1;netstandard2.0;net48;net45;</TargetFrameworks>
+		<AssemblyName>VariableKeywordMatcherIn1</AssemblyName>
+		<RootNamespace>VariableKeywordMatcherIn1</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DocumentationFile>.\VariableKeywordMatcherIn1.xml</DocumentationFile>
+		<Description>VariableKeywordMatcherIn1 is a C# library offering several string-keyword matchers(English + PinYin), they allow you match keyword by Initials\Chinese PinYin\Japanese Romaji(plug-in needed)... You can get the keyword hit position that allow you to highlight the matched words.</Description>
+		<PackageProjectUrl>https://github.com/VShawn/VariableKeywordMatcher</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright></Copyright>
+		<PackageTags>Keyword matcher highlight PinYin</PackageTags>
+		<RepositoryUrl>https://github.com/VShawn/VariableKeywordMatcher</RepositoryUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<NeutralLanguage></NeutralLanguage>
+		<PackageIcon>icon-100.png</PackageIcon>
+		<Version>1.0.12</Version>
+		<Authors>VShawn</Authors>
+		<Product>VariableKeywordMatcherIn1</Product>
+		<Company>VShawn</Company>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\doc\icons\icon-100.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\readme.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ToolGood.Words.FirstPinyin" Version="3.0.1.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Providers\VariableKeywordMatcher.Provider.ChineseZhCnPinYinInitials\VariableKeywordMatcher.Provider.ChineseZhCnPinYinInitials.csproj" />
+		<ProjectReference Include="..\Providers\VariableKeywordMatcher.Provider.ChineseZhCnPinYin\VariableKeywordMatcher.Provider.ChineseZhCnPinYin.csproj" />
+		<ProjectReference Include="..\VariableKeywordMatcher.I\VariableKeywordMatcher.I.csproj" />
+		<ProjectReference Include="..\VariableKeywordMatcher\VariableKeywordMatcher.csproj" />
+	</ItemGroup>
+
+</Project>

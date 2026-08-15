@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VariableKeywordMatcherIn1</name>
+    </assembly>
+    <members>
+        <member name="T:VariableKeywordMatcherIn1.Builder">
+            <summary>
+            Matcher builder
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcherIn1.Builder.GetAvailableProviderNames">
+            <summary>
+            Return a list of available match providers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcherIn1.Builder.GetProviderDescription(System.String)">
+            <summary>
+            Get the description of match provider in its native language
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcherIn1.Builder.GetProviderDescriptionEn(System.String)">
+            <summary>
+            Get the description of match provider in English
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcherIn1.Builder.Build(System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Create a matcher including input match providers, CaseSensitive is false by default
+            </summary>
+            <param name="enabledProviderNames"></param>
+            <param name="isCaseSensitive"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+    </members>
+</doc>

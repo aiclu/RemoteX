@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net5.0-windows;netcoreapp3.1;netstandard2.0;net48;net45;</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>VariableKeywordMatcher.I</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>icon-100.png</PackageIcon>
+		<RepositoryUrl>https://github.com/VShawn/VariableKeywordMatcher</RepositoryUrl>
+		<PackageTags>interface</PackageTags>
+		<Version>1.0.10</Version>
+		<Authors>VShawn</Authors>
+		<Company>VShawn</Company>
+		<Product>VariableKeywordMatcher.I</Product>
+		<PackageProjectUrl>https://github.com/VShawn/VariableKeywordMatcher</PackageProjectUrl>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\doc\icons\icon-100.png" Link="icon-100.png">
+	    <PackagePath></PackagePath>
+	    <Pack>True</Pack>
+	  </None>
+	  <None Include="..\readme.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>

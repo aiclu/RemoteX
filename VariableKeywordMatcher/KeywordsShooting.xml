@@ -1,0 +1,440 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VariableKeywordMatcher</name>
+    </assembly>
+    <members>
+        <member name="T:VariableKeywordMatcher.Builder">
+            <summary>
+            Matcher builder
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Builder.GetAvailableProviderTypes">
+            <summary>
+            Return a list of available match providers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Builder.GetProviderDescription(System.String)">
+            <summary>
+            Get the description of match provider in its native language
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Builder.GetProviderDescriptionEn(System.String)">
+            <summary>
+            Get the description of match provider in English
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Builder.Build(System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Create a matcher including input match providers, CaseSensitive is false by default
+            </summary>
+            <param name="enabledProviderNames"></param>
+            <param name="isCaseSensitive"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:VariableKeywordMatcher.Interface.ISpellCache">
+            <summary>
+            Cache for matcher
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.ISpellCache.GetProviderName">
+            <summary>
+            return the target provider name of this spell cache
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:VariableKeywordMatcher.Interface.MatchProviderBase.IsCaseSensitive">
+            <summary>
+            Is case sensitive for this provider
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.#ctor(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="isCaseSensitive"></param>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.GetProviderName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.GetProviderDescriptionEn">
+            <summary>
+            Get match provider description in English
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.GetProviderDescription">
+            <summary>
+            Get match provider description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.AppendDescriptions(VariableKeywordMatcher.Model.MatchCache@)">
+            <summary>
+            append cache for this match provider to MatchCache
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.DoMatches(VariableKeywordMatcher.Model.MatchCache,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            using keywords to match the cache of the original sting
+            </summary>
+            <param name="matchCache">cache of the original sting</param>
+            <param name="keywords">list of keywords</param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.DoFindMatches(VariableKeywordMatcher.Model.MatchCache,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            for subclass
+            </summary>
+            <param name="matchCache"></param>
+            <param name="keywords"></param>
+            <param name="keywordsInTrueCase"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.ConvertStringToTrueCase(System.String,System.Boolean)">
+            <summary>
+            convert string to lowercase if isCaseSensitive == true
+            </summary>
+            <param name="orgString"></param>
+            <param name="isCaseSensitive"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Interface.MatchProviderBase.CreateBoolFlags(System.Int32)">
+            <summary>
+            create a bool list
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="F:VariableKeywordMatcher.Matcher.IsCaseSensitive">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Matcher.ProviderTypes">
+            <summary>
+            name of available providers
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.#ctor(System.Collections.Generic.IEnumerable{VariableKeywordMatcher.Interface.MatchProviderBase},System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="providers"></param>
+            <param name="isCaseSensitive"></param>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.CreateStringCache(System.String)">
+            <summary>
+            create a matching spell cache for the string
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.Match(VariableKeywordMatcher.Model.MatchCache,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            using keywords to match the cache of the original sting
+            </summary>
+            <param name="matchCache">cache of the original sting</param>
+            <param name="keywords">list of keywords</param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.Match(VariableKeywordMatcher.Model.MatchCache,System.String)">
+            <summary>
+            using keywords to match the cache of the original sting
+            </summary>
+            <param name="matchCache">cache of the original sting</param>
+            <param name="keyword">single keyword</param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.Match(System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            using keywords to match the string
+            </summary>
+            <param name="str">sting</param>
+            <param name="keywords">list of keywords</param>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Matcher.Match(System.String,System.String)">
+            <summary>
+            using keyword to match the string
+            </summary>
+            <param name="str"></param>
+            <param name="keyword"></param>
+            <returns></returns>
+        </member>
+        <member name="T:VariableKeywordMatcher.Model.MatchResult">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Model.MatchResult.#ctor(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Collections.Generic.List{System.Boolean},System.Collections.Generic.List{System.Boolean})">
+            <summary>
+            to show the match result
+            </summary>
+            <param name="originalString"></param>
+            <param name="keywords"></param>
+            <param name="isCaseSensitive"></param>
+            <param name="keywordsMatchedFlags"></param>
+            <param name="hitFlags"></param>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.OriginalString">
+            <summary>
+            original string of this match
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.Keywords">
+            <summary>
+            keywords of this match
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.IsCaseSensitive">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.IsMatchAllKeywords">
+            <summary>
+            return true if all keywords are found in the original string match cache.
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.KeywordsMatchedFlags">
+            <summary>
+            identify which keyword are matched
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.MatchResult.HitFlags">
+            <summary>
+            identify a place is matched or not. e.g. find "aa" on "aabaa" will return {true, true, false, true, true}
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Model.MatchResult.CreateUnmatchedResult(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            create a unmatched result
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Model.MatchResult.Merge(VariableKeywordMatcher.Model.MatchResult)">
+            <summary>
+            merge two results who having the same OriginalString
+            </summary>
+            <param name="o"></param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:VariableKeywordMatcher.Model.SpellCache">
+            <summary>
+            Cache for match, storage the spell of original string.
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Model.SpellCache.#ctor(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="providerName">cache target provider name</param>
+            <param name="stringLength">original string length</param>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.SpellCache.Units">
+            <summary>
+            alphabetical of original string.
+            Unit[i] include all its pronunciations(if existed), else it include originalString[i] only
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.SpellCache.SkipFlag">
+            <summary>
+            if SkipFlag[i] is true, then Unit[i] should not join keyword compare.
+            </summary>
+        </member>
+        <member name="P:VariableKeywordMatcher.Model.SpellCache.ConvertFlag">
+            <summary>
+            if ConvertFlag[i] is false, then Unit[i] is original char without any PinYin convert.
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Model.SpellCache.GetProviderName">
+            <summary>
+            return the target provider name of this spell cache
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider">
+            <summary>
+            Default keyword matcher for original string, e.g. keyword \"Hello Wor\" will matched the string \"Hello World\"
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.#ctor(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="isCaseSensitive"></param>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.GetName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.GetProviderName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.GetProviderDescription">
+            <summary>
+            Get match provider description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.GetProviderDescriptionEn">
+            <summary>
+            Get provider description in English
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DirectMatch.DirectMatchProvider.AppendDescriptions(VariableKeywordMatcher.Model.MatchCache@)">
+            <summary>
+            append cache for this match provider to MatchCache
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider">
+            <summary>
+            Discrete matcher for string, e.g. keyword \"HLWD\" will matched the string \"Hello World\"
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.#ctor(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="isCaseSensitive"></param>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.GetName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.GetProviderName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.GetProviderDescription">
+            <summary>
+            Get provider description in English
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.GetProviderDescriptionEn">
+            <summary>
+            Get provider description in English
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.DiscreteMatch.DiscreteMatchProvider.AppendDescriptions(VariableKeywordMatcher.Model.MatchCache@)">
+            <summary>
+            append cache for this match provider to MatchCache
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider">
+            <summary>
+            Initials matcher for string, e.g. keyword \"HW\" will matched the string \"Hello World\"
+            </summary>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.#ctor(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="isCaseSensitive"></param>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.GetName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.GetProviderName">
+            <summary>
+            return match provider name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.GetProviderDescription">
+            <summary>
+            Get match provider description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.GetProviderDescriptionEn">
+            <summary>
+            Get provider description in English
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VariableKeywordMatcher.Provider.InitialsMatch.InitialsMatchProvider.AppendDescriptions(VariableKeywordMatcher.Model.MatchCache@)">
+            <summary>
+            append cache for this match provider to MatchCache
+            </summary>
+            <returns></returns>
+            <param name="matchCache"></param>
+        </member>
+        <member name="T:AlgorithmForce.Searching.Extensions">
+            <summary>
+            Provides a set of extensions for searching specified collection in another collection.
+            </summary>
+        </member>
+        <member name="M:AlgorithmForce.Searching.Extensions.IndexesOf``1(System.Collections.Generic.IReadOnlyList{``0},System.Collections.Generic.IReadOnlyList{``0},System.Int32,System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Enumerates each zero-based index of all occurrences of the specified collection in this instance
+            and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/>.
+            The search starts at a specified position.
+            </summary>
+            <param name="s">The current collection.</param>
+            <param name="t">The collection to seek.</param>
+            <param name="startIndex">The search starting position.</param>
+            <param name="comparer">The specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> instance.</param>
+            <typeparam name="T">The type of element in the collection.</typeparam>
+            <returns>
+            The zero-based index positions of value if one or more <paramref name="t"/> are found. 
+            If <paramref name="t"/> is empty, no indexes will be enumerated.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="s"/> or <paramref name="t"/> is null.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="startIndex"/> is less than zero or greater than <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count">Count</see> of <paramref name="s"/>.
+            </exception>
+        </member>
+        <member name="M:AlgorithmForce.Searching.Extensions.IndexesOf(System.String,System.Collections.Generic.IReadOnlyList{System.Char})">
+            <summary>
+            Enumerates each zero-based index of all occurrences of the string in this instance.
+            </summary>
+            <param name="s">The string instance.</param>
+            <param name="t">The character collection to seek.</param>
+            <returns>
+            The zero-based index positions of value if one or more <paramref name="t"/> are found. 
+            If <paramref name="t"/> is empty, no indexes will be enumerated.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="s"/> or <paramref name="t"/> is null.</exception>
+        </member>
+        <member name="M:AlgorithmForce.Searching.Extensions.AsReadOnlyList(System.String)">
+            <summary>
+            Wrap a string instance as a read-only character collection.
+            </summary>
+            <param name="str">The string to be wrapped.</param>
+            <returns>A wrapped string.</returns>
+        </member>
+        <member name="T:AlgorithmForce.Searching.StringWrapper">
+            <summary>
+            If one day string implements IReadOnlyList{T} we may dig out this class
+            </summary>
+        </member>
+    </members>
+</doc>
