@@ -161,7 +161,9 @@ namespace _1RM.Service
                 }
                 catch (Exception)
                 {
-                    // ignored
+                    // ignored; fall through to the manual parser below, which
+                    // tolerates runner entries whose type no longer exists
+                    // (e.g. PuttyRunner / KittyRunner after the Rust migration).
                 }
 
                 // fallback to manual parse
@@ -180,6 +182,14 @@ namespace _1RM.Service
                     foreach (var runnerJObj in runners)
                     {
                         var runnerJson = runnerJObj.ToString();
+                        // Skip runner entries whose $type is no longer registered
+                        // (e.g. legacy PuttyRunner / KittyRunner). They are unusable
+                        // anyway, and silently discarding them keeps startup logs clean.
+                        var typeName = runnerJObj["$type"]?.ToString();
+                        if (string.IsNullOrEmpty(typeName) || !Runner.KnownDiscriminators.Contains(typeName))
+                        {
+                            continue;
+                        }
                         try
                         {
                             var runner = JsonConvert.DeserializeObject<Runner>(runnerJson);

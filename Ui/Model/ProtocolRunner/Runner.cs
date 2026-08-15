@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JsonKnownTypes;
@@ -18,6 +19,22 @@ namespace _1RM.Model.ProtocolRunner
     [JsonKnownType(typeof(RustSerialRunner), nameof(RustSerialRunner))]
     public class Runner : NotifyPropertyChangedBase, ICloneable
     {
+        /// <summary>
+        /// All discriminator values that JsonKnownTypesConverter can currently
+        /// deserialize. Used to pre-filter legacy runner entries (e.g. PuttyRunner /
+        /// KittyRunner removed during the Rust migration) so they are skipped
+        /// silently instead of throwing JsonKnownTypesException on every startup.
+        /// </summary>
+        internal static readonly HashSet<string> KnownDiscriminators = new()
+        {
+            nameof(Runner),
+            nameof(ExternalRunner),
+            nameof(InternalDefaultRunner),
+            nameof(RustSshRunner),
+            nameof(RustTelnetRunner),
+            nameof(RustSerialRunner),
+        };
+
         public Runner(string runnerName, string ownerProtocolName)
         {
             OwnerProtocolName = ownerProtocolName;
