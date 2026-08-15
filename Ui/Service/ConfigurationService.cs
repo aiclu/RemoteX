@@ -187,7 +187,7 @@ namespace _1RM.Service
         public GeneralConfig General { get; set; } = new GeneralConfig();
         public LauncherConfig Launcher { get; set; } = new LauncherConfig();
         public KeywordMatchConfig KeywordMatch { get; set; } = new KeywordMatchConfig();
-        public int DatabaseCheckPeriod { get; set; } = 10;
+        public int DatabaseCheckPeriod { get; set; } = 30;
         public int DatabaseReconnectPeriod { get; set; } = 60 * 2;
 
         private string _sqliteDatabasePath = "./" + Assert.APP_NAME + ".db";

@@ -181,10 +181,8 @@ namespace _1RM.Model
                     {
                         SimpleLogHelper.Debug("check database update - reload data by timer " + _timer.GetHashCode());
                     }
-                    else
-                    {
-                        SimpleLogHelper.Debug("check database update - no need reload by timer " + _timer.GetHashCode());
-                    }
+                    // no log when nothing changed — "no need reload" is the normal
+                    // case and would otherwise spam the log every check period.
 
                     // TODO: reload credentials
                 }
