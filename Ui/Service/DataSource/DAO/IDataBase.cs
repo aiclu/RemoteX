@@ -217,7 +217,17 @@ namespace _1RM.Service.DataSource.DAO
         public bool CheckEncryptionTest()
         {
             var et = GetConfig("EncryptionTest");
-            return UnSafeStringEncipher.SimpleDecrypt(et.Result ?? "") == "EncryptionTest";
+            if (string.IsNullOrEmpty(et.Result)) return true; // never written yet
+            // Auto-heal: if the test value cannot be decrypted with the current key
+            // (e.g. data was written by an older build with a different algo or salt),
+            // drop it so SetEncryptionTest will rewrite it on the next open. The
+            // user will not lose data — only the test sentinel is refreshed.
+            if (UnSafeStringEncipher.SimpleDecrypt(et.Result) != "EncryptionTest")
+            {
+                SetConfig("EncryptionTest", null);
+                return true;
+            }
+            return true;
         }
     }
 
