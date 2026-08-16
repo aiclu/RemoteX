@@ -117,23 +117,42 @@ namespace _1RM.View.Host.ProtocolHosts
                     Execute.OnUIThread(() => ShowError(string.IsNullOrEmpty(msg) ? "VNC connect failed" : msg));
                     return;
                 }
-                Execute.OnUIThread(() =>
+                if (token.IsCancellationRequested)
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        VncRustNative.sr_vnc_disconnect(handle);
-                        return;
-                    }
-                    _handle = handle;
-                    RenderLoop(token);
-                });
+                    VncRustNative.sr_vnc_disconnect(handle);
+                    return;
+                }
+                // Set _handle BEFORE starting RenderLoop, on this same worker
+                // thread. Previously _handle was assigned via a deferred
+                // Execute.OnUIThread while RenderLoop started immediately on
+                // another thread and read a still-zero handle -> sr_vnc_poll(0)
+                // returned INVALID_HANDLE and the tab showed "Disconnected"
+                // right away (a race). RenderLoop must run on a background
+                // thread (it busy-loops) but only after the handle is visible.
+                _handle = handle;
+                RenderLoop(token);
             }, token);
         }
 
         public override void ReConn()
         {
             _invokeOnClosedWhenDisconnected = false;
-            Close();
+            // Tear down the current session without triggering OnClosed (which
+            // would make SessionControlService close the whole tab window).
+            Execute.OnUIThread(() =>
+            {
+                Status = ProtocolHostStatus.Disconnected;
+                VncImage.Source = null;
+                _bitmap = null;
+            });
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+            if (_handle != 0)
+            {
+                VncRustNative.sr_vnc_disconnect(_handle);
+                _handle = 0;
+            }
             _invokeOnClosedWhenDisconnected = true;
             Conn();
         }
@@ -210,30 +229,63 @@ namespace _1RM.View.Host.ProtocolHosts
                 Status = ProtocolHostStatus.Connected;
             });
 
+            // Double-buffered framebuffer: the worker writes into `backBuffer`,
+            // then swaps it with `frontBuffer` before posting a single UI
+            // refresh. A `pending` flag coalesces bursts of frames so the UI
+            // thread is never flooded with queued blits (which would make the
+            // window appear "not responding"), and guarantees the UI thread
+            // never reads a buffer that is concurrently being written.
+            var backBuffer = new byte[width * height * 4];
+            var frontBuffer = new byte[width * height * 4];
+            // Cross-thread guard: read on the worker, written on the UI thread.
+            var pending = 0;
+            bool IsPending() => Volatile.Read(ref pending) != 0;
+            void SetPending(bool v) => Volatile.Write(ref pending, v ? 1 : 0);
+
             VncRustNative.sr_vnc_frame_seq(_handle, out var lastSeq);
             while (!token.IsCancellationRequested)
             {
-                // Copy the framebuffer once per frame bump.
+                // Poll the connection state EVERY iteration. If the Rust
+                // read_loop bails out (e.g. a decode error on some frame), the
+                // frame sequence stops advancing and the previous loop would
+                // hang on a frozen picture forever. Detecting "closed" here
+                // surfaces the disconnect immediately.
+                var poll = VncRustNative.sr_vnc_poll(_handle, errBuf, errBuf.Length);
+                if (poll == VncRustNative.SR_ERR_CLOSED || poll == VncRustNative.SR_ERR_INVALID_HANDLE)
+                {
+                    var msg = Encoding.UTF8.GetString(errBuf).TrimEnd('\0');
+                    Execute.OnUIThread(() => OnDisconnected(msg));
+                    return;
+                }
+
                 VncRustNative.sr_vnc_frame_seq(_handle, out var seq);
                 if (seq != lastSeq)
                 {
-                    var rc = VncRustNative.sr_vnc_get_frame(_handle, buffer, buffer.Length, out var len);
-                    if (rc == VncRustNative.SR_OK && len == buffer.Length)
-                    {
-                        Execute.OnUIThread(() => Blit(buffer));
-                        lastSeq = seq;
-                    }
-                    else if (rc == VncRustNative.SR_ERR_CLOSED || rc == VncRustNative.SR_ERR_INVALID_HANDLE)
+                    var rc = VncRustNative.sr_vnc_get_frame(_handle, backBuffer, backBuffer.Length, out var len);
+                    if (rc == VncRustNative.SR_ERR_CLOSED || rc == VncRustNative.SR_ERR_INVALID_HANDLE)
                     {
                         Execute.OnUIThread(() => OnDisconnected(""));
                         return;
                     }
+                    lastSeq = seq;
+                    if (rc != VncRustNative.SR_OK || len != backBuffer.Length)
+                        continue;
+
+                    if (IsPending())
+                        continue; // UI still busy; coalesce this frame.
+
+                    // Swap buffers so the UI thread reads a stable frame while
+                    // the worker keeps filling the other buffer.
+                    (backBuffer, frontBuffer) = (frontBuffer, backBuffer);
+                    SetPending(true);
+                    Execute.OnUIThread(() =>
+                    {
+                        Blit(frontBuffer);
+                        SetPending(false);
+                    });
                 }
                 // Ask Rust to request incremental updates periodically.
-                if (lastSeq == seq)
-                {
-                    VncRustNative.sr_vnc_request_update(_handle);
-                }
+                VncRustNative.sr_vnc_request_update(_handle);
                 Thread.Sleep(30);
             }
         }
@@ -262,7 +314,12 @@ namespace _1RM.View.Host.ProtocolHosts
             TbMessageTitle.Visibility = Visibility.Collapsed;
             BtnReconn.Visibility = Visibility.Visible;
             TbMessage.Text = string.IsNullOrEmpty(message) ? IoC.Translate("Disconnected") : message;
-            if (_invokeOnClosedWhenDisconnected)
+            // If the session never connected successfully (e.g. DNS failure,
+            // connect timeout or auth failure during the async RFB handshake),
+            // keep the tab open showing the error message so the user can see
+            // why it failed and hit Reconnect. Only auto-close when a session
+            // that had connected before is torn down.
+            if (HasConnected && _invokeOnClosedWhenDisconnected)
                 base.OnClosed?.Invoke(base.ConnectionId);
         }
 
@@ -303,7 +360,10 @@ namespace _1RM.View.Host.ProtocolHosts
         private void VncImage_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (_handle == 0 || _bitmap == null) return;
-            _mouseButtons &= (byte)~ButtonMask(e.ChangedButton);
+            // ~mask promotes to a negative int; (byte)(negative) throws under
+            // the project's CheckForOverflowUnderflow. Mask within byte range
+            // first so the cast is always in [0, 255].
+            _mouseButtons = (byte)(_mouseButtons & ~ButtonMask(e.ChangedButton));
             if (!TryMapToFb(e.GetPosition(VncImage), out var x, out var y)) return;
             VncRustNative.sr_vnc_send_pointer(_handle, x, y, _mouseButtons);
         }

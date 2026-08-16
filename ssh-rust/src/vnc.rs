@@ -89,6 +89,23 @@ pub enum VncCommand {
     RequestFbUpdate,
 }
 
+/// Debug helper: append a line to a log file so we can trace the VNC
+/// handshake/decode progress without a debugger. Only active when the
+/// environment variable REMOTEX_VNC_LOG is set (to any value).
+fn vlog(msg: &str) {
+    if std::env::var("REMOTEX_VNC_LOG").is_err() {
+        return;
+    }
+    use std::io::Write;
+    if let Ok(mut f) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("remotex_vnc.log")
+    {
+        let _ = writeln!(f, "{}", msg);
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Session registry (independent handle space)
 // ---------------------------------------------------------------------------
@@ -140,8 +157,14 @@ pub fn connect(
         // Mark the session closed + record any error, so sr_vnc_poll reports it.
         if let Some(session) = sessions_static.lock().unwrap().get_mut(&h) {
             session.closed.store(true, Ordering::SeqCst);
-            if let Err(e) = result {
-                *session.error.lock().unwrap() = Some(e);
+            match &result {
+                Err(e) => {
+                    vlog(&format!("worker: run_session FAILED: {e}"));
+                    *session.error.lock().unwrap() = Some(e.clone());
+                }
+                Ok(()) => {
+                    vlog("worker: run_session exited normally (closed)");
+                }
             }
         }
     });
@@ -152,7 +175,15 @@ pub fn connect(
 }
 
 pub fn disconnect(handle: i64) {
-    if let Some(mut s) = sessions().lock().unwrap().remove(&handle) {
+    // Remove the session in a scoped block so the registry MutexGuard is
+    // dropped BEFORE worker.join(). The worker's read_loop needs to lock the
+    // registry to observe the `closed` flag; holding the lock across join()
+    // would deadlock.
+    let removed = {
+        let mut guard = sessions().lock().unwrap();
+        guard.remove(&handle)
+    };
+    if let Some(mut s) = removed {
         s.closed.store(true, Ordering::SeqCst);
         if let Some(w) = s.worker.take() {
             let _ = w.join();
@@ -169,8 +200,10 @@ fn run_session(
     rx: std::sync::mpsc::Receiver<VncCommand>,
     timeout: Duration,
 ) -> Result<(), String> {
-    // Resolve + TCP connect with timeout.
-    let addr = host
+    // Resolve + TCP connect with timeout. Use (host, port) so that plain
+    // hostnames like "localhost" are resolved correctly (host.to_socket_addrs()
+    // expects a "host:port" string and fails on bare names).
+    let addr = (host, port)
         .to_socket_addrs()
         .map_err(|e| format!("dns resolve {host}: {e}"))?
         .next()
@@ -178,8 +211,14 @@ fn run_session(
     let stream = TcpStream::connect_timeout(&addr, timeout)
         .map_err(|e| format!("connect {host}:{port}: {e}"))?;
     stream.set_nodelay(true).ok();
+    // A short read timeout keeps read_loop responsive to the `closed` flag so
+    // disconnect()/worker.join() can always terminate instead of hanging.
+    let _ = stream.set_read_timeout(Some(Duration::from_millis(200)));
 
     let mut reader = stream.try_clone().map_err(|e| format!("clone: {e}"))?;
+    // try_clone may not inherit SO_RCVTIMEO on every platform; set it again on
+    // the read side so read_exact never blocks forever.
+    let _ = reader.set_read_timeout(Some(Duration::from_millis(200)));
     let mut writer = stream;
     let (width, height) = handshake(&mut reader, &mut writer, password)?;
 
@@ -231,6 +270,14 @@ fn handshake<R: Read, W: Write>(
             String::from_utf8_lossy(&server_version)
         ));
     }
+    vlog(&format!("handshake: server version = {:?}", String::from_utf8_lossy(&server_version)));
+    // RFB 3.7 does NOT expect the client to send a SharedDesktop flag before
+    // ServerInit; only 3.8+ does. Match the server's major.minor so we don't
+    // feed it a stray byte that it will then misinterpret as the high byte
+    // of the framebuffer width. Version string looks like "RFB 003.008\n".
+    let ver_str = String::from_utf8_lossy(&server_version[4..11]).to_string(); // "003.008"
+    let is_rfb38 = !ver_str.starts_with("003.003") && !ver_str.starts_with("003.007");
+    vlog(&format!("server version = {ver_str}, is_rfb38 = {is_rfb38}"));
 
     // 2. security types.
     let mut count = [0u8; 1];
@@ -257,6 +304,7 @@ fn handshake<R: Read, W: Write>(
         return Err(format!("no supported security type (offered {:?})", types));
     };
     write_all(writer, &[chosen])?;
+    vlog(&format!("handshake: security types = {:?}, chosen = {}", types, chosen));
 
     match chosen {
         SECURITY_TYPE_VNC_AUTH => {
@@ -281,8 +329,10 @@ fn handshake<R: Read, W: Write>(
         _ => unreachable!(),
     }
 
-    // 3. client init (shared = false)
-    write_all(writer, &[0])?;
+    // 3. client init (shared = false) — only for RFB 3.8+.
+    if is_rfb38 {
+        write_all(writer, &[0])?;
+    }
 
     // 4. server init
     let mut wh = [0u8; 2];
@@ -296,14 +346,24 @@ fn handshake<R: Read, W: Write>(
     let mut name_len_b = [0u8; 4];
     read_exact(reader, &mut name_len_b)?;
     let name_len = u32::from_be_bytes(name_len_b) as usize;
-    if name_len > 0 && name_len < 4096 {
+    // Always consume the name string, regardless of length, so the stream
+    // stays in sync. A long/malformed length must not be silently skipped.
+    if name_len > 0 && name_len < 1 << 20 {
         let mut name = vec![0u8; name_len];
         read_exact(reader, &mut name)?;
+    } else if name_len != 0 {
+        return Err(format!("server init: implausible name length {name_len}"));
     }
+    vlog(&format!("handshake: server init done, {}x{}", width, height));
     Ok((width, height))
 }
 
-/// VNC DES password challenge (reverse + XOR 0xFF each key byte).
+/// VNC DES password challenge.
+///
+/// The VNC password (max 8 bytes, zero-padded) becomes the DES key after
+/// reversing the bit order of *each* byte (see RFB spec §6.2.1 / TightVNC
+/// `vncEncryptBytes`). It is NOT a simple XOR 0xFF and the key array is NOT
+/// reversed as a whole.
 fn vnc_des_challenge(password: &str, challenge: &[u8; 16]) -> [u8; 16] {
     use des::Des;
     use des::cipher::generic_array::GenericArray;
@@ -313,9 +373,8 @@ fn vnc_des_challenge(password: &str, challenge: &[u8; 16]) -> [u8; 16] {
     let bytes = password.as_bytes();
     for i in 0..8 {
         let b = if i < bytes.len() { bytes[i] } else { 0 };
-        key[i] = b ^ 0xFF;
+        key[i] = b.reverse_bits();
     }
-    key.reverse();
     let cipher = Des::new(GenericArray::from_slice(&key));
     let mut out = [0u8; 16];
     for block in 0..2 {
@@ -337,31 +396,43 @@ fn request_pixel_format_and_encodings(
     height: u32,
 ) -> Result<(), String> {
     // SetPixelFormat: 32bpp, true-colour, little-endian, BGRA with shifts.
-    let mut msg = Vec::with_capacity(20 + 8 + 8);
+    // Message layout: msg-type (1) + padding (3) + pixel-format (16) = 20 bytes.
+    let mut msg = Vec::with_capacity(20);
     msg.push(CLIENT_SET_PIXEL_FORMAT);
     msg.push(0);
-    msg.extend_from_slice(&[0u8; 2]); // padding
-    msg.extend_from_slice(&[32, 24, 0, 1]); // bpp, depth, big-endian=0, true-colour=1
-    msg.extend_from_slice(&[0x00, 0xFF, 0, 0]); // red max
-    msg.extend_from_slice(&[0x00, 0xFF, 0, 0]); // green max
-    msg.extend_from_slice(&[0x00, 0xFF, 0, 0]); // blue max
-    msg.extend_from_slice(&[16, 8, 0, 0]); // red shift, green shift, blue shift, pad
+    msg.push(0);
+    msg.push(0); // padding (3 bytes)
+    msg.push(32); // bpp
+    msg.push(24); // depth
+    msg.push(0);  // big-endian flag
+    msg.push(1);  // true-colour flag
+    msg.push(0x00); msg.push(0xFF); // red-max (U16 BE)
+    msg.push(0x00); msg.push(0xFF); // green-max
+    msg.push(0x00); msg.push(0xFF); // blue-max
+    msg.push(16); // red-shift
+    msg.push(8);  // green-shift
+    msg.push(0);  // blue-shift
+    msg.push(0);  // padding
+    msg.push(0);
+    msg.push(0);  // padding (3 bytes total)
     write_all(writer, &msg)?;
 
-    // SetEncodings: raw, copyrect, hextile, tight, zrle + desktop resize pseudo.
+    // SetEncodings: raw, copyrect, rre, hextile + desktop resize pseudo.
+    // Tight/ZRLE are intentionally NOT requested: their decoders only handle a
+    // subset of tile/filter variants and a hit on an unsupported one makes the
+    // whole read loop bail -> "Disconnected". TigerVNC is happy to fall back
+    // to Hextile/Raw when Tight is not offered.
+    // Layout: msg-type(1) + padding(1) + count(2) + encodings(4 each).
     let encodings = [
         ENCODING_RAW,
         ENCODING_COPY_RECT,
         ENCODING_RRE,
         ENCODING_HEXTILE,
-        ENCODING_TIGHT,
-        ENCODING_ZRLE,
         ENCODING_FB_RESIZE,
     ];
-    let mut msg = Vec::with_capacity(4 + 2 + encodings.len() * 4);
+    let mut msg = Vec::with_capacity(4 + encodings.len() * 4);
     msg.push(CLIENT_SET_ENCODINGS);
-    msg.push(0);
-    msg.extend_from_slice(&[0u8; 2]);
+    msg.push(0); // padding
     let count = encodings.len() as u16;
     msg.extend_from_slice(&count.to_be_bytes());
     for e in encodings {
@@ -381,7 +452,7 @@ fn request_fb_update_full(
 ) -> Result<(), String> {
     let mut msg = Vec::with_capacity(10);
     msg.push(CLIENT_FRAMEBUFFER_UPDATE_REQUEST);
-    msg.push(1); // incremental = 0 (full)
+    msg.push(0); // incremental = 0 (full)
     msg.extend_from_slice(&0u16.to_be_bytes());
     msg.extend_from_slice(&0u16.to_be_bytes());
     msg.extend_from_slice(&(width as u16).to_be_bytes());
@@ -425,16 +496,43 @@ fn send_key(writer: &mut dyn Write, keysym: u32, down: bool) -> Result<(), Strin
 fn read_loop(
     sessions: &Mutex<HashMap<i64, VncSession>>,
     handle: i64,
-    reader: &mut dyn Read,
-    writer: &mut dyn Write,
+    reader: &mut TcpStream,
+    writer: &mut TcpStream,
     rx: &std::sync::mpsc::Receiver<VncCommand>,
 ) -> Result<(), String> {
     // Local framebuffer + geometry; grown/resized by the decoder as needed.
-    let mut framebuf: Vec<u8> = Vec::new();
-    let mut fb_width: u32 = 0;
-    let mut fb_height: u32 = 0;
+    // Initialize the geometry from the handshake result (published on the
+    // session), otherwise the first full-screen rect would be dropped as
+    // out-of-range by the x+w > width check below.
+    let (init_w, init_h) = {
+        let sessions = sessions.lock().unwrap();
+        let s = sessions.get(&handle).ok_or("session gone")?;
+        let w = *s.width.lock().unwrap();
+        let h = *s.height.lock().unwrap();
+        (w, h)
+    };
+    let mut framebuf: Vec<u8> = vec![0u8; (init_w * init_h * 4) as usize];
+    let mut fb_width: u32 = init_w;
+    let mut fb_height: u32 = init_h;
+    let mut frame_count: u64 = 0;
 
     loop {
+        // Exit promptly when the session is being torn down. This matters even
+        // while frames keep streaming in (e.g. an animated desktop), otherwise
+        // disconnect()/worker.join() would never return.
+        {
+            let closed = {
+                let guard = sessions.lock().unwrap();
+                guard
+                    .get(&handle)
+                    .map(|s| s.closed.load(Ordering::SeqCst))
+                    .unwrap_or(true)
+            };
+            if closed {
+                return Ok(());
+            }
+        }
+
         // Drain any pending input commands first.
         while let Ok(cmd) = rx.try_recv() {
             match cmd {
@@ -450,15 +548,51 @@ fn read_loop(
             }
         }
 
-        // Read server message type.
+        // Read server message type. Use a SHORT timeout here: this is the only
+        // point where the loop can promptly observe the `closed` flag so
+        // disconnect()/worker.join() returns quickly, and a message type is
+        // just 1 byte so a short timeout never aborts a mid-frame read.
+        let _ = reader.set_read_timeout(Some(Duration::from_millis(500)));
         let mut typ = [0u8; 1];
         match reader.read_exact(&mut typ) {
             Ok(()) => {}
             Err(e) if e.kind() == io::ErrorKind::WouldBlock || e.kind() == io::ErrorKind::TimedOut => {
-                // timeout: just re-drain commands and loop
+                // timeout: re-drain commands; exit promptly when the session is
+                // being torn down so disconnect()/worker.join() can return.
+                let closed = {
+                    let guard = sessions.lock().unwrap();
+                    guard
+                        .get(&handle)
+                        .map(|s| s.closed.load(Ordering::SeqCst))
+                        .unwrap_or(true)
+                };
+                if closed {
+                    return Ok(());
+                }
                 continue;
             }
             Err(e) => return Err(format!("read message type: {e}")),
+        }
+        // Long timeout for the message body: a full-screen hextile/tight frame
+        // is several MB and can take longer than 500ms over an SSH tunnel. A
+        // short timeout here would abort mid-frame and kill the connection
+        // (the "disconnected" symptom). The body read always completes or EOFs
+        // promptly once the server starts sending.
+        let _ = reader.set_read_timeout(Some(Duration::from_secs(30)));
+
+        // Byte-level diagnostics when REMOTEX_VNC_DUMP=1: for each message we
+        // don't recognise, print the message type plus the next bytes so we can
+        // tell whether the stream is misaligned or the server is sending an
+        // extension we don't handle.
+        if std::env::var("REMOTEX_VNC_DUMP").is_ok() && !matches!(typ[0], 0 | 1 | 2 | 3) {
+            let mut dump = [0u8; 16];
+            match reader.read_exact(&mut dump) {
+                Ok(()) => vlog(&format!(
+                    "read_loop: unknown type {typ:?} -> next bytes {dump:02X?} (ascii {:?})",
+                    String::from_utf8_lossy(&dump)
+                )),
+                Err(_) => {}
+            }
         }
 
         match typ[0] {
@@ -483,6 +617,16 @@ fn read_loop(
                     *session.pixels.lock().unwrap() = framebuf.clone();
                     *session.frame_seq.lock().unwrap() += 1;
                 }
+                frame_count += 1;
+                if frame_count % 30 == 0 {
+                    vlog(&format!(
+                        "read_loop: decoded {} frames, fb = {}x{}, framebuf_len = {}",
+                        frame_count,
+                        fb_width,
+                        fb_height,
+                        framebuf.len()
+                    ));
+                }
                 // request next incremental update
                 request_fb_update(writer)?;
             }
@@ -490,6 +634,9 @@ fn read_loop(
                 // no-op
             }
             MSG_SERVER_CUT_TEXT => {
+                // RFB 3.8: type(1) + padding(3) + length(4) + text.
+                let mut pad = [0u8; 3];
+                read_exact(reader, &mut pad)?;
                 let mut len_b = [0u8; 4];
                 read_exact(reader, &mut len_b)?;
                 let len = u32::from_be_bytes(len_b) as usize;
@@ -498,18 +645,27 @@ fn read_loop(
                 // clipboard: not wired yet
             }
             MSG_SET_COLOUR_MAP => {
+                // RFB 3.8: type(1) + padding(1) + first(2) + n(2) + rgb(6 each).
+                let mut pad = [0u8; 1];
+                read_exact(reader, &mut pad)?;
                 let mut first = [0u8; 2];
                 read_exact(reader, &mut first)?;
                 let mut n = [0u8; 2];
                 read_exact(reader, &mut n)?;
                 let n = u16::from_be_bytes(n);
-                // skip rgb triplets
+                // skip rgb triplets (6 bytes each)
                 let mut buf = vec![0u8; n as usize * 6];
                 read_exact(reader, &mut buf)?;
             }
             other => {
-                // Unknown message; try to keep the stream in sync is hard. Bail.
-                return Err(format!("unknown server message type {other}"));
+                // Unknown message type (e.g. TigerVNC's EndOfContinuousUpdates
+                // is 247/0xF7). We do NOT know its payload length, so we must
+                // NOT read any further bytes — reading ahead would corrupt the
+                // stream alignment and make every subsequent rect/message fail.
+                // Just log and continue; the next message-type read will pick
+                // up at the right byte (these pseudo-extension messages have
+                // empty payloads in practice).
+                vlog(&format!("read_loop: ignoring unknown server message type {other}"));
             }
         }
     }
@@ -641,9 +797,10 @@ fn decode_rre(
         let sy = u16::from_be_bytes([sub[2], sub[3]]) as u32;
         let sw = u16::from_be_bytes([sub[4], sub[5]]) as u32;
         let sh = u16::from_be_bytes([sub[6], sub[7]]) as u32;
+        // RRE sub-rectangle x/y are relative to the rectangle's top-left.
         for yy in 0..sh {
             for xx in 0..sw {
-                put_pixel(framebuf, stride, sx + xx, sy + yy, px);
+                put_pixel(framebuf, stride, x + sx + xx, y + sy + yy, px);
             }
         }
     }
@@ -660,10 +817,15 @@ fn decode_hextile(
     w: u32,
     h: u32,
 ) -> Result<(), String> {
-    const BG_SPECIFIED: u8 = 1;
-    const FG_SPECIFIED: u8 = 2;
-    const ANY_SUBRECTS: u8 = 4;
-    const SUBRECTS_COLOURED: u8 = 8;
+    // TigerVNC / RFB hextile subencoding bits (note: NOT the same layout as
+    // the older "background/foreground" constants used elsewhere):
+    //   bit0 (0x01) raw, bit1 (0x02) bg-specified, bit2 (0x04) fg-specified,
+    //   bit3 (0x08) any-subrects, bit4 (0x10) subrects-coloured.
+    const RAW: u8 = 0x01;
+    const BG_SPECIFIED: u8 = 0x02;
+    const FG_SPECIFIED: u8 = 0x04;
+    const ANY_SUBRECTS: u8 = 0x08;
+    const SUBRECTS_COLOURED: u8 = 0x10;
 
     let mut bg = [0u8; 4];
     let mut fg = [0u8; 4];
@@ -679,6 +841,21 @@ fn decode_hextile(
             read_exact(reader, &mut subencoding)?;
             let se = subencoding[0];
 
+            if se & RAW != 0 {
+                // Raw tile: read tile_w * tile_h * 4 bytes verbatim.
+                let n = (tile_w * tile_h * 4) as usize;
+                let mut raw = vec![0u8; n];
+                read_exact(reader, &mut raw)?;
+                for yy in 0..tile_h {
+                    let dst = ((tile_y + yy) as usize * stride as usize + tile_x as usize) * 4;
+                    let src = (yy as usize) * (tile_w as usize) * 4;
+                    let len = (tile_w as usize) * 4;
+                    framebuf[dst..dst + len].copy_from_slice(&raw[src..src + len]);
+                }
+                tile_x += 16;
+                continue;
+            }
+
             if se & BG_SPECIFIED != 0 {
                 let mut b = [0u8; 4];
                 read_exact(reader, &mut b)?;
@@ -690,14 +867,14 @@ fn decode_hextile(
                 fg = f;
             }
 
-            if se & ANY_SUBRECTS == 0 {
-                // solid tile
-                for yy in 0..tile_h {
-                    for xx in 0..tile_w {
-                        put_pixel(framebuf, stride, tile_x + xx, tile_y + yy, bg);
-                    }
+            // Fill the whole tile with the background colour first.
+            for yy in 0..tile_h {
+                for xx in 0..tile_w {
+                    put_pixel(framebuf, stride, tile_x + xx, tile_y + yy, bg);
                 }
-            } else {
+            }
+
+            if se & ANY_SUBRECTS != 0 {
                 let mut nsub = [0u8; 1];
                 read_exact(reader, &mut nsub)?;
                 let nsub = nsub[0] as u32;
@@ -713,10 +890,9 @@ fn decode_hextile(
                     read_exact(reader, &mut sub)?;
                     let sx = (sub[0] >> 4) as u32;
                     let sy = (sub[0] & 0x0F) as u32;
-                    let sw = (sub[1] >> 4) as u32;
-                    let sh = (sub[1] & 0x0F) as u32;
-                    let sw = if sw == 0 { 16 } else { sw };
-                    let sh = if sh == 0 { 16 } else { sh };
+                    // width/height are stored as (n-1), so add 1 -> 1..16.
+                    let sw = ((sub[1] >> 4) & 0x0F) as u32 + 1;
+                    let sh = (sub[1] & 0x0F) as u32 + 1;
                     for yy in 0..sh {
                         for xx in 0..sw {
                             put_pixel(
@@ -982,4 +1158,196 @@ fn decode_zrle(
         tile_y += 64;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::{Read, Write};
+    use std::net::{TcpListener, TcpStream};
+
+    /// NIST DES test vector: verifies the `des` crate behaves like standard DES
+    /// (which VNC auth relies on).
+    #[test]
+    fn des_crate_nist_vector() {
+        use des::cipher::generic_array::GenericArray;
+        use des::cipher::{BlockEncrypt, KeyInit};
+        let key = hex_decode("133457799BBCDFF1");
+        let pt = hex_decode("0123456789ABCDEF");
+        let mut block = GenericArray::clone_from_slice(&pt);
+        let cipher = des::Des::new(GenericArray::from_slice(&key));
+        cipher.encrypt_block(&mut block);
+        let got: Vec<u8> = block.to_vec();
+        assert_eq!(hex_encode(&got), "85E813540F0AB405");
+    }
+
+    fn hex_decode(s: &str) -> Vec<u8> {
+        (0..s.len()).step_by(2).map(|i| u8::from_str_radix(&s[i..i + 2], 16).unwrap()).collect()
+    }
+    fn hex_encode(b: &[u8]) -> String {
+        b.iter().map(|x| format!("{:02X}", x)).collect()
+    }
+
+    fn expect_bytes(r: &mut TcpStream, n: usize, what: &str) -> Vec<u8> {
+        let mut buf = vec![0u8; n];
+        let mut got = 0;
+        while got < n {
+            match r.read(&mut buf[got..]) {
+                Ok(0) => panic!("mock server: EOF while reading {what}"),
+                Ok(k) => got += k,
+                Err(e) => panic!("mock server: read {what}: {e}"),
+            }
+        }
+        buf
+    }
+
+    #[test]
+    fn vnc_handshake_and_first_frame_protocol_bytes() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut log: Vec<String> = Vec::new();
+            let mut dbg = |what: String| log.push(what);
+
+            // 1. version handshake: read client version, reply with 3.8.
+            let v = expect_bytes(&mut stream, 12, "client version");
+            dbg(format!("client version = {:?}", String::from_utf8_lossy(&v)));
+            stream.write_all(b"RFB 003.008\n").unwrap();
+
+            // 2. security types: offer [VNC Auth = 2].
+            stream.write_all(b"\x01\x02").unwrap();
+            let chosen = expect_bytes(&mut stream, 1, "chosen security");
+            dbg(format!("client chose security type {}", chosen[0]));
+            assert_eq!(chosen[0], 2);
+
+            // 3. VNC Auth challenge.
+            let challenge = [0x11u8; 16];
+            stream.write_all(&challenge).unwrap();
+            let resp = expect_bytes(&mut stream, 16, "vnc auth response");
+            dbg(format!("vnc auth response = {resp:02X?}"));
+
+            // 4. auth result OK, then SharedDesktop flag.
+            stream.write_all(&[0u8; 4]).unwrap();
+            let shared = expect_bytes(&mut stream, 1, "shared flag");
+            dbg(format!("client shared flag = {}", shared[0]));
+
+            // 5. ServerInit: 1920x1200.
+            let mut si = Vec::new();
+            si.extend_from_slice(&1920u16.to_be_bytes());
+            si.extend_from_slice(&1200u16.to_be_bytes());
+            si.extend_from_slice(&[32, 24, 0, 1, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 16, 8, 0, 0, 0, 0]);
+            let name = b"mock tiger";
+            si.extend_from_slice(&(name.len() as u32).to_be_bytes());
+            si.extend_from_slice(name);
+            stream.write_all(&si).unwrap();
+            dbg("sent ServerInit".to_string());
+
+            // 6. Read client messages until the full FBUpdateRequest.
+            loop {
+                let mt = expect_bytes(&mut stream, 1, "client message type");
+                match mt[0] {
+                    0 => {
+                        let body = expect_bytes(&mut stream, 19, "SetPixelFormat body");
+                        dbg(format!("client SetPixelFormat body = {body:02X?}"));
+                    }
+                    2 => {
+                        let padc = expect_bytes(&mut stream, 3, "SetEncodings pad+count");
+                        let n = u16::from_be_bytes([padc[1], padc[2]]) as usize;
+                        let encs = expect_bytes(&mut stream, n * 4, "SetEncodings list");
+                        dbg(format!("client SetEncodings ({n}) = {encs:02X?}"));
+                    }
+                    3 => {
+                        let body = expect_bytes(&mut stream, 9, "FBUpdateRequest body");
+                        let inc = body[0];
+                        let x = u16::from_be_bytes([body[1], body[2]]);
+                        let y = u16::from_be_bytes([body[3], body[4]]);
+                        let w = u16::from_be_bytes([body[5], body[6]]);
+                        let h = u16::from_be_bytes([body[7], body[8]]);
+                        dbg(format!(
+                            "client FBUpdateRequest incremental={inc} rect=({x},{y}) {w}x{h}"
+                        ));
+                        if inc == 0 {
+                            break;
+                        }
+                    }
+                    other => panic!("mock server: unexpected client msg type {other}"),
+                }
+            }
+
+            // 7. Full-screen Raw FramebufferUpdate.
+            let mut frm = Vec::new();
+            frm.push(0u8);
+            frm.push(0u8);
+            frm.extend_from_slice(&1u16.to_be_bytes());
+            frm.extend_from_slice(&0u16.to_be_bytes());
+            frm.extend_from_slice(&0u16.to_be_bytes());
+            frm.extend_from_slice(&1920u16.to_be_bytes());
+            frm.extend_from_slice(&1200u16.to_be_bytes());
+            frm.extend_from_slice(&0i32.to_be_bytes()); // Raw
+            for i in 0..(1920 * 1200) {
+                frm.extend_from_slice(&[
+                    (i & 0xFF) as u8,
+                    ((i >> 8) & 0xFF) as u8,
+                    ((i >> 16) & 0xFF) as u8,
+                    0xFF,
+                ]);
+            }
+            stream.write_all(&frm).unwrap();
+            dbg("sent FramebufferUpdate".to_string());
+
+            // Keep the connection open briefly so the client can process the
+            // frame, then close so the worker's read returns EOF and exits.
+            std::thread::sleep(Duration::from_millis(300));
+            drop(stream);
+            dbg("mock server: closed connection".to_string());
+            log
+        });
+
+        // Client: use the real public connect() API.
+        let handle = connect(
+            "127.0.0.1",
+            addr.port(),
+            Some("mypass"),
+            Duration::from_secs(5),
+        )
+        .expect("client connect should return a handle");
+
+        let server_log = server.join().unwrap();
+        for line in &server_log {
+            eprintln!("[mock-server] {line}");
+        }
+
+        eprintln!("[test] server joined, calling disconnect...");
+        // Read session state without holding the global lock while we print.
+        let mut w = 0u32;
+        let mut h = 0u32;
+        let mut flen = 0usize;
+        let mut seq = 0u64;
+        let mut closed = false;
+        {
+            let registry = sessions();
+            let guard = registry.lock().unwrap();
+            let s = guard.get(&handle).unwrap();
+            w = *s.width.lock().unwrap();
+            h = *s.height.lock().unwrap();
+            flen = s.pixels.lock().unwrap().len();
+            seq = *s.frame_seq.lock().unwrap();
+            closed = s.closed.load(std::sync::atomic::Ordering::SeqCst);
+        }
+        eprintln!(
+            "[test] connected={} width={w} height={h} framebuf_len={flen} frame_seq={seq} closed={closed}",
+            true
+        );
+
+        assert_eq!(w, 1920);
+        assert_eq!(h, 1200);
+        assert_eq!(flen, 1920 * 1200 * 4, "framebuffer should be full");
+        assert!(seq >= 1, "at least one frame decoded");
+
+        eprintln!("[test] about to disconnect (join worker)...");
+        disconnect(handle);
+        eprintln!("[test] disconnect returned");
+    }
 }

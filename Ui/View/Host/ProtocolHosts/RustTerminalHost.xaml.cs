@@ -166,7 +166,10 @@ namespace _1RM.View.Host.ProtocolHosts
             TbMessageTitle.Visibility = Visibility.Collapsed;
             BtnReconn.Visibility = Visibility.Visible;
             TbMessage.Text = IoC.Translate("Disconnected");
-            if (_invokeOnClosedWhenDisconnected)
+            // If the session never connected successfully, keep the tab open
+            // showing the error so the user can see why it failed. Only
+            // auto-close when a session that had connected before is torn down.
+            if (HasConnected && _invokeOnClosedWhenDisconnected)
                 base.OnClosed?.Invoke(base.ConnectionId);
         }
 
