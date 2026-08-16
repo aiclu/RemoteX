@@ -6,7 +6,7 @@ namespace _1RM
     {
         public const uint Major = 1;
         public const uint Minor = 0;
-        public const uint Patch = 9;
+        public const uint Patch = 10;
         public const uint Build = 0;
         public const string BuildDate = "";
         public const string PreRelease = ""; // e.g. "alpha" "beta.2"

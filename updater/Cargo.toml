@@ -14,7 +14,10 @@ path = "src/main.rs"
 # rustls + webpki-roots: pure-Rust TLS, avoids linking the OS schannel stack.
 # Note: rustls pulls in ring, whose Windows build requires NASM — the CI
 # workflow installs NASM (choco install nasm) before building the updater.
-reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+# system-proxy: read the OS proxy settings (WinHTTP/IE on Windows) so downloads
+# go through the user's configured proxy — without it reqwest connects directly
+# and GitHub downloads are slow/fail behind a firewall.
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls", "system-proxy"] }
 # SHA-256 verification
 sha2 = "0.10"
 # zip extraction

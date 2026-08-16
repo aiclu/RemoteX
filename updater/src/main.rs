@@ -1,7 +1,7 @@
 //! remotex-updater — standalone self-updater for RemoteX.
 //!
 //! Invoked by the WPF app as a separate process:
-//!     updater <downloadUrl> <sha256hex> <appExePath> [--restart]
+//!     updater <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]
 //!
 //! Flow:
 //!   1. download the release zip to a temp file (progress -> stdout as JSON lines)
@@ -302,16 +302,41 @@ fn main() {
 }
 
 fn run(args: &[String]) -> Result<()> {
-    // args: <downloadUrl> <sha256hex> <appExePath> [--restart]
-    if args.len() < 3 {
+    // Args (positional, matching SelfUpdateService.RunUpdaterAsync on the C#
+    // side): <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]
+    //
+    // --sha256 is OPTIONAL: when provided, the downloaded zip is verified
+    // against the given hex digest; when absent (current C# call path), the
+    // check is skipped.
+    if args.len() < 2 {
         return Err(UpdError::Args(
-            "usage: updater <downloadUrl> <sha256hex> <appExePath> [--restart]".into(),
+            "usage: updater <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]".into(),
         ));
     }
     let url = &args[0];
-    let expected_sha = &args[1].to_lowercase();
-    let exe_path = PathBuf::from(&args[2]);
-    let want_restart = args.iter().any(|a| a == "--restart");
+    let exe_path = PathBuf::from(&args[1]);
+    let mut expected_sha: Option<String> = None;
+    let mut want_restart = false;
+    let mut i = 2;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--sha256" => {
+                if i + 1 < args.len() {
+                    expected_sha = Some(args[i + 1].to_lowercase());
+                    i += 2;
+                } else {
+                    return Err(UpdError::Args("--sha256 requires a value".into()));
+                }
+            }
+            "--restart" => {
+                want_restart = true;
+                i += 1;
+            }
+            _ => {
+                return Err(UpdError::Args(format!("unknown argument: {}", args[i])));
+            }
+        }
+    }
 
     let tmp = tempfile::Builder::new()
         .prefix("remotex-upd-")
@@ -323,14 +348,16 @@ fn run(args: &[String]) -> Result<()> {
     // 1. download
     download(url, &zip_path)?;
 
-    // 2. verify
-    emit_stage("verify");
-    let actual_sha = sha256_of(&zip_path)?;
-    if *expected_sha != actual_sha {
-        return Err(UpdError::ShaMismatch {
-            expected: expected_sha.clone(),
-            got: actual_sha,
-        });
+    // 2. verify (optional)
+    if let Some(expected) = &expected_sha {
+        emit_stage("verify");
+        let actual_sha = sha256_of(&zip_path)?;
+        if *expected != actual_sha {
+            return Err(UpdError::ShaMismatch {
+                expected: expected.clone(),
+                got: actual_sha,
+            });
+        }
     }
 
     // 3. extract
