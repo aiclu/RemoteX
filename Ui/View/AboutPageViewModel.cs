@@ -198,18 +198,21 @@ namespace _1RM.View
 
         private void OnNewVersionRelease(VersionHelper.CheckUpdateResult result)
         {
-            this.NewVersion = result.NewerVersion;
-            this.NewVersionUrl = result.NewerUrl;
-            this.IsBreakingNewVersion = result.NewerHasBreakChange;
-            var v = IoC.Get<ConfigurationService>().Engagement.BreakingChangeAlertVersion;
-            if (this.IsBreakingNewVersion
-                && VersionHelper.Version.FromString(result.NewerVersion) > v)
+            // VersionHelper raises this callback from its background check task.
+            // All state consumed by AboutPageView is WPF-bound and must be changed
+            // on the dispatcher thread.
+            Execute.OnUIThread(() =>
             {
-                Execute.OnUIThreadSync(() =>
+                NewVersion = result.NewerVersion;
+                NewVersionUrl = result.NewerUrl;
+                IsBreakingNewVersion = result.NewerHasBreakChange;
+                var v = IoC.Get<ConfigurationService>().Engagement.BreakingChangeAlertVersion;
+                if (IsBreakingNewVersion
+                    && VersionHelper.Version.FromString(result.NewerVersion) > v)
                 {
                     IoC.Get<IWindowManager>().ShowDialog(IoC.Get<BreakingChangeUpdateViewModel>());
-                });
-            }
+                }
+            });
         }
 
 
@@ -232,6 +235,7 @@ namespace _1RM.View
             {
                 return _cmdUpdate ??= new RelayCommand(async (o) =>
                 {
+                    if (IsUpdating) return;
                     if (IsBreakingNewVersion)
                     {
                         MaskLayerController.ShowProcessingRing();

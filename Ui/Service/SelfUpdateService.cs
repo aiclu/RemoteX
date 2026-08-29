@@ -93,6 +93,10 @@ namespace _1RM.Service
                 StandardOutputEncoding = Encoding.UTF8,
             };
 
+            // Pass our PID through an environment variable so older updater.exe
+            // builds remain compatible (they simply ignore the variable).
+            psi.Environment["REMOTEX_TARGET_PID"] = Environment.ProcessId.ToString();
+
             using var proc = new Process { StartInfo = psi, EnableRaisingEvents = true };
             proc.OutputDataReceived += (_, e) =>
             {

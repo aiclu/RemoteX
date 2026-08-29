@@ -46,12 +46,20 @@ enum UpdError {
 
 type Result<T> = std::result::Result<T, UpdError>;
 
+fn log_line(message: &str) {
+    let path = env::temp_dir().join("RemoteX-updater.log");
+    if let Ok(mut file) = fs::OpenOptions::new().create(true).append(true).open(path) {
+        let _ = writeln!(file, "{message}");
+    }
+}
+
 fn emit(obj: &str) {
     println!("{obj}");
     let _ = std::io::stdout().flush();
 }
 
 fn emit_stage(stage: &str) {
+    log_line(&format!("stage={stage}"));
     emit(&format!("{{\"type\":\"stage\",\"stage\":\"{stage}\"}}"));
 }
 
@@ -169,39 +177,98 @@ fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<()> {
 // process helpers
 // ---------------------------------------------------------------------------
 
-/// Returns true if any process is currently running with the given exe path.
-fn process_running(exe_path: &Path) -> bool {
+/// Returns true if the process with the given PID is still running.
+fn process_running_by_pid(pid: u32) -> bool {
+    let out = match Command::new("tasklist")
+        .args(["/FI", &format!("PID eq {pid}"), "/FO", "CSV", "/NH"])
+        .stdout(Stdio::piped())
+        .output()
+    {
+        Ok(o) => o,
+        Err(e) => {
+            log_line(&format!("tasklist failed for pid {pid}: {e}"));
+            // Fail closed: do not replace files while the target may still be
+            // running if process inspection itself failed.
+            return true;
+        }
+    };
+    let expected = pid.to_string();
+    String::from_utf8_lossy(&out.stdout).lines().any(|line| {
+        line.split(',')
+            .nth(1)
+            .map(|value| value.trim().trim_matches('"') == expected)
+            .unwrap_or(false)
+    })
+}
+
+/// Fallback for callers that do not provide a PID. New app builds always pass
+/// the PID, but keeping this path preserves compatibility with older callers.
+fn process_running_by_name(exe_path: &Path) -> bool {
     let exe_name = exe_path
         .file_name()
         .map(|s| s.to_string_lossy().to_string())
         .unwrap_or_default();
     let out = match Command::new("tasklist")
-        .args(["/FI", &format!("IMAGENAME eq {}", exe_name), "/NH"])
+        .args(["/FI", &format!("IMAGENAME eq {exe_name}"), "/NH"])
         .stdout(Stdio::piped())
         .output()
     {
         Ok(o) => o,
-        Err(_) => return false,
+        Err(e) => {
+            log_line(&format!("tasklist failed for {exe_name}: {e}"));
+            return true;
+        }
     };
-    let text = String::from_utf8_lossy(&out.stdout).to_string();
-    // tasklist lists processes even if the path differs; we approximate by name.
-    text.contains(&exe_name.to_lowercase()) || text.contains(&exe_name)
+    String::from_utf8_lossy(&out.stdout)
+        .to_ascii_lowercase()
+        .contains(&exe_name.to_ascii_lowercase())
 }
 
-fn wait_for_exit(exe_path: &Path, timeout_secs: u64) {
+fn wait_for_exit(exe_path: &Path, pid: Option<u32>, timeout_secs: u64) -> Result<()> {
     emit_stage("wait-exit");
     let deadline = Instant::now() + Duration::from_secs(timeout_secs);
+    let is_running = || pid.map(process_running_by_pid)
+        .unwrap_or_else(|| process_running_by_name(exe_path));
+
     while Instant::now() < deadline {
-        if !process_running(exe_path) {
-            break;
+        if !is_running() {
+            return Ok(());
         }
         thread::sleep(Duration::from_millis(300));
     }
+
+    if is_running() {
+        let detail = pid
+            .map(|value| format!("pid {value}"))
+            .unwrap_or_else(|| exe_path.display().to_string());
+        return Err(UpdError::Swap(format!(
+            "target process ({detail}) did not exit within {timeout_secs}s"
+        )));
+    }
+    Ok(())
 }
 
-fn restart(exe_path: &Path) {
-    // detach: spawn with CREATE_NEW_PROCESS_GROUP and don't wait
-    let _ = Command::new(exe_path).spawn();
+fn restart(exe_path: &Path) -> Result<()> {
+    // The updater is already detached from the app, so spawning without waiting
+    // lets the replacement start after this process exits.
+    Command::new(exe_path)
+        .spawn()
+        .map(|_| ())
+        .map_err(|e| UpdError::Swap(format!("restart failed: {e}")))
+}
+
+fn copy_with_retry(source: &Path, destination: &Path) -> Result<()> {
+    let mut last_error = None;
+    for _ in 0..10 {
+        match fs::copy(source, destination) {
+            Ok(_) => return Ok(()),
+            Err(e) => {
+                last_error = Some(e);
+                thread::sleep(Duration::from_millis(300));
+            }
+        }
+    }
+    Err(UpdError::Io(last_error.expect("copy retry must record an error")))
 }
 
 // ---------------------------------------------------------------------------
@@ -241,7 +308,8 @@ fn swap_in(target_exe: &Path, new_exe: &Path) -> Result<()> {
     let backup = exe_dir.join("RemoteX.exe.bak");
     if target_exe.exists() {
         let _ = fs::remove_file(&backup);
-        fs::copy(target_exe, &backup)?;
+        copy_with_retry(target_exe, &backup)
+            .map_err(|e| UpdError::Swap(format!("backup failed: {e}")))?;
     }
 
     // copy the whole staging dir (dlls, rust libs, etc.) next to the exe
@@ -251,24 +319,31 @@ fn swap_in(target_exe: &Path, new_exe: &Path) -> Result<()> {
     for e in fs::read_dir(staging_root)? {
         let e = e?;
         let src = e.path();
-        let name = src.file_name().unwrap_or_default();
-        if name.to_string_lossy().eq_ignore_ascii_case("RemoteX.exe") {
-            continue; // handled below
+        let name = e.file_name();
+        if name.to_string_lossy().eq_ignore_ascii_case("RemoteX.exe")
+            || name.to_string_lossy().eq_ignore_ascii_case("updater.exe")
+        {
+            // RemoteX.exe is replaced below. The running updater cannot replace
+            // its own executable, so keep the existing helper for this update.
+            continue;
         }
-        let dst = exe_dir.join(name);
+        let dst = exe_dir.join(&name);
         if src.is_dir() {
             // replace any existing directory
             if dst.exists() {
-                let _ = fs::remove_dir_all(&dst);
+                fs::remove_dir_all(&dst)
+                    .map_err(|e| UpdError::Swap(format!("remove {} failed: {e}", dst.display())))?;
             }
             copy_dir(&src, &dst)?;
         } else if src.is_file() {
-            let _ = fs::copy(&src, &dst);
+            copy_with_retry(&src, &dst)
+                .map_err(|e| UpdError::Swap(format!("copy {} failed: {e}", name.to_string_lossy())))?;
         }
     }
 
     // finally replace the exe
-    fs::copy(new_exe, target_exe)?;
+    copy_with_retry(new_exe, target_exe)
+        .map_err(|e| UpdError::Swap(format!("replace {} failed: {e}", target_exe.display())))?;
     emit_stage("swapped");
     Ok(())
 }
@@ -282,7 +357,7 @@ fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
         if s.is_dir() {
             copy_dir(&s, &d)?;
         } else if s.is_file() {
-            let _ = fs::copy(&s, &d);
+            copy_with_retry(&s, &d)?;
         }
     }
     Ok(())
@@ -294,28 +369,37 @@ fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
+    log_line("started");
     if let Err(e) = run(&args) {
+        log_line(&format!("error={e}"));
         emit_error(&e.to_string());
         std::process::exit(1);
     }
+    log_line("done");
     emit("{\"type\":\"done\"}");
 }
 
 fn run(args: &[String]) -> Result<()> {
     // Args (positional, matching SelfUpdateService.RunUpdaterAsync on the C#
-    // side): <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]
+    // side): <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>] [--restart]
     //
     // --sha256 is OPTIONAL: when provided, the downloaded zip is verified
     // against the given hex digest; when absent (current C# call path), the
-    // check is skipped.
+    // check is skipped. The PID can also be supplied through
+    // REMOTEX_TARGET_PID for compatibility with older updater binaries.
     if args.len() < 2 {
         return Err(UpdError::Args(
-            "usage: updater <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]".into(),
+            "usage: updater <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>] [--restart]".into(),
         ));
     }
     let url = &args[0];
     let exe_path = PathBuf::from(&args[1]);
     let mut expected_sha: Option<String> = None;
+    // New C# clients pass the PID through the environment for compatibility
+    // with older updater binaries that reject unknown command-line options.
+    let mut target_pid = env::var("REMOTEX_TARGET_PID")
+        .ok()
+        .and_then(|value| value.parse::<u32>().ok());
     let mut want_restart = false;
     let mut i = 2;
     while i < args.len() {
@@ -326,6 +410,16 @@ fn run(args: &[String]) -> Result<()> {
                     i += 2;
                 } else {
                     return Err(UpdError::Args("--sha256 requires a value".into()));
+                }
+            }
+            "--pid" => {
+                if i + 1 < args.len() {
+                    target_pid = Some(args[i + 1].parse().map_err(|_| {
+                        UpdError::Args("--pid requires a numeric process id".into())
+                    })?);
+                    i += 2;
+                } else {
+                    return Err(UpdError::Args("--pid requires a value".into()));
                 }
             }
             "--restart" => {
@@ -364,7 +458,7 @@ fn run(args: &[String]) -> Result<()> {
     extract_zip(&zip_path, &staging)?;
 
     // 4. wait for the app to exit (it usually is still running while we work)
-    wait_for_exit(&exe_path, 30);
+    wait_for_exit(&exe_path, target_pid, 30)?;
 
     // 5. swap
     let new_exe = find_new_exe(&staging)?;
@@ -372,7 +466,7 @@ fn run(args: &[String]) -> Result<()> {
 
     // 6. restart
     if want_restart {
-        restart(&exe_path);
+        restart(&exe_path)?;
     }
 
     Ok(())
