@@ -171,7 +171,7 @@ namespace _1RM.View.ErrorReport
         {
             try
             {
-                HyperlinkHelper.OpenUriBySystem("https://github.com/1Remote/1Remote/issues");
+                HyperlinkHelper.OpenUriBySystem("https://github.com/aiclu/RemoteX/issues");
             }
             catch
             {

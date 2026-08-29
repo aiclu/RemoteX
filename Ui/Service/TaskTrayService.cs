@@ -100,7 +100,7 @@ namespace _1RM.Service
                 var linkFeedback = new System.Windows.Forms.ToolStripMenuItem(IoC.Translate("about_page_feedback"));
                 linkFeedback.Click += (sender, args) =>
                 {
-                    HyperlinkHelper.OpenUriBySystem("https://github.com/1Remote/1Remote/issues");
+                    HyperlinkHelper.OpenUriBySystem("https://github.com/aiclu/RemoteX/issues");
                 };
                 var exit = new System.Windows.Forms.ToolStripMenuItem(IoC.Translate("Exit"));
                 exit.Click += (sender, args) =>
