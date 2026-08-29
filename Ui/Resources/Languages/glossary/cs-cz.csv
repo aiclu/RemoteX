@@ -244,7 +244,7 @@ User profile;Profil uživatele
 Selected runner;Vybraný spouštěč
 Login with password;Přihlásit se heslem
 Login with ssh private key;Přihlásit se pomocí soukromého ssh klíče
-Supports the Putty-key only;Podporuje pouze Putty-klíč
+Supports the Putty-key only;Vestavěné SSH/SFTP podporuje klíče OpenSSH/PEM bez hesla, externí runnery mohou podporovat jiné formáty.
 Supports the OpenSSH format key only with the internal SFTP client.;Vestavěný SFTP klient podporuje klíče v OpenSSH formátu.
 Supports the OpenSSH format key and Putty-key with WinSCP.;Podporuje klíč v OpenSSH formátu a Putty-klíč s WinSCP.
 Environment variables;Proměnné prostředí

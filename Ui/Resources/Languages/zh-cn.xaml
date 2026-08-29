@@ -241,7 +241,7 @@
     <s:String x:Key="Selected runner">指定Runner</s:String>
     <s:String x:Key="Login with password">通过密码登录</s:String>
     <s:String x:Key="Login with ssh private key">通过私钥登录</s:String>
-    <s:String x:Key="Supports the Putty-key only">仅支持 putty key</s:String>
+    <s:String x:Key="Supports the Putty-key only">内置 SSH/SFTP 支持无密码短语的 OpenSSH/PEM 私钥；外部 Runner 可能支持其他格式。</s:String>
     <s:String x:Key="Supports the OpenSSH format key only with the internal SFTP client.">内置客户端仅支持 OpenSSH 格式私钥</s:String>
     <s:String x:Key="Supports the OpenSSH format key and Putty-key with WinSCP.">WinSCP 可支持 Putty 和 OpenSSH 两种格式私钥</s:String>
     <s:String x:Key="Environment variables">环境变量</s:String>

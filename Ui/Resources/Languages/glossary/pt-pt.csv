@@ -247,7 +247,7 @@ User profile;Perfil do utilizador
 Selected runner;Executor selecionado
 Login with password;Iniciar sessão com palavra-passe
 Login with ssh private key;Iniciar sessão com chave privada SSH
-Supports the Putty-key only;Suporta apenas chave do Putty
+Supports the Putty-key only;O SSH/SFTP integrado suporta chaves OpenSSH/PEM sem frase-passe, runners externos podem suportar outros formatos.
 Supports the OpenSSH format key only with the internal SFTP client.;Suporta apenas chave no formato OpenSSH com o cliente SFTP interno
 Supports the OpenSSH format key and Putty-key with WinSCP.;Suporta chave no formato OpenSSH e chave Putty com o WinSCP
 Environment variables;Variáveis de ambiente

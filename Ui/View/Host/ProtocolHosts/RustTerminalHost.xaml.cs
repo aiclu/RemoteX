@@ -224,7 +224,18 @@ namespace _1RM.View.Host.ProtocolHosts
             {
                 case SSH ssh:
                     ssh.DecryptToConnectLevel();
-                    return new SshConnectParams(ssh.Address, (ushort)ssh.GetPort(), ssh.UserName, ssh.Password, string.IsNullOrEmpty(ssh.PrivateKey) ? null : ssh.PrivateKey);
+                    // Use the selected authentication method explicitly. Older or
+                    // imported records can still contain both fields, and the Rust
+                    // core otherwise prefers the password whenever both are set.
+                    var usePrivateKey = ssh.UsePrivateKeyForConnect
+                                        ?? (!string.IsNullOrEmpty(ssh.PrivateKey)
+                                            && string.IsNullOrEmpty(ssh.Password));
+                    return new SshConnectParams(
+                        ssh.Address,
+                        (ushort)ssh.GetPort(),
+                        ssh.UserName,
+                        usePrivateKey ? null : (string.IsNullOrEmpty(ssh.Password) ? null : ssh.Password),
+                        usePrivateKey ? (string.IsNullOrEmpty(ssh.PrivateKey) ? null : ssh.PrivateKey) : null);
                 case Telnet telnet:
                     return new TelnetConnectParams(telnet.Address, (ushort)telnet.GetPort());
                 case Serial serial:

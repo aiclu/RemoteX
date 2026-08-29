@@ -243,7 +243,7 @@ User profile;Ustawienia użytkownika
 Selected runner;Wybrany program uruchamiający
 Login with password;Zaloguj za pomocą hasła
 Login with ssh private key;Zaloguj za pomocą klucz prywantego SSH
-Supports the Putty-key only;Wspierane są tylko klucze Putty
+Supports the Putty-key only;Wbudowany SSH/SFTP obsługuje klucze OpenSSH/PEM bez hasła, zewnętrzne runnery mogą obsługiwać inne formaty.
 Supports the OpenSSH format key only with the internal SFTP client.;Wspierane są tylko formaty klucza OpenSSH z wewnętrznym klientem SFTP.
 Supports the OpenSSH format key and Putty-key with WinSCP.;Wspierane formaty klucza OpenSSH i klucza Putty z WinSCP.
 Environment variables;Zmienne środowiskowe

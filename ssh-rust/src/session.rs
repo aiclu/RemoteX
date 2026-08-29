@@ -101,25 +101,36 @@ async fn connect_async(
         .map_err(|_| SrError::Connect(format!("connection to {host}:{port} timed out after {}s", timeout.as_secs())))?
         .map_err(|e| SrError::Connect(e.to_string()))?;
 
-    let auth_result = if let Some(pw) = password {
-        session
+    let auth_result = match (password, key_path) {
+        (Some(_), Some(_)) => {
+            return Err(SrError::Connect(
+                "password and private key are mutually exclusive".into(),
+            ));
+        }
+        (Some(pw), None) => session
             .authenticate_password(user, pw)
             .await
-            .map_err(|e| SrError::Connect(e.to_string()))?
-    } else if let Some(key) = key_path {
-        let key = russh::keys::load_secret_key(key, None)
-            .map_err(|e| SrError::Connect(format!("cannot load key: {e}")))?;
-        let hash_alg = session
-            .best_supported_rsa_hash()
-            .await
-            .map_err(|e| SrError::Connect(e.to_string()))?
-            .flatten();
-        session
-            .authenticate_publickey(user, russh::keys::PrivateKeyWithHashAlg::new(Arc::new(key), hash_alg))
-            .await
-            .map_err(|e| SrError::Connect(e.to_string()))?
-    } else {
-        return Err(SrError::Connect("no credentials".into()));
+            .map_err(|e| SrError::Connect(e.to_string()))?,
+        (None, Some(key_path)) => {
+            // russh accepts OpenSSH/PEM private keys here. PuTTY .ppk and
+            // passphrase-protected keys are intentionally not supported by the
+            // built-in runner; external runners can be used for those formats.
+            let key = russh::keys::load_secret_key(key_path, None)
+                .map_err(|e| SrError::Connect(format!("cannot load private key: {e}")))?;
+            let hash_alg = session
+                .best_supported_rsa_hash()
+                .await
+                .map_err(|e| SrError::Connect(e.to_string()))?
+                .flatten();
+            session
+                .authenticate_publickey(
+                    user,
+                    russh::keys::PrivateKeyWithHashAlg::new(Arc::new(key), hash_alg),
+                )
+                .await
+                .map_err(|e| SrError::Connect(e.to_string()))?
+        }
+        (None, None) => return Err(SrError::Connect("no credentials".into())),
     };
 
     if auth_result != russh::client::AuthResult::Success {

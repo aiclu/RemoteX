@@ -243,7 +243,7 @@ User profile;User profile
 Selected runner;Selected runner
 Login with password;Login with password
 Login with ssh private key;Login with ssh private key
-Supports the Putty-key only;Supports the Putty-key only
+Supports the Putty-key only;Built-in SSH/SFTP supports OpenSSH/PEM keys without a passphrase, external runners may support other formats.
 Supports the OpenSSH format key only with the internal SFTP client.;Supports the OpenSSH format key only with the internal SFTP client.
 Supports the OpenSSH format key and Putty-key with WinSCP.;Supports the OpenSSH format key and Putty-key with WinSCP.
 Environment variables;Environment variables

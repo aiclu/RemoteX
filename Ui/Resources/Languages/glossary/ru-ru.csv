@@ -243,7 +243,7 @@ User profile;Профиль пользователя
 Selected runner;Выбранный триггер
 Login with password;Войти с паролем
 Login with ssh private key;Войти с закрытым ключом ssh
-Supports the Putty-key only;Поддерживается только ключ Putty
+Supports the Putty-key only;Встроенный SSH/SFTP поддерживает ключи OpenSSH/PEM без парольной фразы, внешние runners могут поддерживать другие форматы.
 Supports the OpenSSH format key only with the internal SFTP client.;Поддерживается ключ формата OpenSSH, только с внутренним SFTP-клиентом.
 Supports the OpenSSH format key and Putty-key with WinSCP.;Поддерживает ключ формата OpenSSH и ключ Putty с WinSCP.
 Environment variables;Переменные среды

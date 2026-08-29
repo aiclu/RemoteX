@@ -241,7 +241,7 @@
     <s:String x:Key="Selected runner">選擇的執行器</s:String>
     <s:String x:Key="Login with password">透過密碼登入</s:String>
     <s:String x:Key="Login with ssh private key">透過私密金鑰登入</s:String>
-    <s:String x:Key="Supports the Putty-key only">僅支援 putty 金鑰</s:String>
+    <s:String x:Key="Supports the Putty-key only">內建 SSH/SFTP 支援不含密碼片語的 OpenSSH/PEM 私密金鑰；外部 Runner 可能支援其他格式。</s:String>
     <s:String x:Key="Supports the OpenSSH format key only with the internal SFTP client.">SFTP 內建客戶端只能支援 OpenSSH 格式的金鑰</s:String>
     <s:String x:Key="Supports the OpenSSH format key and Putty-key with WinSCP.">WinSCP 可以支援 Putty 和 OpenSSH 兩種格式的金鑰</s:String>
     <s:String x:Key="Environment variables">環境變數</s:String>

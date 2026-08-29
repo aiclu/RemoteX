@@ -35,7 +35,7 @@ namespace _1RM.View.Editor.Forms
         {
             if (DataContext is SftpFormViewModel { New: var sftp })
             {
-                var path = SelectFileHelper.OpenFile(filter: "ppk|*.*", currentDirectoryForShowingRelativePath: Environment.CurrentDirectory);
+                var path = SelectFileHelper.OpenFile(filter: "Private key|*.*", currentDirectoryForShowingRelativePath: Environment.CurrentDirectory);
                 if (path == null) return;
                 sftp.PrivateKey = path;
             }

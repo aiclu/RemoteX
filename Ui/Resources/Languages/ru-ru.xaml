@@ -241,7 +241,7 @@
     <s:String x:Key="Selected runner">Выбранный триггер</s:String>
     <s:String x:Key="Login with password">Войти с паролем</s:String>
     <s:String x:Key="Login with ssh private key">Войти с закрытым ключом ssh</s:String>
-    <s:String x:Key="Supports the Putty-key only">Поддерживается только ключ Putty</s:String>
+    <s:String x:Key="Supports the Putty-key only">Встроенный SSH/SFTP поддерживает ключи OpenSSH/PEM без парольной фразы; внешние runners могут поддерживать другие форматы.</s:String>
     <s:String x:Key="Supports the OpenSSH format key only with the internal SFTP client.">Поддерживается ключ формата OpenSSH, только с внутренним SFTP-клиентом.</s:String>
     <s:String x:Key="Supports the OpenSSH format key and Putty-key with WinSCP.">Поддерживает ключ формата OpenSSH и ключ Putty с WinSCP.</s:String>
     <s:String x:Key="Environment variables">Переменные среды</s:String>

@@ -241,7 +241,7 @@
     <s:String x:Key="Selected runner">Ausgewählter Runner</s:String>
     <s:String x:Key="Login with password">Mit Passwort anmelden</s:String>
     <s:String x:Key="Login with ssh private key">Mit privaten SSH-Schlüssel anmelden</s:String>
-    <s:String x:Key="Supports the Putty-key only">Unterstützt nur den Putty-Key</s:String>
+    <s:String x:Key="Supports the Putty-key only">Integriertes SSH/SFTP unterstützt OpenSSH-/PEM-Schlüssel ohne Passphrase; externe Runner unterstützen möglicherweise andere Formate.</s:String>
     <s:String x:Key="Supports the OpenSSH format key only with the internal SFTP client.">Unterstützt das OpenSSH-Schlüsselformat nur für den internen SFTP-Client.</s:String>
     <s:String x:Key="Supports the OpenSSH format key and Putty-key with WinSCP.">Unterstützt das OpenSSH-Schlüsselformat und den Putty-Schlüssel mit WinSCP.</s:String>
     <s:String x:Key="Environment variables">Umgebungsvariablen</s:String>

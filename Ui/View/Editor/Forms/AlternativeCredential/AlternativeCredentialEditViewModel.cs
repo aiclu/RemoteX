@@ -256,7 +256,7 @@ namespace _1RM.View.Editor.Forms.AlternativeCredential
 
         public void ButtonOpenPrivateKey_OnClick(object sender, RoutedEventArgs e)
         {
-            var path = SelectFileHelper.OpenFile(filter: "ppk|*.*", currentDirectoryForShowingRelativePath: Environment.CurrentDirectory);
+            var path = SelectFileHelper.OpenFile(filter: "Private key|*.*", currentDirectoryForShowingRelativePath: Environment.CurrentDirectory);
             if (path == null) return;
             PrivateKeyPath = path;
         }

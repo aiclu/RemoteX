@@ -243,7 +243,7 @@ User profile;Benutzerprofil
 Selected runner;Ausgewählter Runner
 Login with password;Mit Passwort anmelden
 Login with ssh private key;Mit privaten SSH-Schlüssel anmelden
-Supports the Putty-key only;Unterstützt nur den Putty-Key
+Supports the Putty-key only;Integriertes SSH/SFTP unterstützt OpenSSH-/PEM-Schlüssel ohne Passphrase, externe Runner unterstützen möglicherweise andere Formate.
 Supports the OpenSSH format key only with the internal SFTP client.;Unterstützt das OpenSSH-Schlüsselformat nur für den internen SFTP-Client.
 Supports the OpenSSH format key and Putty-key with WinSCP.;Unterstützt das OpenSSH-Schlüsselformat und den Putty-Schlüssel mit WinSCP.
 Environment variables;Umgebungsvariablen

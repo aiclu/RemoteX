@@ -241,7 +241,7 @@
     <s:String x:Key="Selected runner">ランナー選択</s:String>
     <s:String x:Key="Login with password">パスワードでログイン</s:String>
     <s:String x:Key="Login with ssh private key">SSH鍵認証でログイン</s:String>
-    <s:String x:Key="Supports the Putty-key only">Puttyキーにのみ対応</s:String>
+    <s:String x:Key="Supports the Putty-key only">内蔵 SSH/SFTP はパスフレーズなしの OpenSSH/PEM キーに対応します。外部 Runner は他の形式に対応している場合があります。</s:String>
     <s:String x:Key="Supports the OpenSSH format key only with the internal SFTP client.">ビルトインSFTPクライアントはOpenSSH形式のキーにのみ対応します。</s:String>
     <s:String x:Key="Supports the OpenSSH format key and Putty-key with WinSCP.">WinSCPはOpenSSH形式のキーとPuttyキーに対応します。</s:String>
     <s:String x:Key="Environment variables">環境変数</s:String>
