@@ -129,7 +129,11 @@ namespace _1RM.View
         public bool IsUpdating
         {
             get => _isUpdating;
-            set => SetAndNotifyIfChanged(ref _isUpdating, value);
+            set
+            {
+                if (SetAndNotifyIfChanged(ref _isUpdating, value))
+                    RaisePropertyChanged(nameof(IsUpdatePanelVisible));
+            }
         }
 
         private double _updateProgress;
@@ -153,6 +157,19 @@ namespace _1RM.View
             set => SetAndNotifyIfChanged(ref _updateStatus, value);
         }
 
+        private bool _updateFailed;
+        public bool UpdateFailed
+        {
+            get => _updateFailed;
+            set
+            {
+                if (SetAndNotifyIfChanged(ref _updateFailed, value))
+                    RaisePropertyChanged(nameof(IsUpdatePanelVisible));
+            }
+        }
+
+        public bool IsUpdatePanelVisible => IsUpdating || UpdateFailed;
+
         private IProgress<(string stage, double pct)>? _updateProgressSink;
         private IProgress<(string stage, double pct)> UpdateProgressSink => _updateProgressSink ??= new Progress<(string stage, double pct)>(p =>
         {
@@ -160,40 +177,75 @@ namespace _1RM.View
             switch (stage)
             {
                 case "download":
-                    UpdateStatus = $"Downloading update... {pct:F0}%";
+                    UpdateStatus = $"{TranslateUpdateText("Downloading update...", "Downloading update...")} {pct:F0}%";
                     UpdateProgress = pct;
                     UpdateIsIndeterminate = false;
                     break;
                 case "verify":
-                    UpdateStatus = "Verifying update...";
+                    UpdateStatus = TranslateUpdateText("Verifying update...", "Verifying update...");
                     UpdateIsIndeterminate = true;
                     break;
                 case "extract":
-                    UpdateStatus = "Extracting update...";
+                    UpdateStatus = TranslateUpdateText("Extracting update...", "Extracting update...");
+                    UpdateIsIndeterminate = true;
+                    break;
+                case "ready-to-swap":
+                    UpdateStatus = TranslateUpdateText("Update is ready to install...", "Update is ready to install...");
                     UpdateIsIndeterminate = true;
                     break;
                 case "wait-exit":
-                    UpdateStatus = "Waiting for RemoteX to exit...";
+                    UpdateStatus = TranslateUpdateText("Waiting for RemoteX to exit...", "Waiting for RemoteX to exit...");
                     UpdateIsIndeterminate = true;
                     break;
                 case "swap":
-                    UpdateStatus = "Installing update...";
+                    UpdateStatus = TranslateUpdateText("Installing update...", "Installing update...");
                     UpdateIsIndeterminate = true;
                     break;
                 case "swapped":
-                    UpdateStatus = "Update installed. Restarting...";
+                    UpdateStatus = TranslateUpdateText("Update installed. Restarting...", "Update installed. Restarting...");
                     UpdateIsIndeterminate = true;
                     break;
                 case "error":
-                    UpdateStatus = "Update failed.";
+                    UpdateStatus = TranslateUpdateText("Update failed.", "Update failed.");
+                    UpdateIsIndeterminate = false;
+                    break;
+                case "uac-cancelled":
+                    UpdateStatus = TranslateUpdateText("Administrator permission was not granted.", "Administrator permission was not granted.");
+                    UpdateIsIndeterminate = false;
+                    break;
+                case "failed":
+                case "rolled-back":
+                case "rollback-failed":
+                    UpdateStatus = TranslateUpdateText("Update failed.", "Update failed.");
                     UpdateIsIndeterminate = false;
                     break;
             }
         });
 
+        private static string TranslateUpdateText(string key, string fallback)
+        {
+            try
+            {
+                var text = IoC.Translate(key);
+                return string.IsNullOrWhiteSpace(text) ? fallback : text;
+            }
+            catch
+            {
+                return fallback;
+            }
+        }
+
+        private static string UpdateFailureText(string detail = "")
+        {
+            var message = TranslateUpdateText(
+                "Update failed. The previous version is still running. You can retry or download it manually.",
+                "Update failed. The previous version is still running. You can retry or download it manually.");
+            return string.IsNullOrWhiteSpace(detail) ? message : $"{message}\n{detail}";
+        }
+
         public void CheckUpdateAsync()
         {
-            _checker.CheckUpdateAsync();
+            _checker?.CheckUpdateAsync();
         }
 
         private void OnNewVersionRelease(VersionHelper.CheckUpdateResult result)
@@ -249,55 +301,95 @@ namespace _1RM.View
                     if (!SelfUpdateService.UpdaterExists())
                     {
                         // No updater shipped (e.g. dev build): fall back to the browser.
-                        HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                        HyperlinkHelper.OpenUriBySystem(string.IsNullOrWhiteSpace(NewVersionUrl)
+                            ? AppVersion.UpdatePublishUrls[0]
+                            : NewVersionUrl);
                         return;
                     }
 
                     // In-place progress next to the Update link; no full-screen mask.
                     IsUpdating = true;
+                    UpdateFailed = false;
                     UpdateIsIndeterminate = true;
                     UpdateProgress = 0;
-                    UpdateStatus = "Checking update...";
+                    UpdateStatus = TranslateUpdateText("Checking update...", "Checking update...");
+                    SelfUpdatePackage? package = null;
                     try
                     {
-                        var zipUrl = await SelfUpdateService.GetLatestSelfContainedZipUrlAsync();
-                        if (string.IsNullOrEmpty(zipUrl))
+                        package = await SelfUpdateService.GetLatestSelfContainedPackageAsync();
+                        if (package == null)
                         {
-                            UpdateStatus = "Cannot locate the update package.";
-                            MessageBoxHelper.ErrorAlert("Cannot locate the update package. Please download it manually.");
-                            HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                            if (string.IsNullOrWhiteSpace(NewVersionUrl))
+                                NewVersionUrl = AppVersion.UpdatePublishUrls[0];
+                            UpdateFailed = true;
+                            UpdateStatus = TranslateUpdateText("Cannot locate the update package.", "Cannot locate the update package.");
+                            MessageBoxHelper.ErrorAlert(UpdateFailureText("The update package could not be located. Use the manual download link below to continue."));
                             return;
                         }
 
-                        var ok = await SelfUpdateService.RunUpdaterAsync(zipUrl, UpdateProgressSink, onWaitExit: () =>
+                        var releaseVersion = VersionHelper.Version.FromString(package.Version);
+                        if (releaseVersion <= AppVersion.VersionData)
                         {
-                            // updater has downloaded+verified+extracted; close the app so it can
-                            // swap the exe and restart us. The updater runs detached (no parent wait).
+                            NewVersion = "";
+                            UpdateStatus = TranslateUpdateText("RemoteX is already up to date.", "RemoteX is already up to date.");
+                            return;
+                        }
+
+                        NewVersion = package.Version;
+                        NewVersionUrl = string.IsNullOrWhiteSpace(package.ReleaseUrl) ? NewVersionUrl : package.ReleaseUrl;
+                        var targetExe = SelfUpdateService.GetCurrentExecutablePath();
+                        var runElevated = !SelfUpdateService.IsInstallDirectoryWritable(targetExe);
+                        var result = await SelfUpdateService.RunUpdaterAsync(package, targetExe, runElevated, UpdateProgressSink, onReadyToSwap: () =>
+                        {
+                            // The updater has downloaded, verified, extracted and preflighted
+                            // the package. Close only at this handoff point so failures before
+                            // replacement leave the current application running.
                             Execute.OnUIThreadSync(() => App.Close());
                         });
-                        if (ok)
+                        if (result.Succeeded && !App.ExitingFlag)
                         {
-                            // If the app is still alive after updater exits, it means the updater
-                            // failed to restart us; just inform the user.
-                            MessageBoxHelper.ErrorAlert("Update finished but the app did not restart automatically. Please restart RemoteX.");
+                            UpdateFailed = true;
+                            UpdateStatus = TranslateUpdateText("The update is ready, but RemoteX did not close.", "The update is ready, but RemoteX did not close.");
+                            MessageBoxHelper.ErrorAlert(UpdateFailureText("Please close and restart RemoteX, then try again if the update is still offered."));
                         }
-                        else
+                        else if (!result.Succeeded)
                         {
-                            MessageBoxHelper.ErrorAlert("Update failed. Please try downloading it manually.");
-                            HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                            UpdateFailed = true;
+                            var statusKey = result.ElevationCancelled ? "Administrator permission was not granted." : "Update failed.";
+                            UpdateStatus = TranslateUpdateText(statusKey, statusKey);
+                            var detail = string.IsNullOrWhiteSpace(result.Message)
+                                ? $"Updater log: {SelfUpdateService.UpdaterLogPath}"
+                                : $"{result.Message}\nUpdater log: {SelfUpdateService.UpdaterLogPath}";
+                            MessageBoxHelper.ErrorAlert(UpdateFailureText(detail));
                         }
                     }
                     catch (Exception ex)
                     {
                         SimpleLogHelper.Error(ex);
-                        MessageBoxHelper.ErrorAlert("Update failed. Please try downloading it manually.");
-                        HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
+                        if (package != null)
+                            SelfUpdateService.MarkUpdateFailed(package.Version, ex.Message);
+                        UpdateFailed = true;
+                        UpdateStatus = TranslateUpdateText("Update failed.", "Update failed.");
+                        MessageBoxHelper.ErrorAlert(UpdateFailureText($"Updater log: {SelfUpdateService.UpdaterLogPath}"));
                     }
                     finally
                     {
                         IsUpdating = false;
                     }
 #endif
+                });
+            }
+        }
+
+        private RelayCommand? _cmdOpenUpdatePage;
+        public RelayCommand CmdOpenUpdatePage
+        {
+            get
+            {
+                return _cmdOpenUpdatePage ??= new RelayCommand(_ =>
+                {
+                    if (!string.IsNullOrWhiteSpace(NewVersionUrl))
+                        HyperlinkHelper.OpenUriBySystem(NewVersionUrl);
                 });
             }
         }

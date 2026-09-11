@@ -1,21 +1,17 @@
 //! remotex-updater — standalone self-updater for RemoteX.
 //!
-//! Invoked by the WPF app as a separate process:
-//!     updater <downloadUrl> <appExePath> [--sha256 <hex>] [--restart]
+//! Normal invocation:
+//!     updater <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>]
+//!              [--target-version <version>] [--state-file <path>] [--restart]
 //!
-//! Flow:
-//!   1. download the release zip to a temp file (progress -> stdout as JSON lines)
-//!   2. verify the sha256 of the downloaded file
-//!   3. extract to a temp staging dir
-//!   4. wait for the target exe process to exit (poll, up to N seconds)
-//!   5. back up the current exe, swap in the new one
-//!   6. restart the app if --restart was passed
+//! Apply-stage invocation is used to replace the running updater itself:
+//!     updater --apply-stage <stageDir> <appExePath> [--parent-pid <pid>]
+//!              [--target-version <version>] [--state-file <path>] [--restart]
 //!
-//! stdout protocol (JSON lines) — consumed by the C# side:
-//!   {"type":"stage","stage":"download"}          at each phase transition
-//!   {"type":"progress","pct":42.3}               download progress 0..100
-//!   {"type":"error","message":"..."}             fatal error, then exit(1)
-//!   {"type":"done"}                              success
+//! The normal process downloads and validates the release before emitting
+//! `ready-to-swap`. The WPF application closes only after that stage. A staged
+//! updater then waits for the old updater to exit, performs the reversible swap
+//! (including updater.exe), and restarts RemoteX.
 
 use std::env;
 use std::fs;
@@ -27,6 +23,8 @@ use std::time::{Duration, Instant};
 
 use sha2::{Digest, Sha256};
 use thiserror::Error;
+
+const UPDATER_PROTOCOL_VERSION: &str = "2";
 
 #[derive(Error, Debug)]
 enum UpdError {
@@ -45,6 +43,27 @@ enum UpdError {
 }
 
 type Result<T> = std::result::Result<T, UpdError>;
+
+#[derive(Clone, Debug)]
+struct UpdateOptions {
+    url: String,
+    exe_path: PathBuf,
+    expected_sha: Option<String>,
+    target_pid: Option<u32>,
+    target_version: Option<String>,
+    state_file: Option<PathBuf>,
+    want_restart: bool,
+}
+
+#[derive(Clone, Debug)]
+struct ApplyOptions {
+    stage: PathBuf,
+    exe_path: PathBuf,
+    parent_pid: Option<u32>,
+    target_version: Option<String>,
+    state_file: Option<PathBuf>,
+    want_restart: bool,
+}
 
 fn log_line(message: &str) {
     let path = env::temp_dir().join("RemoteX-updater.log");
@@ -70,16 +89,138 @@ fn emit_progress(pct: f64) {
 fn emit_error(msg: &str) {
     emit(&format!(
         "{{\"type\":\"error\",\"message\":\"{}\"}}",
-        msg.replace('\\', "\\\\").replace('"', "\\\"")
+        json_escape(msg)
     ));
+}
+
+fn json_escape(value: &str) -> String {
+    value
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\r', "\\r")
+        .replace('\n', "\\n")
+        .replace('\t', "\\t")
+}
+
+fn write_state(
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+    phase: &str,
+    message: Option<&str>,
+    backup_path: Option<&Path>,
+    progress: f64,
+) -> Result<()> {
+    let Some(path) = state_file else {
+        return Ok(());
+    };
+
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let target = target_version.unwrap_or("");
+    let msg = message.unwrap_or("");
+    let backup = backup_path
+        .map(|value| value.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let contents = format!(
+        "{{\"targetVersion\":\"{}\",\"phase\":\"{}\",\"message\":\"{}\",\"backupPath\":\"{}\",\"progress\":{:.1}}}",
+        json_escape(target),
+        json_escape(phase),
+        json_escape(msg),
+        json_escape(&backup),
+        progress.clamp(0.0, 100.0)
+    );
+
+    let temp_path = PathBuf::from(format!("{}.tmp", path.to_string_lossy()));
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open(&temp_path)?;
+    file.write_all(contents.as_bytes())?;
+    file.flush()?;
+    file.sync_all()?;
+    drop(file);
+
+    // Windows does not replace an existing file with std::fs::rename. Remove
+    // the old marker only after the new contents have been flushed; startup
+    // also accepts the .tmp file if termination happens during this window.
+    if path.exists() {
+        let _ = fs::remove_file(path);
+    }
+    fs::rename(&temp_path, path)?;
+    Ok(())
+}
+
+fn record_state(
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+    phase: &str,
+    message: Option<&str>,
+    backup_path: Option<&Path>,
+    progress: f64,
+) {
+    if let Err(error) = write_state(
+        state_file,
+        target_version,
+        phase,
+        message,
+        backup_path,
+        progress,
+    ) {
+        log_line(&format!("state write failed for phase={phase}: {error}"));
+    }
+}
+
+fn record_stage(stage: &str, state_file: Option<&Path>, target_version: Option<&str>) {
+    emit_stage(stage);
+    record_state(state_file, target_version, stage, None, None, 0.0);
+}
+
+fn state_has_phase(state_file: Option<&Path>, phase: &str) -> bool {
+    let Some(path) = state_file else {
+        return false;
+    };
+    let marker = format!("\"phase\":\"{phase}\"");
+    fs::read_to_string(path)
+        .map(|contents| contents.contains(&marker))
+        .unwrap_or(false)
+}
+
+fn record_failure(state_file: Option<&Path>, target_version: Option<&str>, error: &UpdError) {
+    // Keep the terminal transaction state and its backup reference intact. A
+    // later launch uses `swapped` to confirm success, and uses the rollback
+    // states to present recovery diagnostics instead of losing that context.
+    if state_has_phase(state_file, "swapped")
+        || state_has_phase(state_file, "rolled-back")
+        || state_has_phase(state_file, "rollback-failed")
+    {
+        log_line(&format!("terminal state preserved after error: {error}"));
+        return;
+    }
+
+    record_state(
+        state_file,
+        target_version,
+        "failed",
+        Some(&error.to_string()),
+        None,
+        0.0,
+    );
 }
 
 // ---------------------------------------------------------------------------
 // download
 // ---------------------------------------------------------------------------
 
-fn download(url: &str, dest: &Path) -> Result<()> {
-    emit_stage("download");
+fn download(
+    url: &str,
+    dest: &Path,
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+) -> Result<()> {
+    record_stage("download", state_file, target_version);
     let client = reqwest::blocking::Client::builder()
         .connect_timeout(Duration::from_secs(15))
         .build()
@@ -97,10 +238,7 @@ fn download(url: &str, dest: &Path) -> Result<()> {
         )));
     }
 
-    let total = resp
-        .content_length()
-        .unwrap_or(0);
-
+    let total = resp.content_length().unwrap_or(0);
     let mut file = fs::File::create(dest)?;
     let mut buf = [0u8; 64 * 1024];
     let mut downloaded: u64 = 0;
@@ -118,7 +256,7 @@ fn download(url: &str, dest: &Path) -> Result<()> {
         }
     }
     file.flush()?;
-    emit_stage("downloaded");
+    record_stage("downloaded", state_file, target_version);
     Ok(())
 }
 
@@ -140,16 +278,18 @@ fn sha256_of(path: &Path) -> Result<String> {
 // extraction
 // ---------------------------------------------------------------------------
 
-fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<()> {
-    emit_stage("extract");
+fn extract_zip(
+    zip_path: &Path,
+    dest_dir: &Path,
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+) -> Result<()> {
+    record_stage("extract", state_file, target_version);
     fs::create_dir_all(dest_dir)?;
 
     let file = fs::File::open(zip_path)?;
-    let mut archive =
-        zip::ZipArchive::new(file).map_err(|e| UpdError::Extract(e.to_string()))?;
+    let mut archive = zip::ZipArchive::new(file).map_err(|e| UpdError::Extract(e.to_string()))?;
 
-    // The release zip contains a top-level folder (e.g. "RemoteX-1.0.2-net9-x64");
-    // we want the RemoteX.exe inside it. Extract everything to the staging dir.
     for i in 0..archive.len() {
         let mut entry = archive
             .by_index(i)
@@ -169,12 +309,12 @@ fn extract_zip(zip_path: &Path, dest_dir: &Path) -> Result<()> {
         let mut out = fs::File::create(&out_path)?;
         std::io::copy(&mut entry, &mut out)?;
     }
-    emit_stage("extracted");
+    record_stage("extracted", state_file, target_version);
     Ok(())
 }
 
 // ---------------------------------------------------------------------------
-// process helpers
+// process and permission helpers
 // ---------------------------------------------------------------------------
 
 /// Returns true if the process with the given PID is still running.
@@ -187,8 +327,6 @@ fn process_running_by_pid(pid: u32) -> bool {
         Ok(o) => o,
         Err(e) => {
             log_line(&format!("tasklist failed for pid {pid}: {e}"));
-            // Fail closed: do not replace files while the target may still be
-            // running if process inspection itself failed.
             return true;
         }
     };
@@ -201,8 +339,6 @@ fn process_running_by_pid(pid: u32) -> bool {
     })
 }
 
-/// Fallback for callers that do not provide a PID. New app builds always pass
-/// the PID, but keeping this path preserves compatibility with older callers.
 fn process_running_by_name(exe_path: &Path) -> bool {
     let exe_name = exe_path
         .file_name()
@@ -224,11 +360,19 @@ fn process_running_by_name(exe_path: &Path) -> bool {
         .contains(&exe_name.to_ascii_lowercase())
 }
 
-fn wait_for_exit(exe_path: &Path, pid: Option<u32>, timeout_secs: u64) -> Result<()> {
-    emit_stage("wait-exit");
+fn wait_for_exit(
+    exe_path: &Path,
+    pid: Option<u32>,
+    timeout_secs: u64,
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+) -> Result<()> {
+    record_stage("wait-exit", state_file, target_version);
     let deadline = Instant::now() + Duration::from_secs(timeout_secs);
-    let is_running = || pid.map(process_running_by_pid)
-        .unwrap_or_else(|| process_running_by_name(exe_path));
+    let is_running = || {
+        pid.map(process_running_by_pid)
+            .unwrap_or_else(|| process_running_by_name(exe_path))
+    };
 
     while Instant::now() < deadline {
         if !is_running() {
@@ -248,9 +392,30 @@ fn wait_for_exit(exe_path: &Path, pid: Option<u32>, timeout_secs: u64) -> Result
     Ok(())
 }
 
+fn verify_target_writable(exe_path: &Path) -> Result<()> {
+    let exe_dir = exe_path
+        .parent()
+        .ok_or_else(|| UpdError::Swap("exe has no parent dir".into()))?;
+    let probe = exe_dir.join(format!(".remotex-update-probe-{}.tmp", std::process::id()));
+    let result = (|| {
+        let mut file = fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(&probe)
+            .map_err(|e| UpdError::Swap(format!("target directory is not writable: {e}")))?;
+        file.write_all(b"RemoteX update preflight")?;
+        file.flush()?;
+        drop(file);
+        fs::remove_file(&probe)?;
+        Ok(())
+    })();
+    if result.is_err() {
+        let _ = fs::remove_file(&probe);
+    }
+    result
+}
+
 fn restart(exe_path: &Path) -> Result<()> {
-    // The updater is already detached from the app, so spawning without waiting
-    // lets the replacement start after this process exits.
     Command::new(exe_path)
         .spawn()
         .map(|_| ())
@@ -268,183 +433,369 @@ fn copy_with_retry(source: &Path, destination: &Path) -> Result<()> {
             }
         }
     }
-    Err(UpdError::Io(last_error.expect("copy retry must record an error")))
+    Err(UpdError::Io(
+        last_error.expect("copy retry must record an error"),
+    ))
 }
 
 // ---------------------------------------------------------------------------
-// swap: backup + replace
+// staging and swap
 // ---------------------------------------------------------------------------
 
-fn find_new_exe(staging: &Path) -> Result<PathBuf> {
-    // walk the staging dir for a top-level file named RemoteX.exe
-    fn walk(dir: &Path, depth: usize) -> Option<PathBuf> {
+fn find_named_file(staging: &Path, wanted_name: &str) -> Option<PathBuf> {
+    fn walk(dir: &Path, wanted_name: &str, depth: usize) -> Option<PathBuf> {
         if depth > 3 {
             return None;
         }
-        for e in fs::read_dir(dir).ok()? {
-            let e = e.ok()?;
-            let p = e.path();
-            if p.is_file() && p.file_name().map(|n| n.to_string_lossy().eq_ignore_ascii_case("RemoteX.exe")).unwrap_or(false) {
-                return Some(p);
+        for entry in fs::read_dir(dir).ok()? {
+            let entry = entry.ok()?;
+            let path = entry.path();
+            if path.is_file()
+                && path
+                    .file_name()
+                    .map(|name| name.to_string_lossy().eq_ignore_ascii_case(wanted_name))
+                    .unwrap_or(false)
+            {
+                return Some(path);
             }
-            if p.is_dir() {
-                if let Some(found) = walk(&p, depth + 1) {
+            if path.is_dir() {
+                if let Some(found) = walk(&path, wanted_name, depth + 1) {
                     return Some(found);
                 }
             }
         }
         None
     }
-    walk(staging, 0).ok_or_else(|| UpdError::Swap("RemoteX.exe not found in release zip".into()))
+    walk(staging, wanted_name, 0)
 }
 
-fn swap_in(target_exe: &Path, new_exe: &Path) -> Result<()> {
-    emit_stage("swap");
-    let exe_dir = target_exe
-        .parent()
-        .ok_or_else(|| UpdError::Swap("exe has no parent dir".into()))?;
+fn find_new_exe(staging: &Path) -> Result<PathBuf> {
+    find_named_file(staging, "RemoteX.exe")
+        .ok_or_else(|| UpdError::Swap("RemoteX.exe not found in release zip".into()))
+}
 
-    // back up current exe so we can restore on next launch if the new one fails
-    let backup = exe_dir.join("RemoteX.exe.bak");
-    if target_exe.exists() {
-        let _ = fs::remove_file(&backup);
-        copy_with_retry(target_exe, &backup)
-            .map_err(|e| UpdError::Swap(format!("backup failed: {e}")))?;
+fn remove_path(path: &Path) -> Result<()> {
+    if path.is_dir() {
+        fs::remove_dir_all(path)?;
+    } else if path.exists() {
+        fs::remove_file(path)?;
     }
-
-    // copy the whole staging dir (dlls, rust libs, etc.) next to the exe
-    let staging_root = new_exe
-        .parent()
-        .ok_or_else(|| UpdError::Swap("staging has no parent".into()))?;
-    for e in fs::read_dir(staging_root)? {
-        let e = e?;
-        let src = e.path();
-        let name = e.file_name();
-        if name.to_string_lossy().eq_ignore_ascii_case("RemoteX.exe")
-            || name.to_string_lossy().eq_ignore_ascii_case("updater.exe")
-        {
-            // RemoteX.exe is replaced below. The running updater cannot replace
-            // its own executable, so keep the existing helper for this update.
-            continue;
-        }
-        let dst = exe_dir.join(&name);
-        if src.is_dir() {
-            // replace any existing directory
-            if dst.exists() {
-                fs::remove_dir_all(&dst)
-                    .map_err(|e| UpdError::Swap(format!("remove {} failed: {e}", dst.display())))?;
-            }
-            copy_dir(&src, &dst)?;
-        } else if src.is_file() {
-            copy_with_retry(&src, &dst)
-                .map_err(|e| UpdError::Swap(format!("copy {} failed: {e}", name.to_string_lossy())))?;
-        }
-    }
-
-    // finally replace the exe
-    copy_with_retry(new_exe, target_exe)
-        .map_err(|e| UpdError::Swap(format!("replace {} failed: {e}", target_exe.display())))?;
-    emit_stage("swapped");
     Ok(())
 }
 
 fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)?;
-    for e in fs::read_dir(src)? {
-        let e = e?;
-        let s = e.path();
-        let d = dst.join(e.file_name());
-        if s.is_dir() {
-            copy_dir(&s, &d)?;
-        } else if s.is_file() {
-            copy_with_retry(&s, &d)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let source = entry.path();
+        let destination = dst.join(entry.file_name());
+        if source.is_dir() {
+            copy_dir(&source, &destination)?;
+        } else if source.is_file() {
+            copy_with_retry(&source, &destination)?;
         }
     }
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
-// main
-// ---------------------------------------------------------------------------
-
-fn main() {
-    let args: Vec<String> = env::args().skip(1).collect();
-    log_line("started");
-    if let Err(e) = run(&args) {
-        log_line(&format!("error={e}"));
-        emit_error(&e.to_string());
-        std::process::exit(1);
+fn backup_entries(exe_dir: &Path, backup_root: &Path, names: &[std::ffi::OsString]) -> Result<()> {
+    for name in names {
+        let source = exe_dir.join(name);
+        if !source.exists() {
+            continue;
+        }
+        let destination = backup_root.join(name);
+        if source.is_dir() {
+            copy_dir(&source, &destination)?;
+        } else {
+            copy_with_retry(&source, &destination)?;
+        }
     }
-    log_line("done");
-    emit("{\"type\":\"done\"}");
+    Ok(())
 }
 
-fn run(args: &[String]) -> Result<()> {
-    // Args (positional, matching SelfUpdateService.RunUpdaterAsync on the C#
-    // side): <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>] [--restart]
-    //
-    // --sha256 is OPTIONAL: when provided, the downloaded zip is verified
-    // against the given hex digest; when absent (current C# call path), the
-    // check is skipped. The PID can also be supplied through
-    // REMOTEX_TARGET_PID for compatibility with older updater binaries.
+fn restore_entries(exe_dir: &Path, backup_root: &Path, names: &[std::ffi::OsString]) -> Result<()> {
+    for name in names {
+        let destination = exe_dir.join(name);
+        if destination.exists() {
+            remove_path(&destination)?;
+        }
+
+        let backup = backup_root.join(name);
+        if backup.is_dir() {
+            copy_dir(&backup, &destination)?;
+        } else if backup.is_file() {
+            copy_with_retry(&backup, &destination)?;
+        }
+    }
+    Ok(())
+}
+
+fn swap_in(
+    target_exe: &Path,
+    new_exe: &Path,
+    replace_updater: bool,
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+) -> Result<()> {
+    record_stage("swap", state_file, target_version);
+    let exe_dir = target_exe
+        .parent()
+        .ok_or_else(|| UpdError::Swap("exe has no parent dir".into()))?;
+    let staging_root = new_exe
+        .parent()
+        .ok_or_else(|| UpdError::Swap("staging has no parent".into()))?;
+    let backup_root = exe_dir.join(format!(".remotex-update-backup-{}", std::process::id()));
+
+    if backup_root.exists() {
+        remove_path(&backup_root)?;
+    }
+    fs::create_dir_all(&backup_root)?;
+    log_line(&format!("backup-start path={}", backup_root.display()));
+
+    let entries: Vec<fs::DirEntry> =
+        fs::read_dir(staging_root)?.collect::<std::result::Result<_, _>>()?;
+    let names: Vec<std::ffi::OsString> = entries.iter().map(|entry| entry.file_name()).collect();
+    if let Err(error) = backup_entries(exe_dir, &backup_root, &names) {
+        log_line(&format!("backup-failed error={error}"));
+        let _ = remove_path(&backup_root);
+        return Err(UpdError::Swap(format!("backup failed: {error}")));
+    }
+    log_line(&format!("backup-complete path={}", backup_root.display()));
+
+    let apply_result = (|| -> Result<()> {
+        log_line("swap-start");
+        let main_name = new_exe
+            .file_name()
+            .ok_or_else(|| UpdError::Swap("new executable has no file name".into()))?;
+
+        for entry in &entries {
+            let source = entry.path();
+            let name = entry.file_name();
+            if name == main_name {
+                continue;
+            }
+            if !replace_updater && name.to_string_lossy().eq_ignore_ascii_case("updater.exe") {
+                continue;
+            }
+
+            let destination = exe_dir.join(&name);
+            if destination.exists() {
+                remove_path(&destination).map_err(|e| {
+                    UpdError::Swap(format!("remove {} failed: {e}", destination.display()))
+                })?;
+            }
+            if source.is_dir() {
+                copy_dir(&source, &destination)?;
+            } else if source.is_file() {
+                copy_with_retry(&source, &destination).map_err(|e| {
+                    UpdError::Swap(format!("copy {} failed: {e}", name.to_string_lossy()))
+                })?;
+            }
+        }
+
+        copy_with_retry(new_exe, target_exe)
+            .map_err(|e| UpdError::Swap(format!("replace {} failed: {e}", target_exe.display())))?;
+        Ok(())
+    })();
+
+    match apply_result {
+        Ok(()) => {
+            log_line("swap-complete");
+            record_state(
+                state_file,
+                target_version,
+                "swapped",
+                None,
+                Some(&backup_root),
+                100.0,
+            );
+            Ok(())
+        }
+        Err(error) => {
+            log_line(&format!("rollback-start cause={error}"));
+            let rollback_result = restore_entries(exe_dir, &backup_root, &names);
+            match rollback_result {
+                Ok(()) => {
+                    log_line("rollback-complete");
+                    record_state(
+                        state_file,
+                        target_version,
+                        "rolled-back",
+                        Some(&error.to_string()),
+                        None,
+                        0.0,
+                    );
+                    let _ = remove_path(&backup_root);
+                    Err(error)
+                }
+                Err(rollback_error) => {
+                    let message = format!("{error}; rollback failed: {rollback_error}");
+                    log_line(&format!("rollback-failed error={message}"));
+                    record_state(
+                        state_file,
+                        target_version,
+                        "rollback-failed",
+                        Some(&message),
+                        Some(&backup_root),
+                        0.0,
+                    );
+                    Err(UpdError::Swap(message))
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// argument parsing and execution
+// ---------------------------------------------------------------------------
+
+fn parse_normal_options(args: &[String]) -> Result<UpdateOptions> {
     if args.len() < 2 {
         return Err(UpdError::Args(
-            "usage: updater <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>] [--restart]".into(),
+            "usage: updater <downloadUrl> <appExePath> [--sha256 <hex>] [--pid <pid>] [--target-version <version>] [--state-file <path>] [--restart]".into(),
         ));
     }
-    let url = &args[0];
-    let exe_path = PathBuf::from(&args[1]);
-    let mut expected_sha: Option<String> = None;
-    // New C# clients pass the PID through the environment for compatibility
-    // with older updater binaries that reject unknown command-line options.
-    let mut target_pid = env::var("REMOTEX_TARGET_PID")
-        .ok()
-        .and_then(|value| value.parse::<u32>().ok());
-    let mut want_restart = false;
+
+    let mut options = UpdateOptions {
+        url: args[0].clone(),
+        exe_path: PathBuf::from(&args[1]),
+        expected_sha: None,
+        target_pid: env::var("REMOTEX_TARGET_PID")
+            .ok()
+            .and_then(|value| value.parse::<u32>().ok()),
+        target_version: env::var("REMOTEX_TARGET_VERSION").ok(),
+        state_file: env::var_os("REMOTEX_STATE_FILE").map(PathBuf::from),
+        want_restart: false,
+    };
+
     let mut i = 2;
     while i < args.len() {
         match args[i].as_str() {
             "--sha256" => {
-                if i + 1 < args.len() {
-                    expected_sha = Some(args[i + 1].to_lowercase());
-                    i += 2;
-                } else {
+                if i + 1 >= args.len() {
                     return Err(UpdError::Args("--sha256 requires a value".into()));
                 }
+                options.expected_sha = Some(args[i + 1].to_lowercase());
+                i += 2;
             }
             "--pid" => {
-                if i + 1 < args.len() {
-                    target_pid = Some(args[i + 1].parse().map_err(|_| {
-                        UpdError::Args("--pid requires a numeric process id".into())
-                    })?);
-                    i += 2;
-                } else {
+                if i + 1 >= args.len() {
                     return Err(UpdError::Args("--pid requires a value".into()));
                 }
+                options.target_pid =
+                    Some(args[i + 1].parse().map_err(|_| {
+                        UpdError::Args("--pid requires a numeric process id".into())
+                    })?);
+                i += 2;
+            }
+            "--target-version" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--target-version requires a value".into()));
+                }
+                options.target_version = Some(args[i + 1].clone());
+                i += 2;
+            }
+            "--state-file" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--state-file requires a value".into()));
+                }
+                options.state_file = Some(PathBuf::from(&args[i + 1]));
+                i += 2;
             }
             "--restart" => {
-                want_restart = true;
+                options.want_restart = true;
                 i += 1;
             }
-            _ => {
-                return Err(UpdError::Args(format!("unknown argument: {}", args[i])));
-            }
+            _ => return Err(UpdError::Args(format!("unknown argument: {}", args[i]))),
         }
     }
+    Ok(options)
+}
+
+fn parse_apply_options(args: &[String]) -> Result<ApplyOptions> {
+    if args.len() < 3 {
+        return Err(UpdError::Args(
+            "usage: updater --apply-stage <stageDir> <appExePath> [--parent-pid <pid>] [--target-version <version>] [--state-file <path>] [--restart]".into(),
+        ));
+    }
+
+    let mut options = ApplyOptions {
+        stage: PathBuf::from(&args[1]),
+        exe_path: PathBuf::from(&args[2]),
+        parent_pid: None,
+        target_version: None,
+        state_file: None,
+        want_restart: false,
+    };
+
+    let mut i = 3;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--parent-pid" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--parent-pid requires a value".into()));
+                }
+                options.parent_pid = Some(args[i + 1].parse().map_err(|_| {
+                    UpdError::Args("--parent-pid requires a numeric process id".into())
+                })?);
+                i += 2;
+            }
+            "--target-version" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--target-version requires a value".into()));
+                }
+                options.target_version = Some(args[i + 1].clone());
+                i += 2;
+            }
+            "--state-file" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--state-file requires a value".into()));
+                }
+                options.state_file = Some(PathBuf::from(&args[i + 1]));
+                i += 2;
+            }
+            "--restart" => {
+                options.want_restart = true;
+                i += 1;
+            }
+            _ => return Err(UpdError::Args(format!("unknown argument: {}", args[i]))),
+        }
+    }
+    Ok(options)
+}
+
+fn run_normal(options: &UpdateOptions) -> Result<()> {
+    record_state(
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+        "starting",
+        None,
+        None,
+        0.0,
+    );
 
     let tmp = tempfile::Builder::new()
         .prefix("remotex-upd-")
         .tempdir()
-        .map_err(|e| UpdError::Io(e))?;
+        .map_err(UpdError::Io)?;
     let zip_path = tmp.path().join("update.zip");
     let staging = tmp.path().join("stage");
 
-    // 1. download
-    download(url, &zip_path)?;
+    download(
+        &options.url,
+        &zip_path,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    )?;
 
-    // 2. verify (optional)
-    if let Some(expected) = &expected_sha {
-        emit_stage("verify");
+    if let Some(expected) = &options.expected_sha {
+        record_stage(
+            "verify",
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+        );
         let actual_sha = sha256_of(&zip_path)?;
         if *expected != actual_sha {
             return Err(UpdError::ShaMismatch {
@@ -454,20 +805,249 @@ fn run(args: &[String]) -> Result<()> {
         }
     }
 
-    // 3. extract
-    extract_zip(&zip_path, &staging)?;
-
-    // 4. wait for the app to exit (it usually is still running while we work)
-    wait_for_exit(&exe_path, target_pid, 30)?;
-
-    // 5. swap
+    extract_zip(
+        &zip_path,
+        &staging,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    )?;
     let new_exe = find_new_exe(&staging)?;
-    swap_in(&exe_path, &new_exe)?;
+    verify_target_writable(&options.exe_path)?;
+    record_stage(
+        "ready-to-swap",
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    );
 
-    // 6. restart
-    if want_restart {
-        restart(&exe_path)?;
+    wait_for_exit(
+        &options.exe_path,
+        options.target_pid,
+        30,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    )?;
+
+    // The current updater is locked by Windows. Run the freshly downloaded
+    // helper from staging so it can replace updater.exe after this process exits.
+    if let Some(staged_updater) = find_named_file(&staging, "updater.exe") {
+        record_stage(
+            "helper-handoff",
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+        );
+        let mut command = Command::new(&staged_updater);
+        command
+            .arg("--apply-stage")
+            .arg(&staging)
+            .arg(&options.exe_path)
+            .arg("--parent-pid")
+            .arg(std::process::id().to_string());
+        if options.want_restart {
+            command.arg("--restart");
+        }
+        if let Some(version) = &options.target_version {
+            command.arg("--target-version").arg(version);
+        }
+        if let Some(state_file) = &options.state_file {
+            command.arg("--state-file").arg(state_file);
+        }
+
+        match command.spawn() {
+            Ok(_) => {
+                // Transfer ownership of the temp directory to the staged
+                // helper. It remains until the helper has copied the release.
+                let _ = tmp.keep();
+                return Ok(());
+            }
+            Err(error) => {
+                let _ = restart(&options.exe_path);
+                return Err(UpdError::Swap(format!(
+                    "start staged updater failed: {error}"
+                )));
+            }
+        }
     }
 
+    // Compatibility fallback for packages that do not contain updater.exe.
+    let swap_result = swap_in(
+        &options.exe_path,
+        &new_exe,
+        false,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    );
+    if swap_result.is_err() {
+        let _ = restart(&options.exe_path);
+    }
+    swap_result?;
+    if options.want_restart {
+        restart(&options.exe_path)?;
+    }
     Ok(())
+}
+
+fn run_apply(options: &ApplyOptions) -> Result<()> {
+    // Validate the staged package and the target directory before waiting for
+    // the parent.  The WPF bootstrap path uses this signal as the handoff
+    // point, so it must be emitted before the application is asked to close.
+    let new_exe = find_new_exe(&options.stage)?;
+    verify_target_writable(&options.exe_path)?;
+    record_stage(
+        "ready-to-swap",
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    );
+
+    if let Some(parent_pid) = options.parent_pid {
+        wait_for_exit(
+            &options.exe_path,
+            Some(parent_pid),
+            30,
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+        )?;
+    }
+
+    let swap_result = swap_in(
+        &options.exe_path,
+        &new_exe,
+        true,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    );
+    if swap_result.is_err() {
+        let _ = restart(&options.exe_path);
+    }
+    swap_result?;
+    if options.want_restart {
+        restart(&options.exe_path)?;
+    }
+    Ok(())
+}
+
+fn run(args: &[String]) -> Result<()> {
+    if args.first().map(String::as_str) == Some("--apply-stage") {
+        let options = parse_apply_options(args)?;
+        let result = run_apply(&options);
+        if let Err(error) = &result {
+            record_failure(
+                options.state_file.as_deref(),
+                options.target_version.as_deref(),
+                error,
+            );
+        }
+        return result;
+    }
+
+    let options = parse_normal_options(args)?;
+    let result = run_normal(&options);
+    if let Err(error) = &result {
+        record_failure(
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+            error,
+        );
+    }
+    result
+}
+
+fn main() {
+    let args: Vec<String> = env::args().skip(1).collect();
+    log_line("started");
+    if args.len() == 1 && args[0] == "--version" {
+        emit(&format!(
+            "{{\"type\":\"version\",\"protocol\":\"{}\"}}",
+            UPDATER_PROTOCOL_VERSION
+        ));
+        log_line("version-probe");
+        return;
+    }
+    if let Err(error) = run(&args) {
+        log_line(&format!("error={error}"));
+        emit_error(&error.to_string());
+        std::process::exit(1);
+    }
+    log_line("done");
+    emit("{\"type\":\"done\"}");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::io::Cursor;
+    use tempfile::tempdir;
+    use zip::write::SimpleFileOptions;
+    use zip::ZipWriter;
+
+    #[test]
+    fn json_escape_handles_quotes_and_control_characters() {
+        assert_eq!(json_escape("a\\b\"c\nd"), "a\\\\b\\\"c\\nd");
+    }
+
+    #[test]
+    fn find_new_exe_supports_release_folder() {
+        let temp = tempdir().unwrap();
+        let release = temp.path().join("RemoteX-1.0.14-net9-x64");
+        fs::create_dir_all(&release).unwrap();
+        let exe = release.join("RemoteX.exe");
+        fs::write(&exe, b"new").unwrap();
+
+        assert_eq!(find_new_exe(temp.path()).unwrap(), exe);
+    }
+
+    #[test]
+    fn extract_zip_rejects_parent_traversal() {
+        let temp = tempdir().unwrap();
+        let zip_path = temp.path().join("bad.zip");
+        let bytes = {
+            let mut writer = ZipWriter::new(Cursor::new(Vec::new()));
+            writer
+                .start_file("../outside.txt", SimpleFileOptions::default())
+                .unwrap();
+            std::io::Write::write_all(&mut writer, b"bad").unwrap();
+            writer.finish().unwrap().into_inner()
+        };
+        fs::write(&zip_path, bytes).unwrap();
+
+        let result = extract_zip(&zip_path, &temp.path().join("stage"), None, None);
+        assert!(matches!(result, Err(UpdError::Extract(_))));
+        assert!(!temp.path().join("outside.txt").exists());
+    }
+
+    #[test]
+    fn swap_replaces_main_exe_and_updater() {
+        let temp = tempdir().unwrap();
+        let target_dir = temp.path().join("installed");
+        let stage_dir = temp.path().join("stage").join("RemoteX-1.0.14");
+        fs::create_dir_all(&target_dir).unwrap();
+        fs::create_dir_all(&stage_dir).unwrap();
+
+        let target_exe = target_dir.join("RemoteX.exe");
+        fs::write(&target_exe, b"old app").unwrap();
+        fs::write(target_dir.join("updater.exe"), b"old updater").unwrap();
+        fs::write(target_dir.join("shared.dll"), b"old library").unwrap();
+        fs::write(stage_dir.join("RemoteX.exe"), b"new app").unwrap();
+        fs::write(stage_dir.join("updater.exe"), b"new updater").unwrap();
+        fs::write(stage_dir.join("shared.dll"), b"new library").unwrap();
+
+        swap_in(
+            &target_exe,
+            &stage_dir.join("RemoteX.exe"),
+            true,
+            None,
+            Some("1.0.14"),
+        )
+        .unwrap();
+
+        assert_eq!(fs::read(&target_exe).unwrap(), b"new app");
+        assert_eq!(
+            fs::read(target_dir.join("updater.exe")).unwrap(),
+            b"new updater"
+        );
+        assert_eq!(
+            fs::read(target_dir.join("shared.dll")).unwrap(),
+            b"new library"
+        );
+    }
 }

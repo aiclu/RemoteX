@@ -117,6 +117,7 @@ namespace _1RM
         public static ConfigurationService? ConfigurationServiceObj;
         public static ThemeService? ThemeServiceObj;
         public static GlobalData GlobalDataObj = null!;
+        public static PendingUpdateState? PendingUpdateRecovery { get; private set; }
 
         private static bool _isNewUser = false;
         private static DatabaseStatus _localDataConnectionStatus;
@@ -269,6 +270,11 @@ namespace _1RM
                 SimpleLogHelper.LogFileName = AppPathHelper.Instance.LogFilePath;
             }
 
+            // Validate the result of the previous self-update before the main
+            // window is shown. A successful update clears the marker; an old
+            // executable leaves it available for a retry and diagnostics.
+            PendingUpdateRecovery = SelfUpdateService.CheckPendingUpdate();
+
 
             KeywordMatchServiceObj = new KeywordMatchService();
             // read profile
@@ -391,6 +397,21 @@ namespace _1RM
             }
 
             var mvm = IoC.Get<MainWindowViewModel>();
+            if (PendingUpdateRecovery != null)
+            {
+                var recovery = PendingUpdateRecovery;
+                mvm.OnMainWindowViewLoaded += () =>
+                {
+                    var summaryKey = recovery.Phase.Equals("rollback-failed", StringComparison.OrdinalIgnoreCase)
+                        ? "Update rollback failed. The old version may need manual recovery."
+                        : "The previous update did not complete. The current version is still running.";
+                    var summary = IoC.Translate(summaryKey);
+                    var logLabel = IoC.Translate("Updater log");
+                    var detail = string.IsNullOrWhiteSpace(recovery.Message) ? "" : $"\n{recovery.Message}";
+                    MessageBoxHelper.ErrorAlert($"{summary}{detail}\n{logLabel}: {SelfUpdateService.UpdaterLogPath}");
+                };
+            }
+
             if (AppStartupHelper.IsStartMinimized == false
                 || _localDataConnectionStatus.Status != EnumDatabaseStatus.OK
                 || _isNewUser)

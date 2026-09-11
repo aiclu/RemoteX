@@ -127,7 +127,7 @@
                                         </TextBlock>
                                     </Grid>
 
-                                    <Grid Margin="0 -5 0 15" Visibility="{Binding IsUpdating, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid Margin="0 -5 0 15" Visibility="{Binding IsUpdatePanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
                                             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -137,6 +137,7 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"></RowDefinition>
                                                 <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
                                             </Grid.RowDefinitions>
                                             <TextBlock Grid.Row="0" Text="{Binding UpdateStatus}" TextWrapping="Wrap" Margin="0 0 0 4"/>
                                             <ProgressBar Grid.Row="1"
@@ -144,6 +145,17 @@
                                                          Minimum="0" Maximum="100"
                                                          Value="{Binding UpdateProgress}"
                                                          IsIndeterminate="{Binding UpdateIsIndeterminate}"/>
+                                            <TextBlock Grid.Row="2"
+                                                       Margin="0 5 0 0"
+                                                       Visibility="{Binding UpdateFailed, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <Hyperlink Command="{Binding CmdOpenUpdatePage}">
+                                                    <Run Text="{DynamicResource 'Download manually'}" />
+                                                </Hyperlink>
+                                                <Run Text=" · " />
+                                                <Hyperlink Command="{Binding CmdUpdate}">
+                                                    <Run Text="{DynamicResource 'Retry update'}" />
+                                                </Hyperlink>
+                                            </TextBlock>
                                         </Grid>
                                     </Grid>
                                 </StackPanel>

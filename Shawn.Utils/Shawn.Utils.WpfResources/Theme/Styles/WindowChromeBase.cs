@@ -12,7 +12,8 @@ namespace Shawn.Utils.WpfResources.Theme.Styles
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            ((HwndSource)PresentationSource.FromVisual(this)).AddHook(HookProc);
+            if (PresentationSource.FromVisual(this) is HwndSource source)
+                source.AddHook(HookProc);
         }
 
         private IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

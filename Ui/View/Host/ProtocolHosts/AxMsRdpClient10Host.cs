@@ -22,31 +22,31 @@ namespace _1RM.View.Host.ProtocolHosts
     {
         protected override string GetConnectionInfoSummary()
         {
-            return $"{IoC.Translate("Connection quality")}: {ConnectionInfoUnavailable}";
+            return $"{ConnectionInfoTranslate("Connection quality", "Connection quality")}: {ConnectionInfoUnavailable}";
         }
 
         protected override ConnectionInfoSection BuildClientDetailsSection()
         {
             return new ConnectionInfoSection(
-                IoC.Translate("Client details"),
+                ConnectionInfoTranslate("Client details", "Client details"),
                 new[]
                 {
-                    new ConnectionInfoRow(IoC.Translate("Client version"), GetRdpClientVersion()),
-                    new ConnectionInfoRow(IoC.Translate("Local OS"), GetLocalOsDescription()),
+                    CreateConnectionInfoRow("Client version", GetRdpClientVersion),
+                    CreateConnectionInfoRow("Local OS", GetLocalOsDescription),
                 });
         }
 
         protected override ConnectionInfoSection BuildRemoteComputerDetailsSection()
         {
             return new ConnectionInfoSection(
-                IoC.Translate("Remote computer details"),
+                ConnectionInfoTranslate("Remote computer details", "Remote computer details"),
                 new[]
                 {
-                    new ConnectionInfoRow(IoC.Translate("Remote session type"), IoC.Translate("Remote desktop")),
-                    new ConnectionInfoRow(IoC.Translate("Network name"), ConnectionInfoUnavailable),
-                    new ConnectionInfoRow(IoC.Translate("Gateway name"), GetRdpGatewayName()),
-                    new ConnectionInfoRow(IoC.Translate("Gateway logon method"), GetRdpGatewayLogonMethod()),
-                    new ConnectionInfoRow(IoC.Translate("Remote computer"), GetRdpRemoteComputer()),
+                    CreateConnectionInfoRow("Remote session type", () => ConnectionInfoTranslate("Remote desktop", "Remote desktop")),
+                    CreateConnectionInfoRow("Network name", () => null),
+                    CreateConnectionInfoRow("Gateway name", GetRdpGatewayName),
+                    CreateConnectionInfoRow("Gateway logon method", GetRdpGatewayLogonMethod),
+                    CreateConnectionInfoRow("Remote computer", GetRdpRemoteComputer),
                 });
         }
 
@@ -65,47 +65,56 @@ namespace _1RM.View.Host.ProtocolHosts
 
         private string GetRdpGatewayName()
         {
-            if (_rdpSettings.GatewayMode is null or EGatewayMode.DoNotUseGateway)
-            {
-                return IoC.Translate("Not in use");
-            }
-
             try
             {
+                if (_rdpSettings.GatewayMode is null or EGatewayMode.DoNotUseGateway)
+                {
+                    return ConnectionInfoTranslate("Not in use", "Not in use");
+                }
+
                 var gatewayHostName = _rdpClient?.TransportSettings2?.GatewayHostname;
                 if (!string.IsNullOrWhiteSpace(gatewayHostName))
                 {
                     return gatewayHostName;
                 }
+
+                if (!string.IsNullOrWhiteSpace(_rdpSettings.GatewayHostName))
+                {
+                    return _rdpSettings.GatewayHostName;
+                }
+
+                return _rdpSettings.GatewayMode == EGatewayMode.AutomaticallyDetectGatewayServerSettings
+                    ? ConnectionInfoTranslate("Automatically detected", "Automatically detected")
+                    : ConnectionInfoUnavailable;
             }
             catch (Exception e)
             {
                 SimpleLogHelper.Debug($"Unable to read RDP gateway name: {e.Message}");
+                return ConnectionInfoUnavailable;
             }
-
-            if (!string.IsNullOrWhiteSpace(_rdpSettings.GatewayHostName))
-            {
-                return _rdpSettings.GatewayHostName;
-            }
-
-            return _rdpSettings.GatewayMode == EGatewayMode.AutomaticallyDetectGatewayServerSettings
-                ? IoC.Translate("Automatically detected")
-                : ConnectionInfoUnavailable;
         }
 
         private string GetRdpGatewayLogonMethod()
         {
-            if (_rdpSettings.GatewayMode is null or EGatewayMode.DoNotUseGateway)
+            try
             {
-                return IoC.Translate("Not in use");
-            }
+                if (_rdpSettings.GatewayMode is null or EGatewayMode.DoNotUseGateway)
+                {
+                    return ConnectionInfoTranslate("Not in use", "Not in use");
+                }
 
-            return _rdpSettings.GatewayLogonMethod switch
+                return _rdpSettings.GatewayLogonMethod switch
+                {
+                    EGatewayLogonMethod.Password => ConnectionInfoTranslate("Password", "Password"),
+                    EGatewayLogonMethod.SmartCard => ConnectionInfoTranslate("server_editor_gateway_logon_method_smart_card", "Smart card"),
+                    _ => ConnectionInfoUnavailable,
+                };
+            }
+            catch (Exception e)
             {
-                EGatewayLogonMethod.Password => IoC.Translate("Password"),
-                EGatewayLogonMethod.SmartCard => IoC.Translate("server_editor_gateway_logon_method_smart_card"),
-                _ => ConnectionInfoUnavailable,
-            };
+                SimpleLogHelper.Debug($"Unable to read RDP gateway logon method: {e.Message}");
+                return ConnectionInfoUnavailable;
+            }
         }
 
         private string GetRdpRemoteComputer()
@@ -123,7 +132,15 @@ namespace _1RM.View.Host.ProtocolHosts
                 SimpleLogHelper.Debug($"Unable to read RDP remote computer: {e.Message}");
             }
 
-            return ConnectionInfoValueOrUnavailable(_rdpSettings.Address);
+            try
+            {
+                return ConnectionInfoValueOrUnavailable(_rdpSettings.Address);
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Debug($"Unable to read RDP configured remote computer: {e.Message}");
+                return ConnectionInfoUnavailable;
+            }
         }
 
         private void BtnCancel_OnClick(object sender, RoutedEventArgs e)

@@ -7,6 +7,7 @@ using System.Windows.Data;
 using System.Windows.Interop;
 using _1RM.Model;
 using _1RM.Model.Protocol.Base;
+using _1RM.View;
 using _1RM.View.Host;
 using _1RM.View.Settings;
 using Shawn.Utils;
@@ -213,14 +214,39 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             try
             {
-                // Collect the diagnostic data before showing the modal window so the
-                // dialog remains a stable snapshot and never interferes with a session.
-                var viewModel = new ConnectionInfoViewModel(CreateConnectionInfoSnapshot());
-                viewModel.ShowDialog(ParentWindow?.DataContext as IViewAware);
+                Execute.OnUIThreadSync(() =>
+                {
+                    // Collect the diagnostic data before showing the modal window so the
+                    // dialog remains a stable snapshot and never interferes with a session.
+                    var snapshot = CreateConnectionInfoSnapshot();
+                    var viewModel = new ConnectionInfoViewModel(snapshot);
+                    var owner = ParentWindow?.DataContext as IViewAware
+                        ?? IoC.TryGet<MainWindowViewModel>();
+                    viewModel.ShowDialog(owner);
+                });
             }
             catch (Exception e)
             {
                 SimpleLogHelper.Error(e);
+
+                // A diagnostic command must never take down the whole application.  In
+                // particular, WPF window initialization errors are otherwise routed to
+                // Bootstrapper.OnUnhandledException, which intentionally closes RemoteX.
+                try
+                {
+                    Execute.OnUIThreadSync(() =>
+                    {
+                        var title = ConnectionInfoTranslate("Connection information", "Connection information");
+                        var message = ConnectionInfoTranslate(
+                            "Unable to show connection information",
+                            "Unable to show connection information. Details were written to the log.");
+                        System.Windows.MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+                }
+                catch (Exception fallbackException)
+                {
+                    SimpleLogHelper.Error(fallbackException);
+                }
             }
         }
 
@@ -228,98 +254,96 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             var capturedAtUtc = DateTimeOffset.UtcNow;
             return new ConnectionInfoSnapshot(
-                GetConnectionInfoWindowTitle(),
-                GetConnectionInfoSummary(),
+                SafeConnectionInfoText("window title", GetConnectionInfoWindowTitle, ConnectionInfoTranslate("Connection information", "Connection information")),
+                SafeConnectionInfoText("summary", GetConnectionInfoSummary, ConnectionInfoTranslate("Unavailable", "Unavailable")),
                 capturedAtUtc,
                 new[]
                 {
-                    BuildSessionDetailsSection(capturedAtUtc),
-                    BuildClientDetailsSection(),
-                    BuildNetworkDetailsSection(),
-                    BuildRemoteComputerDetailsSection(),
+                    SafeConnectionInfoSection("Session details", () => BuildSessionDetailsSection(capturedAtUtc)),
+                    SafeConnectionInfoSection("Client details", BuildClientDetailsSection),
+                    SafeConnectionInfoSection("Network details", BuildNetworkDetailsSection),
+                    SafeConnectionInfoSection("Remote computer details", BuildRemoteComputerDetailsSection),
                 });
         }
 
         protected virtual string GetConnectionInfoWindowTitle()
         {
-            var displayName = string.IsNullOrWhiteSpace(ProtocolServer.DisplayName)
-                ? ProtocolServer.ProtocolDisplayName
-                : ProtocolServer.DisplayName;
-            return $"{IoC.Translate("Connection information")} - {displayName}";
+            var displayName = SafeConnectionInfoValue("display name", () => ProtocolServer.DisplayName);
+            if (displayName == ConnectionInfoUnavailable)
+                displayName = SafeConnectionInfoValue("protocol name", () => ProtocolServer.ProtocolDisplayName);
+            return $"{ConnectionInfoTranslate("Connection information", "Connection information")} - {displayName}";
         }
 
         protected virtual string GetConnectionInfoSummary()
         {
-            return $"{IoC.Translate("Connection status")}: {GetConnectionInfoStatus()}";
+            return $"{ConnectionInfoTranslate("Connection status", "Connection status")}: {GetConnectionInfoStatus()}";
         }
 
         protected virtual ConnectionInfoSection BuildSessionDetailsSection(DateTimeOffset capturedAtUtc)
         {
             var rows = new List<ConnectionInfoRow>
             {
-                new(IoC.Translate("Time (UTC)"), capturedAtUtc.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)),
-                new(IoC.Translate("Activity ID"), ConnectionInfoUnavailable),
-                new(IoC.Translate("Protocol"), ConnectionInfoValueOrUnavailable(ProtocolServer.ProtocolDisplayName)),
-                new(IoC.Translate("Connection status"), GetConnectionInfoStatus()),
-                new(IoC.Translate("Session ID"), ConnectionInfoValueOrUnavailable(ProtocolServer.SessionId)),
+                CreateConnectionInfoRow("Time (UTC)", () => capturedAtUtc.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)),
+                CreateConnectionInfoRow("Activity ID", () => null),
+                CreateConnectionInfoRow("Protocol", () => ProtocolServer.ProtocolDisplayName),
+                CreateConnectionInfoRow("Connection status", GetConnectionInfoStatus),
+                CreateConnectionInfoRow("Session ID", () => ProtocolServer.SessionId),
             };
 
             if (ProtocolServer is ProtocolBaseWithAddressPort addressPort)
             {
-                rows.Add(new ConnectionInfoRow(IoC.Translate("Hostname"), ConnectionInfoValueOrUnavailable(addressPort.Address)));
-                rows.Add(new ConnectionInfoRow(IoC.Translate("Port"), ConnectionInfoValueOrUnavailable(addressPort.Port)));
+                rows.Add(CreateConnectionInfoRow("Hostname", () => addressPort.Address));
+                rows.Add(CreateConnectionInfoRow("Port", () => addressPort.Port));
             }
 
             if (ProtocolServer is ProtocolBaseWithAddressPortUserPwd userPwd)
             {
-                rows.Add(new ConnectionInfoRow(IoC.Translate("User"), ConnectionInfoValueOrUnavailable(userPwd.UserName)));
+                rows.Add(CreateConnectionInfoRow("User", () => userPwd.UserName));
             }
 
-            return new ConnectionInfoSection(IoC.Translate("Session details"), rows);
+            return new ConnectionInfoSection(ConnectionInfoTranslate("Session details", "Session details"), rows);
         }
 
         protected virtual ConnectionInfoSection BuildClientDetailsSection()
         {
             return new ConnectionInfoSection(
-                IoC.Translate("Client details"),
+                ConnectionInfoTranslate("Client details", "Client details"),
                 new[]
                 {
-                    new ConnectionInfoRow(
-                        IoC.Translate("Client version"),
-                        $"{Assert.APP_DISPLAY_NAME} {AppVersion.Version}"),
-                    new ConnectionInfoRow(IoC.Translate("Local OS"), GetLocalOsDescription()),
+                    CreateConnectionInfoRow("Client version", () => $"{Assert.APP_DISPLAY_NAME} {AppVersion.Version}"),
+                    CreateConnectionInfoRow("Local OS", GetLocalOsDescription),
                 });
         }
 
         protected virtual ConnectionInfoSection BuildNetworkDetailsSection()
         {
             return new ConnectionInfoSection(
-                IoC.Translate("Network details"),
+                ConnectionInfoTranslate("Network details", "Network details"),
                 new[]
                 {
-                    new ConnectionInfoRow(IoC.Translate("Transport protocol"), ConnectionInfoUnavailable),
-                    new ConnectionInfoRow(IoC.Translate("Round-trip time"), ConnectionInfoUnavailable),
-                    new ConnectionInfoRow(IoC.Translate("Available bandwidth"), ConnectionInfoUnavailable),
-                    new ConnectionInfoRow(IoC.Translate("Frame rate"), ConnectionInfoUnavailable),
+                    CreateConnectionInfoRow("Transport protocol", () => null),
+                    CreateConnectionInfoRow("Round-trip time", () => null),
+                    CreateConnectionInfoRow("Available bandwidth", () => null),
+                    CreateConnectionInfoRow("Frame rate", () => null),
                 });
         }
 
         protected virtual ConnectionInfoSection BuildRemoteComputerDetailsSection()
         {
             return new ConnectionInfoSection(
-                IoC.Translate("Remote computer details"),
+                ConnectionInfoTranslate("Remote computer details", "Remote computer details"),
                 new[]
                 {
-                    new ConnectionInfoRow(IoC.Translate("Remote session type"), ConnectionInfoValueOrUnavailable(ProtocolServer.ProtocolDisplayName)),
-                    new ConnectionInfoRow(IoC.Translate("Network name"), ConnectionInfoUnavailable),
-                    new ConnectionInfoRow(IoC.Translate("Remote computer"), GetConnectionInfoRemoteComputer()),
+                    CreateConnectionInfoRow("Remote session type", () => ProtocolServer.ProtocolDisplayName),
+                    CreateConnectionInfoRow("Network name", () => null),
+                    CreateConnectionInfoRow("Remote computer", GetConnectionInfoRemoteComputer),
                 });
         }
 
         protected virtual string GetConnectionInfoRemoteComputer()
         {
             return ProtocolServer is ProtocolBaseWithAddressPort addressPort
-                ? ConnectionInfoValueOrUnavailable(addressPort.Address)
+                ? SafeConnectionInfoValue("remote computer", () => addressPort.Address)
                 : ConnectionInfoUnavailable;
         }
 
@@ -327,13 +351,13 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             return Status switch
             {
-                ProtocolHostStatus.NotInit => IoC.Translate("Not initialized"),
-                ProtocolHostStatus.Initializing => IoC.Translate("Initializing"),
-                ProtocolHostStatus.Initialized => IoC.Translate("Initialized"),
-                ProtocolHostStatus.Connecting => IoC.Translate("Connecting"),
-                ProtocolHostStatus.WaitingForReconnect => IoC.Translate("Waiting for reconnect"),
-                ProtocolHostStatus.Connected => IoC.Translate("Connected"),
-                ProtocolHostStatus.Disconnected => IoC.Translate("Disconnected"),
+                ProtocolHostStatus.NotInit => ConnectionInfoTranslate("Not initialized", "Not initialized"),
+                ProtocolHostStatus.Initializing => ConnectionInfoTranslate("Initializing", "Initializing"),
+                ProtocolHostStatus.Initialized => ConnectionInfoTranslate("Initialized", "Initialized"),
+                ProtocolHostStatus.Connecting => ConnectionInfoTranslate("Connecting", "Connecting"),
+                ProtocolHostStatus.WaitingForReconnect => ConnectionInfoTranslate("Waiting for reconnect", "Waiting for reconnect"),
+                ProtocolHostStatus.Connected => ConnectionInfoTranslate("Connected", "Connected"),
+                ProtocolHostStatus.Disconnected => ConnectionInfoTranslate("Disconnected", "Disconnected"),
                 _ => ConnectionInfoUnavailable,
             };
         }
@@ -350,7 +374,76 @@ namespace _1RM.View.Host.ProtocolHosts
             return string.IsNullOrWhiteSpace(text) ? ConnectionInfoUnavailable : text;
         }
 
-        protected static string ConnectionInfoUnavailable => IoC.Translate("Unavailable");
+        protected static string ConnectionInfoUnavailable => ConnectionInfoTranslate("Unavailable", "Unavailable");
+
+        protected static string ConnectionInfoTranslate(string key, string fallback)
+        {
+            try
+            {
+                var translated = IoC.Translate(key);
+                return string.IsNullOrWhiteSpace(translated) ? fallback : translated;
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Debug($"Unable to translate connection-info key '{key}': {e.Message}");
+                return fallback;
+            }
+        }
+
+        protected ConnectionInfoRow CreateConnectionInfoRow(string labelKey, Func<object?> valueFactory)
+        {
+            return new ConnectionInfoRow(
+                ConnectionInfoTranslate(labelKey, labelKey),
+                SafeConnectionInfoValue(labelKey, valueFactory));
+        }
+
+        private static string SafeConnectionInfoText(string fieldName, Func<string> valueFactory, string fallback)
+        {
+            try
+            {
+                var value = valueFactory();
+                return string.IsNullOrWhiteSpace(value) ? fallback : value;
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Error($"Unable to read connection-info {fieldName}: {e}");
+                return fallback;
+            }
+        }
+
+        private static ConnectionInfoSection SafeConnectionInfoSection(string sectionKey, Func<ConnectionInfoSection> sectionFactory)
+        {
+            try
+            {
+                var section = sectionFactory();
+                if (section != null)
+                    return section;
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Error($"Unable to build connection-info section '{sectionKey}': {e}");
+            }
+
+            return new ConnectionInfoSection(
+                ConnectionInfoTranslate(sectionKey, sectionKey),
+                new[]
+                {
+                    new ConnectionInfoRow(ConnectionInfoTranslate("Unavailable", "Unavailable"), ConnectionInfoUnavailable),
+                });
+        }
+
+        private static string SafeConnectionInfoValue(string fieldName, Func<object?> valueFactory)
+        {
+            try
+            {
+                return ConnectionInfoValueOrUnavailable(valueFactory());
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Debug($"Unable to read connection-info field '{fieldName}': {e.Message}");
+                return ConnectionInfoUnavailable;
+            }
+        }
 
         public string ConnectionId
         {
