@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interop;
 using _1RM.Model;
 using _1RM.Model.Protocol.Base;
+using _1RM.View.Host;
 using _1RM.View.Settings;
 using Shawn.Utils;
 using Shawn.Utils.Wpf;
 using Shawn.Utils.WpfResources.Theme.Styles;
+using Stylet;
 
 namespace _1RM.View.Host.ProtocolHosts
 {
@@ -83,6 +86,16 @@ namespace _1RM.View.Host.ProtocolHosts
             CanFullScreen = canFullScreen;
 
             // Add right click menu
+            {
+                var tb = new TextBlock();
+                tb.SetResourceReference(TextBlock.TextProperty, "View connection information");
+                MenuItems.Add(new System.Windows.Controls.MenuItem()
+                {
+                    Header = tb,
+                    Command = new RelayCommand((_) => ShowConnectionInfo())
+                });
+            }
+
             {
                 var tb = new TextBlock();
                 tb.SetResourceReference(TextBlock.TextProperty, "Reconnect");
@@ -195,6 +208,149 @@ namespace _1RM.View.Host.ProtocolHosts
                 });
             }
         }
+
+        private void ShowConnectionInfo()
+        {
+            try
+            {
+                // Collect the diagnostic data before showing the modal window so the
+                // dialog remains a stable snapshot and never interferes with a session.
+                var viewModel = new ConnectionInfoViewModel(CreateConnectionInfoSnapshot());
+                viewModel.ShowDialog(ParentWindow?.DataContext as IViewAware);
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Error(e);
+            }
+        }
+
+        public virtual ConnectionInfoSnapshot CreateConnectionInfoSnapshot()
+        {
+            var capturedAtUtc = DateTimeOffset.UtcNow;
+            return new ConnectionInfoSnapshot(
+                GetConnectionInfoWindowTitle(),
+                GetConnectionInfoSummary(),
+                capturedAtUtc,
+                new[]
+                {
+                    BuildSessionDetailsSection(capturedAtUtc),
+                    BuildClientDetailsSection(),
+                    BuildNetworkDetailsSection(),
+                    BuildRemoteComputerDetailsSection(),
+                });
+        }
+
+        protected virtual string GetConnectionInfoWindowTitle()
+        {
+            var displayName = string.IsNullOrWhiteSpace(ProtocolServer.DisplayName)
+                ? ProtocolServer.ProtocolDisplayName
+                : ProtocolServer.DisplayName;
+            return $"{IoC.Translate("Connection information")} - {displayName}";
+        }
+
+        protected virtual string GetConnectionInfoSummary()
+        {
+            return $"{IoC.Translate("Connection status")}: {GetConnectionInfoStatus()}";
+        }
+
+        protected virtual ConnectionInfoSection BuildSessionDetailsSection(DateTimeOffset capturedAtUtc)
+        {
+            var rows = new List<ConnectionInfoRow>
+            {
+                new(IoC.Translate("Time (UTC)"), capturedAtUtc.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)),
+                new(IoC.Translate("Activity ID"), ConnectionInfoUnavailable),
+                new(IoC.Translate("Protocol"), ConnectionInfoValueOrUnavailable(ProtocolServer.ProtocolDisplayName)),
+                new(IoC.Translate("Connection status"), GetConnectionInfoStatus()),
+                new(IoC.Translate("Session ID"), ConnectionInfoValueOrUnavailable(ProtocolServer.SessionId)),
+            };
+
+            if (ProtocolServer is ProtocolBaseWithAddressPort addressPort)
+            {
+                rows.Add(new ConnectionInfoRow(IoC.Translate("Hostname"), ConnectionInfoValueOrUnavailable(addressPort.Address)));
+                rows.Add(new ConnectionInfoRow(IoC.Translate("Port"), ConnectionInfoValueOrUnavailable(addressPort.Port)));
+            }
+
+            if (ProtocolServer is ProtocolBaseWithAddressPortUserPwd userPwd)
+            {
+                rows.Add(new ConnectionInfoRow(IoC.Translate("User"), ConnectionInfoValueOrUnavailable(userPwd.UserName)));
+            }
+
+            return new ConnectionInfoSection(IoC.Translate("Session details"), rows);
+        }
+
+        protected virtual ConnectionInfoSection BuildClientDetailsSection()
+        {
+            return new ConnectionInfoSection(
+                IoC.Translate("Client details"),
+                new[]
+                {
+                    new ConnectionInfoRow(
+                        IoC.Translate("Client version"),
+                        $"{Assert.APP_DISPLAY_NAME} {AppVersion.Version}"),
+                    new ConnectionInfoRow(IoC.Translate("Local OS"), GetLocalOsDescription()),
+                });
+        }
+
+        protected virtual ConnectionInfoSection BuildNetworkDetailsSection()
+        {
+            return new ConnectionInfoSection(
+                IoC.Translate("Network details"),
+                new[]
+                {
+                    new ConnectionInfoRow(IoC.Translate("Transport protocol"), ConnectionInfoUnavailable),
+                    new ConnectionInfoRow(IoC.Translate("Round-trip time"), ConnectionInfoUnavailable),
+                    new ConnectionInfoRow(IoC.Translate("Available bandwidth"), ConnectionInfoUnavailable),
+                    new ConnectionInfoRow(IoC.Translate("Frame rate"), ConnectionInfoUnavailable),
+                });
+        }
+
+        protected virtual ConnectionInfoSection BuildRemoteComputerDetailsSection()
+        {
+            return new ConnectionInfoSection(
+                IoC.Translate("Remote computer details"),
+                new[]
+                {
+                    new ConnectionInfoRow(IoC.Translate("Remote session type"), ConnectionInfoValueOrUnavailable(ProtocolServer.ProtocolDisplayName)),
+                    new ConnectionInfoRow(IoC.Translate("Network name"), ConnectionInfoUnavailable),
+                    new ConnectionInfoRow(IoC.Translate("Remote computer"), GetConnectionInfoRemoteComputer()),
+                });
+        }
+
+        protected virtual string GetConnectionInfoRemoteComputer()
+        {
+            return ProtocolServer is ProtocolBaseWithAddressPort addressPort
+                ? ConnectionInfoValueOrUnavailable(addressPort.Address)
+                : ConnectionInfoUnavailable;
+        }
+
+        protected string GetConnectionInfoStatus()
+        {
+            return Status switch
+            {
+                ProtocolHostStatus.NotInit => IoC.Translate("Not initialized"),
+                ProtocolHostStatus.Initializing => IoC.Translate("Initializing"),
+                ProtocolHostStatus.Initialized => IoC.Translate("Initialized"),
+                ProtocolHostStatus.Connecting => IoC.Translate("Connecting"),
+                ProtocolHostStatus.WaitingForReconnect => IoC.Translate("Waiting for reconnect"),
+                ProtocolHostStatus.Connected => IoC.Translate("Connected"),
+                ProtocolHostStatus.Disconnected => IoC.Translate("Disconnected"),
+                _ => ConnectionInfoUnavailable,
+            };
+        }
+
+        protected static string GetLocalOsDescription()
+        {
+            var architecture = Environment.Is64BitOperatingSystem ? "x64" : "x86";
+            return $"{Environment.OSVersion.VersionString} ({architecture})";
+        }
+
+        protected static string ConnectionInfoValueOrUnavailable(object? value)
+        {
+            var text = Convert.ToString(value, CultureInfo.InvariantCulture);
+            return string.IsNullOrWhiteSpace(text) ? ConnectionInfoUnavailable : text;
+        }
+
+        protected static string ConnectionInfoUnavailable => IoC.Translate("Unavailable");
 
         public string ConnectionId
         {

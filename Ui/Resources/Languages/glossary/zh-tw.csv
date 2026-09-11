@@ -27,6 +27,7 @@ Name;名稱
 File Name;檔案名稱
 Test;測試
 Reconnect;重新連線
+Disconnected;已斷線
 Dismiss;關閉
 Lock;鎖定
 Always on top;保持在最上層
@@ -331,3 +332,39 @@ ListViewMode_List;列表
 ListViewMode_Card;卡片
 ListViewMode_Tree;樹形
 Do not check for new version;
+View connection information;查看連線資訊
+Connection information;連線資訊
+Time (UTC);時間 (UTC)
+Activity ID;活動 ID
+Connection status;連線狀態
+Session ID;工作階段 ID
+Session details;工作階段詳細資訊
+Client details;用戶端詳細資訊
+Client version;用戶端版本
+Local OS;本機作業系統
+Network details;網路詳細資訊
+Transport protocol;傳輸協定
+Round-trip time;往返時間
+Available bandwidth;可用頻寬
+Frame rate;畫面更新率
+Remote computer details;遠端電腦詳細資訊
+Remote session type;遠端工作階段類型
+Network name;網路名稱
+Gateway name;閘道名稱
+Gateway logon method;閘道登入方法
+Remote computer;遠端電腦
+Unavailable;無法使用
+Not in use;未使用
+Automatically detected;自動偵測
+Copied;已複製
+Unable to copy;無法複製
+This information is a snapshot captured when the window was opened.;此資訊是視窗開啟時擷取的快照。
+Copy all;全部複製
+Not initialized;未初始化
+Initializing;初始化中
+Initialized;已初始化
+Connecting;連線中
+Waiting for reconnect;等待重新連線
+Connected;已連線
+Remote desktop;遠端桌面
+Connection quality;連線品質

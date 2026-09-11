@@ -441,6 +441,9 @@
         <Page Update="View\Host\FullScreenWindowView.xaml">
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="View\Host\ConnectionInfoView.xaml">
+            <SubType>Designer</SubType>
+        </Page>
         <Page Update="View\Host\ProtocolHosts\AxMsRdpClient10Host.xaml">
             <SubType>Designer</SubType>
         </Page>

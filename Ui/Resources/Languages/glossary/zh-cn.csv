@@ -27,6 +27,7 @@ Name;名称
 File Name;文件名
 Test;测试
 Reconnect;重新连接
+Disconnected;已断开连接
 Dismiss;关闭
 Lock;锁定
 Always on top;置顶
@@ -331,3 +332,39 @@ ListViewMode_List;列表
 ListViewMode_Card;卡片
 ListViewMode_Tree;树形
 Do not check for new version;
+View connection information;查看连接信息
+Connection information;连接信息
+Time (UTC);时间 (UTC)
+Activity ID;活动 ID
+Connection status;连接状态
+Session ID;会话 ID
+Session details;会话详情
+Client details;客户端详细信息
+Client version;客户端版本
+Local OS;本地操作系统
+Network details;网络详细信息
+Transport protocol;传输协议
+Round-trip time;往返时间
+Available bandwidth;可用带宽
+Frame rate;帧率
+Remote computer details;远程计算机详细信息
+Remote session type;远程会话类型
+Network name;网络名称
+Gateway name;网关名称
+Gateway logon method;网关登录方式
+Remote computer;远程计算机
+Unavailable;不可用
+Not in use;未使用
+Automatically detected;自动检测
+Copied;已复制
+Unable to copy;复制失败
+This information is a snapshot captured when the window was opened.;此信息是窗口打开时捕获的快照。
+Copy all;复制全部
+Not initialized;未初始化
+Initializing;初始化中
+Initialized;已初始化
+Connecting;连接中
+Waiting for reconnect;等待重新连接
+Connected;已连接
+Remote desktop;远程桌面
+Connection quality;连接质量

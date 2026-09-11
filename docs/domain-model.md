@@ -9,6 +9,8 @@
 | 协议 | Protocol | 可连接的远程会话类型：RDP、SSH、Telnet、VNC、FTP、SFTP、Serial、LocalApp 等。`Ui/Model/Protocol/` 下各具体类。 |
 | 会话 | Session | 一次运行中的远程连接。在 Rust 核心中抽象为 `TermSession` trait。 |
 | 终端会话 | TermSession | Rust 侧协议无关的会话接口，五方法：`write`/`poll_read`/`is_closed`/`error_message`/`resize`。SSH/Telnet/Serial 均实现之。 |
+| 会话连接信息 | Session Connection Information | 用户从运行中的宿主查看到的连接诊断快照，在请求时采集，包含非敏感的目标、状态和协议特有信息；不包含密码等凭据。 |
+| 连接参数 | Connection Settings | 保存于协议模型、用于建立会话的目标与认证配置；它不同于运行中的会话连接信息。 |
 | 桥接层 | Bridge | C# 侧连接 Rust cdylib 的适配层（`SshRustBridge`）。管理生命周期 + 后台 poll 线程 + 事件回调。 |
 | 会话注册表 | Session Registry | Rust 侧 `i64` handle → `Box<dyn TermSession>` 的全局表，FFI 层通过 handle 分发调用。 |
 | 串口参数 | Serial Params | Serial 协议的 COMPort、BaudRate、DataBits、Parity、StopBits、FlowControl。C# 侧映射为枚举 int 传入 Rust。 |

@@ -27,6 +27,7 @@ Name;Name
 File Name;File Name
 Test;Test
 Reconnect;Reconnect
+Disconnected;Disconnected
 Dismiss;Dismiss
 Lock;Lock
 Always on top;Always on top
@@ -331,3 +332,39 @@ ListViewMode_List;List
 ListViewMode_Card;Card
 ListViewMode_Tree;Tree
 Do not check for new version;Do not check for new version
+View connection information;View connection information
+Connection information;Connection information
+Time (UTC);Time (UTC)
+Activity ID;Activity ID
+Connection status;Connection status
+Session ID;Session ID
+Session details;Session details
+Client details;Client details
+Client version;Client version
+Local OS;Local OS
+Network details;Network details
+Transport protocol;Transport protocol
+Round-trip time;Round-trip time
+Available bandwidth;Available bandwidth
+Frame rate;Frame rate
+Remote computer details;Remote computer details
+Remote session type;Remote session type
+Network name;Network name
+Gateway name;Gateway name
+Gateway logon method;Gateway logon method
+Remote computer;Remote computer
+Unavailable;Unavailable
+Not in use;Not in use
+Automatically detected;Automatically detected
+Copied;Copied
+Unable to copy;Unable to copy
+This information is a snapshot captured when the window was opened.;This information is a snapshot captured when the window was opened.
+Copy all;Copy all
+Not initialized;Not initialized
+Initializing;Initializing
+Initialized;Initialized
+Connecting;Connecting
+Waiting for reconnect;Waiting for reconnect
+Connected;Connected
+Remote desktop;Remote desktop
+Connection quality;Connection quality
