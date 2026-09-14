@@ -988,7 +988,7 @@ mod tests {
     #[test]
     fn find_new_exe_supports_release_folder() {
         let temp = tempdir().unwrap();
-        let release = temp.path().join("RemoteX-1.0.14-net9-x64");
+        let release = temp.path().join("RemoteX-1.0.15-net9-x64");
         fs::create_dir_all(&release).unwrap();
         let exe = release.join("RemoteX.exe");
         fs::write(&exe, b"new").unwrap();
@@ -1019,7 +1019,7 @@ mod tests {
     fn swap_replaces_main_exe_and_updater() {
         let temp = tempdir().unwrap();
         let target_dir = temp.path().join("installed");
-        let stage_dir = temp.path().join("stage").join("RemoteX-1.0.14");
+        let stage_dir = temp.path().join("stage").join("RemoteX-1.0.15");
         fs::create_dir_all(&target_dir).unwrap();
         fs::create_dir_all(&stage_dir).unwrap();
 
@@ -1036,7 +1036,7 @@ mod tests {
             &stage_dir.join("RemoteX.exe"),
             true,
             None,
-            Some("1.0.14"),
+            Some("1.0.15"),
         )
         .unwrap();
 

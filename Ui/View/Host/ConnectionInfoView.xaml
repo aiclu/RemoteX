@@ -7,7 +7,7 @@
                          xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles;assembly=Shawn.Utils.WpfResources"
                          mc:Ignorable="d"
                          d:DataContext="{d:DesignInstance host:ConnectionInfoViewModel}"
-                         Title="{Binding WindowTitle}"
+                         Title="{Binding WindowTitle, Mode=OneWay}"
                          Width="620"
                          Height="650"
                          MinWidth="480"
@@ -43,7 +43,7 @@
                     Background="{DynamicResource AccentMidBrush}"
                     Padding="16 0">
                 <Grid>
-                    <TextBlock Text="{Binding WindowTitle}"
+                            <TextBlock Text="{Binding WindowTitle, Mode=OneWay}"
                                Foreground="{DynamicResource AccentTextBrush}"
                                FontSize="{DynamicResource GlobalFontSizeSubtitle}"
                                FontWeight="SemiBold"
@@ -78,7 +78,7 @@
                                        Foreground="{DynamicResource AccentMidBrush}"
                                        FontSize="25"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding Summary}"
+                            <TextBlock Text="{Binding Summary, Mode=OneWay}"
                                        Foreground="{DynamicResource BackgroundTextBrush}"
                                        FontSize="{DynamicResource GlobalFontSizeSubtitle}"
                                        TextWrapping="Wrap"
@@ -95,7 +95,7 @@
                                                FontWeight="SemiBold"
                                                Margin="0 0 0 6">
                                         <Run Text="[" />
-                                        <Run Text="{Binding Title}" />
+                                        <Run Text="{Binding Title, Mode=OneWay}" />
                                         <Run Text="]" />
                                     </TextBlock>
                                     <ItemsControl ItemsSource="{Binding Rows}">
@@ -106,12 +106,12 @@
                                                         <ColumnDefinition Width="190" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Label}"
+                                                    <TextBlock Text="{Binding Label, Mode=OneWay}"
                                                                Foreground="{DynamicResource PrimaryTextBrush}"
                                                                Opacity="0.78"
                                                                TextWrapping="Wrap" />
                                                     <TextBlock Grid.Column="1"
-                                                               Text="{Binding Value}"
+                                                               Text="{Binding Value, Mode=OneWay}"
                                                                Foreground="{DynamicResource PrimaryTextBrush}"
                                                                TextWrapping="Wrap" />
                                                 </Grid>
