@@ -6,25 +6,37 @@
 //!
 //! Apply-stage invocation is used to replace the running updater itself:
 //!     updater --apply-stage <stageDir> <appExePath> [--parent-pid <pid>]
+//!              [--target-pid <pid>] [--ready-file <path>]
 //!              [--target-version <version>] [--state-file <path>] [--restart]
 //!
 //! The normal process downloads and validates the release before emitting
 //! `ready-to-swap`. The WPF application closes only after that stage. A staged
-//! updater then waits for the old updater to exit, performs the reversible swap
-//! (including updater.exe), and restarts RemoteX.
+//! updater proves its detached process is ready, waits for the target app and
+//! old updater to exit, performs the reversible swap (including updater.exe),
+//! and restarts RemoteX.
 
 use std::env;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 const UPDATER_PROTOCOL_VERSION: &str = "2";
+const HELPER_READY_TIMEOUT_SECS: u64 = 15;
+const PROCESS_EXIT_TIMEOUT_SECS: u64 = 60;
+
+#[cfg(windows)]
+const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
+#[cfg(windows)]
+const DETACHED_PROCESS: u32 = 0x0000_0008;
 
 #[derive(Error, Debug)]
 enum UpdError {
@@ -60,6 +72,8 @@ struct ApplyOptions {
     stage: PathBuf,
     exe_path: PathBuf,
     parent_pid: Option<u32>,
+    target_pid: Option<u32>,
+    ready_file: Option<PathBuf>,
     target_version: Option<String>,
     state_file: Option<PathBuf>,
     want_restart: bool,
@@ -68,7 +82,15 @@ struct ApplyOptions {
 fn log_line(message: &str) {
     let path = env::temp_dir().join("RemoteX-updater.log");
     if let Ok(mut file) = fs::OpenOptions::new().create(true).append(true).open(path) {
-        let _ = writeln!(file, "{message}");
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|value| value.as_millis())
+            .unwrap_or_default();
+        let _ = writeln!(
+            file,
+            "{message} pid={} ts_ms={timestamp}",
+            std::process::id()
+        );
     }
 }
 
@@ -91,6 +113,95 @@ fn emit_error(msg: &str) {
         "{{\"type\":\"error\",\"message\":\"{}\"}}",
         json_escape(msg)
     ));
+}
+
+fn write_ready_marker(path: &Path) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let temp_path = PathBuf::from(format!("{}.tmp", path.to_string_lossy()));
+    if temp_path.exists() {
+        let _ = fs::remove_file(&temp_path);
+    }
+
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open(&temp_path)?;
+    writeln!(file, "ready=1")?;
+    writeln!(file, "pid={}", std::process::id())?;
+    file.flush()?;
+    file.sync_all()?;
+    drop(file);
+
+    if path.exists() {
+        fs::remove_file(path)?;
+    }
+    fs::rename(temp_path, path)?;
+    Ok(())
+}
+
+fn wait_for_ready_marker(path: &Path, child: &mut Child, timeout_secs: u64) -> Result<()> {
+    log_line(&format!(
+        "helper-wait-ready path={} timeout_secs={timeout_secs}",
+        path.display()
+    ));
+    let deadline = Instant::now() + Duration::from_secs(timeout_secs);
+    while Instant::now() < deadline {
+        if let Ok(contents) = fs::read_to_string(path) {
+            if contents.lines().any(|line| line.trim() == "ready=1") {
+                log_line(&format!("helper-ready path={}", path.display()));
+                return Ok(());
+            }
+        }
+
+        if let Some(status) = child.try_wait()? {
+            return Err(UpdError::Swap(format!(
+                "staged updater exited before ready (status={status})"
+            )));
+        }
+        thread::sleep(Duration::from_millis(100));
+    }
+
+    Err(UpdError::Swap(format!(
+        "staged updater did not signal ready within {timeout_secs}s"
+    )))
+}
+
+fn spawn_detached_helper(command: &mut Command) -> std::io::Result<Child> {
+    command
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+
+    #[cfg(windows)]
+    {
+        command.creation_flags(DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB);
+        match command.spawn() {
+            Ok(child) => Ok(child),
+            Err(first_error) => {
+                log_line(&format!(
+                    "helper-spawn-breakaway-failed error={first_error}"
+                ));
+                command.creation_flags(DETACHED_PROCESS);
+                command.spawn().map_err(|second_error| {
+                    std::io::Error::new(
+                        second_error.kind(),
+                        format!(
+                            "breakaway spawn failed: {first_error}; fallback spawn failed: {second_error}"
+                        ),
+                    )
+                })
+            }
+        }
+    }
+
+    #[cfg(not(windows))]
+    {
+        command.spawn()
+    }
 }
 
 fn json_escape(value: &str) -> String {
@@ -367,26 +478,71 @@ fn wait_for_exit(
     state_file: Option<&Path>,
     target_version: Option<&str>,
 ) -> Result<()> {
-    record_stage("wait-exit", state_file, target_version);
+    wait_for_processes_exit(
+        exe_path,
+        &[pid],
+        timeout_secs,
+        state_file,
+        target_version,
+        true,
+    )
+}
+
+fn wait_for_processes_exit(
+    exe_path: &Path,
+    pids: &[Option<u32>],
+    timeout_secs: u64,
+    state_file: Option<&Path>,
+    target_version: Option<&str>,
+    publish_stage: bool,
+) -> Result<()> {
+    if publish_stage {
+        record_stage("wait-exit", state_file, target_version);
+    }
+    let descriptions: Vec<String> = pids
+        .iter()
+        .map(|pid| {
+            pid.map(|value| format!("pid {value}"))
+                .unwrap_or_else(|| exe_path.display().to_string())
+        })
+        .collect();
+    log_line(&format!(
+        "wait-start processes={} timeout_secs={timeout_secs}",
+        descriptions.join(",")
+    ));
+
     let deadline = Instant::now() + Duration::from_secs(timeout_secs);
-    let is_running = || {
-        pid.map(process_running_by_pid)
-            .unwrap_or_else(|| process_running_by_name(exe_path))
+    let running_processes = || {
+        pids.iter()
+            .filter_map(|pid| {
+                let running = pid
+                    .map(process_running_by_pid)
+                    .unwrap_or_else(|| process_running_by_name(exe_path));
+                if running {
+                    Some(
+                        pid.map(|value| format!("pid {value}"))
+                            .unwrap_or_else(|| exe_path.display().to_string()),
+                    )
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
     };
 
     while Instant::now() < deadline {
-        if !is_running() {
+        if running_processes().is_empty() {
+            log_line("wait-complete");
             return Ok(());
         }
         thread::sleep(Duration::from_millis(300));
     }
 
-    if is_running() {
-        let detail = pid
-            .map(|value| format!("pid {value}"))
-            .unwrap_or_else(|| exe_path.display().to_string());
+    let running = running_processes();
+    if !running.is_empty() {
         return Err(UpdError::Swap(format!(
-            "target process ({detail}) did not exit within {timeout_secs}s"
+            "target process(es) ({}) did not exit within {timeout_secs}s",
+            running.join(", ")
         )));
     }
     Ok(())
@@ -717,7 +873,7 @@ fn parse_normal_options(args: &[String]) -> Result<UpdateOptions> {
 fn parse_apply_options(args: &[String]) -> Result<ApplyOptions> {
     if args.len() < 3 {
         return Err(UpdError::Args(
-            "usage: updater --apply-stage <stageDir> <appExePath> [--parent-pid <pid>] [--target-version <version>] [--state-file <path>] [--restart]".into(),
+            "usage: updater --apply-stage <stageDir> <appExePath> [--parent-pid <pid>] [--target-pid <pid>] [--ready-file <path>] [--target-version <version>] [--state-file <path>] [--restart]".into(),
         ));
     }
 
@@ -725,6 +881,8 @@ fn parse_apply_options(args: &[String]) -> Result<ApplyOptions> {
         stage: PathBuf::from(&args[1]),
         exe_path: PathBuf::from(&args[2]),
         parent_pid: None,
+        target_pid: None,
+        ready_file: None,
         target_version: None,
         state_file: None,
         want_restart: false,
@@ -740,6 +898,22 @@ fn parse_apply_options(args: &[String]) -> Result<ApplyOptions> {
                 options.parent_pid = Some(args[i + 1].parse().map_err(|_| {
                     UpdError::Args("--parent-pid requires a numeric process id".into())
                 })?);
+                i += 2;
+            }
+            "--target-pid" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--target-pid requires a value".into()));
+                }
+                options.target_pid = Some(args[i + 1].parse().map_err(|_| {
+                    UpdError::Args("--target-pid requires a numeric process id".into())
+                })?);
+                i += 2;
+            }
+            "--ready-file" => {
+                if i + 1 >= args.len() {
+                    return Err(UpdError::Args("--ready-file requires a value".into()));
+                }
+                options.ready_file = Some(PathBuf::from(&args[i + 1]));
                 i += 2;
             }
             "--target-version" => {
@@ -813,35 +987,38 @@ fn run_normal(options: &UpdateOptions) -> Result<()> {
     )?;
     let new_exe = find_new_exe(&staging)?;
     verify_target_writable(&options.exe_path)?;
-    record_stage(
-        "ready-to-swap",
-        options.state_file.as_deref(),
-        options.target_version.as_deref(),
-    );
-
-    wait_for_exit(
-        &options.exe_path,
-        options.target_pid,
-        30,
-        options.state_file.as_deref(),
-        options.target_version.as_deref(),
-    )?;
 
     // The current updater is locked by Windows. Run the freshly downloaded
-    // helper from staging so it can replace updater.exe after this process exits.
+    // helper from staging before telling the application to close. The helper
+    // proves that it started successfully, then waits for both the application
+    // and this updater before replacing updater.exe.
     if let Some(staged_updater) = find_named_file(&staging, "updater.exe") {
+        let ready_file = tmp.path().join("helper-ready");
+        if ready_file.exists() {
+            let _ = fs::remove_file(&ready_file);
+        }
         record_stage(
             "helper-handoff",
             options.state_file.as_deref(),
             options.target_version.as_deref(),
         );
+        log_line(&format!(
+            "helper-spawn-start path={} target_pid={:?}",
+            staged_updater.display(),
+            options.target_pid
+        ));
         let mut command = Command::new(&staged_updater);
         command
             .arg("--apply-stage")
             .arg(&staging)
             .arg(&options.exe_path)
             .arg("--parent-pid")
-            .arg(std::process::id().to_string());
+            .arg(std::process::id().to_string())
+            .arg("--ready-file")
+            .arg(&ready_file);
+        if let Some(target_pid) = options.target_pid {
+            command.arg("--target-pid").arg(target_pid.to_string());
+        }
         if options.want_restart {
             command.arg("--restart");
         }
@@ -852,23 +1029,50 @@ fn run_normal(options: &UpdateOptions) -> Result<()> {
             command.arg("--state-file").arg(state_file);
         }
 
-        match command.spawn() {
-            Ok(_) => {
-                // Transfer ownership of the temp directory to the staged
-                // helper. It remains until the helper has copied the release.
-                let _ = tmp.keep();
-                return Ok(());
-            }
-            Err(error) => {
-                let _ = restart(&options.exe_path);
-                return Err(UpdError::Swap(format!(
-                    "start staged updater failed: {error}"
-                )));
-            }
+        let mut child = spawn_detached_helper(&mut command)
+            .map_err(|error| UpdError::Swap(format!("start staged updater failed: {error}")))?;
+        log_line(&format!(
+            "helper-spawned child_pid={} child_path={}",
+            child.id(),
+            staged_updater.display()
+        ));
+        if let Err(error) =
+            wait_for_ready_marker(&ready_file, &mut child, HELPER_READY_TIMEOUT_SECS)
+        {
+            log_line(&format!("helper-ready-failed error={error}"));
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error);
         }
+
+        // Transfer ownership of the temp directory to the staged helper. It
+        // remains until the helper has copied the release. Persist this before
+        // emitting ready-to-swap so the application's shutdown cannot race
+        // with TempDir cleanup.
+        let path = tmp.keep();
+        log_line(&format!("handoff-root path={}", path.display()));
+
+        record_stage(
+            "ready-to-swap",
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+        );
+        return Ok(());
     }
 
     // Compatibility fallback for packages that do not contain updater.exe.
+    record_stage(
+        "ready-to-swap",
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    );
+    wait_for_exit(
+        &options.exe_path,
+        options.target_pid,
+        PROCESS_EXIT_TIMEOUT_SECS,
+        options.state_file.as_deref(),
+        options.target_version.as_deref(),
+    )?;
     let swap_result = swap_in(
         &options.exe_path,
         &new_exe,
@@ -892,20 +1096,56 @@ fn run_apply(options: &ApplyOptions) -> Result<()> {
     // point, so it must be emitted before the application is asked to close.
     let new_exe = find_new_exe(&options.stage)?;
     verify_target_writable(&options.exe_path)?;
-    record_stage(
-        "ready-to-swap",
-        options.state_file.as_deref(),
-        options.target_version.as_deref(),
-    );
-
-    if let Some(parent_pid) = options.parent_pid {
-        wait_for_exit(
-            &options.exe_path,
-            Some(parent_pid),
-            30,
+    let has_ready_file = options.ready_file.is_some();
+    if has_ready_file {
+        let ready_file = options.ready_file.as_deref().expect("checked above");
+        write_ready_marker(ready_file)?;
+        log_line(&format!(
+            "helper-ready-marker path={}",
+            ready_file.display()
+        ));
+    } else {
+        record_stage(
+            "ready-to-swap",
             options.state_file.as_deref(),
             options.target_version.as_deref(),
-        )?;
+        );
+    }
+
+    if options.target_pid.is_some() || options.parent_pid.is_some() {
+        let mut wait_targets = Vec::new();
+        if let Some(target_pid) = options.target_pid {
+            wait_targets.push(Some(target_pid));
+        } else if options.ready_file.is_some() {
+            // The normal handoff still supports callers that do not provide
+            // --target-pid by falling back to the executable name. Legacy
+            // bootstrap callers pass their application PID as parent_pid and
+            // should not add a second name-based wait.
+            wait_targets.push(None);
+        }
+        if let Some(parent_pid) = options.parent_pid {
+            wait_targets.push(Some(parent_pid));
+        }
+        let wait_result = wait_for_processes_exit(
+            &options.exe_path,
+            &wait_targets,
+            PROCESS_EXIT_TIMEOUT_SECS,
+            options.state_file.as_deref(),
+            options.target_version.as_deref(),
+            !has_ready_file,
+        );
+        if let Err(error) = wait_result {
+            log_line(&format!("wait-failed error={error}"));
+            if has_ready_file {
+                match restart(&options.exe_path) {
+                    Ok(()) => log_line("old-version-restarted-after-wait-failure"),
+                    Err(restart_error) => {
+                        log_line(&format!("old-version-restart-failed error={restart_error}"));
+                    }
+                }
+            }
+            return Err(error);
+        }
     }
 
     let swap_result = swap_in(
@@ -916,7 +1156,10 @@ fn run_apply(options: &ApplyOptions) -> Result<()> {
         options.target_version.as_deref(),
     );
     if swap_result.is_err() {
-        let _ = restart(&options.exe_path);
+        match restart(&options.exe_path) {
+            Ok(()) => log_line("old-version-restarted-after-swap-failure"),
+            Err(error) => log_line(&format!("old-version-restart-failed error={error}")),
+        }
     }
     swap_result?;
     if options.want_restart {
@@ -983,6 +1226,61 @@ mod tests {
     #[test]
     fn json_escape_handles_quotes_and_control_characters() {
         assert_eq!(json_escape("a\\b\"c\nd"), "a\\\\b\\\"c\\nd");
+    }
+
+    #[test]
+    fn parse_apply_options_accepts_handoff_arguments() {
+        let args = vec![
+            "--apply-stage".into(),
+            "stage".into(),
+            "RemoteX.exe".into(),
+            "--parent-pid".into(),
+            "101".into(),
+            "--target-pid".into(),
+            "202".into(),
+            "--ready-file".into(),
+            "ready.marker".into(),
+            "--target-version".into(),
+            "1.0.15".into(),
+        ];
+
+        let options = parse_apply_options(&args).unwrap();
+        assert_eq!(options.parent_pid, Some(101));
+        assert_eq!(options.target_pid, Some(202));
+        assert_eq!(options.ready_file, Some(PathBuf::from("ready.marker")));
+        assert_eq!(options.target_version.as_deref(), Some("1.0.15"));
+    }
+
+    #[test]
+    fn ready_marker_is_written_atomically() {
+        let temp = tempdir().unwrap();
+        let marker = temp.path().join("handoff").join("ready.marker");
+
+        write_ready_marker(&marker).unwrap();
+
+        let contents = fs::read_to_string(&marker).unwrap();
+        assert!(contents.lines().any(|line| line == "ready=1"));
+        assert!(contents.lines().any(|line| line.starts_with("pid=")));
+        assert!(!marker.with_extension("marker.tmp").exists());
+    }
+
+    #[test]
+    fn ready_marker_is_observed_before_child_exit() {
+        let temp = tempdir().unwrap();
+        let marker = temp.path().join("ready.marker");
+        write_ready_marker(&marker).unwrap();
+
+        let mut child = if cfg!(windows) {
+            Command::new("cmd")
+                .args(["/C", "exit", "0"])
+                .spawn()
+                .unwrap()
+        } else {
+            Command::new("sh").args(["-c", "exit 0"]).spawn().unwrap()
+        };
+
+        wait_for_ready_marker(&marker, &mut child, 1).unwrap();
+        let _ = child.wait();
     }
 
     #[test]

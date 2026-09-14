@@ -647,7 +647,9 @@ namespace _1RM.Service
                 process.WaitForExit();
                 var state = TryReadPendingUpdateState();
                 if (process.ExitCode == 0 && Volatile.Read(ref callbackFailed) == 0
-                    && (Volatile.Read(ref readySignalled) != 0 || state?.Phase == "swapped"))
+                    && (Volatile.Read(ref readySignalled) != 0
+                        || state?.Phase == "ready-to-swap"
+                        || state?.Phase == "swapped"))
                     return new SelfUpdateExecutionResult(true, "swapped");
             }
             catch (Exception e)
@@ -730,7 +732,7 @@ namespace _1RM.Service
                 "--apply-stage",
                 stagePath,
                 targetExe,
-                "--parent-pid",
+                "--target-pid",
                 Environment.ProcessId.ToString(),
                 "--target-version",
                 targetVersion,
@@ -915,7 +917,10 @@ namespace _1RM.Service
                 await proc.WaitForExitAsync();
                 proc.WaitForExit();
                 var completedState = TryReadPendingUpdateState();
-                if (proc.ExitCode == 0 && (Volatile.Read(ref readySignalled) != 0 || completedState?.Phase == "swapped"))
+                if (proc.ExitCode == 0
+                    && (Volatile.Read(ref readySignalled) != 0
+                        || completedState?.Phase == "ready-to-swap"
+                        || completedState?.Phase == "swapped"))
                     return new SelfUpdateExecutionResult(true, "swapped");
 
                 if (completedState?.Phase == "swapped")
@@ -930,7 +935,7 @@ namespace _1RM.Service
             if (state?.Phase == "swapped")
                 return new SelfUpdateExecutionResult(true, state.Phase, state.Message);
             if (state?.Phase == "ready-to-swap")
-                return new SelfUpdateExecutionResult(false, state.Phase, state.Message);
+                return new SelfUpdateExecutionResult(true, state.Phase, state.Message);
 
             const string message = "Updater exited before the application was replaced.";
             MarkUpdateFailed(package.Version, message);

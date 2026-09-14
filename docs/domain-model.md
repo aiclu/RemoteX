@@ -35,12 +35,13 @@
 |---|---|---|
 | 连接信息快照 | Connection Information Snapshot | 用户打开“查看连接信息”时，在 UI 线程一次性采集的只读诊断数据。快照与会话生命周期解耦；单个协议字段、COM 属性或分区读取失败只显示“不可用”，不影响其它字段或主程序。 |
 | 更新包 | Self-update Package | 同一份发布元数据中的目标版本、下载地址、发布页地址和可选 SHA-256 摘要；检查版本与实际下载包不得来自不一致的请求。 |
-| 更新交接 | Update Handoff | 更新器完成下载、摘要校验、解压、主程序存在性检查和目标目录权限预检后发出 `ready-to-swap`，应用才关闭并把文件替换交给更新器。 |
+| 更新器就绪握手 | Updater Ready Handshake | 暂存更新器完成启动、发布包检查和目标目录预检后，通过一次性 ready-file 向父更新器证明自身可继续运行；握手失败时应用不得关闭。 |
+| 更新交接 | Update Handoff | 父更新器确认暂存更新器就绪并持久化暂存目录后发出 `ready-to-swap`，应用才关闭；暂存更新器随后等待目标应用 PID和父更新器 PID退出，再接管文件替换。 |
 | 更新事务 | Update Transaction | 更新器创建备份、替换文件、记录状态并在替换失败时恢复旧文件的可回滚过程。事务终态包括 `swapped`、`rolled-back` 和 `rollback-failed`。 |
 | 已安装版本 | Installed Version | 应用启动时从当前可执行文件实际加载的 `AppVersion.Version`。只有它达到待更新目标版本，才清除 `.locality/update-state.json`；否则保留失败状态供诊断和重试。 |
 | 待更新状态 | Pending Update State | `.locality/update-state.json` 中的目标版本、阶段、错误消息、备份目录和进度；普通启动失败或 UAC 取消时不能通过删除它掩盖旧版本仍在运行的事实。 |
 
-约束：连接信息复制内容只包含快照中的非敏感字段，不读取或输出密码、私钥、凭据令牌；Store 构建不使用便携版自更新。普通安装目录不可写时，应用通过 `runas` 请求 UAC，取消请求不关闭旧版本。
+约束：连接信息复制内容只包含快照中的非敏感字段，不读取或输出密码、私钥、凭据令牌；Store 构建不使用便携版自更新。普通安装目录不可写时，应用通过 `runas` 请求 UAC，取消请求不关闭旧版本。`helper-handoff` 只表示开始交接，只有 `ready-to-swap` 表示可安全关闭应用。
 
 ## Runner
 
