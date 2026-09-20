@@ -38,6 +38,25 @@ namespace _1RM.View.Host.ProtocolHosts
                 SimpleLogHelper.Error(e);
             }
         }
+
+        public static bool TrySetExtendedProperty(this AxHost axHost, string propertyName, object value)
+        {
+            try
+            {
+                if (axHost.IsDisposed || axHost.Disposing || !axHost.IsHandleCreated)
+                    return false;
+                var settings = axHost.GetOcx() as IMsRdpExtendedSettings
+                    ?? throw new InvalidCastException();
+                settings.set_Property(propertyName, ref value);
+                return true;
+            }
+            catch (Exception e)
+            {
+                // Never log property values or exception messages, which may contain credentials.
+                SimpleLogHelper.Warning($"RDP property '{propertyName}' failed: {e.GetType().Name}, HRESULT=0x{e.HResult:X8}");
+                return false;
+            }
+        }
     }
 
     internal class AxMsRdpClient10NotSafeForScriptingEx : AxMSTSCLib.AxMsRdpClient10NotSafeForScripting
@@ -88,6 +107,11 @@ namespace _1RM.View.Host.ProtocolHosts
         private DateTime _lastLoginTime = DateTime.MinValue;
 
         private readonly object _rdpClientDisposeLock = new object();
+        private readonly RdpNetworkMetricsCollector _rdpNetworkMetrics = new RdpNetworkMetricsCollector();
+        private long _rdpNetworkMetricsGeneration;
+        private volatile bool _rdpNetworkMetricsCollectionEnabled;
+        private AxMsRdpClient10NotSafeForScriptingEx? _rdpNetworkMetricsClient;
+        private AxMSTSCLib.IMsTscAxEvents_OnNetworkStatusChangedEventHandler? _rdpNetworkStatusChangedHandler;
 
 
         public static AxMsRdpClient10Host Create(RDP rdp, int width = 0, int height = 0)
@@ -158,6 +182,7 @@ namespace _1RM.View.Host.ProtocolHosts
                     }
                 }
             };
+
 
             InitRdp(width, height);
             GlobalEventHelper.OnScreenResolutionChanged += OnScreenResolutionChanged;
@@ -256,26 +281,30 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             lock (_rdpClientDisposeLock)
             {
-                _rdpClient = new AxMsRdpClient10NotSafeForScriptingEx();
+                _rdpNetworkMetrics.Reset();
+                _rdpNetworkMetricsCollectionEnabled = false;
+                var generation = Interlocked.Increment(ref _rdpNetworkMetricsGeneration);
+                var client = new AxMsRdpClient10NotSafeForScriptingEx();
+                _rdpClient = client;
 
                 SimpleLogHelper.Debug("RDP Host: init new AxMsRdpClient10NotSafeForScriptingEx()");
 
-                ((System.ComponentModel.ISupportInitialize)(_rdpClient)).BeginInit();
-                _rdpClient.Dock = DockStyle.Fill;
-                _rdpClient.Enabled = true;
-                _rdpClient.BackColor = Color.Black;
+                ((System.ComponentModel.ISupportInitialize)(client)).BeginInit();
+                client.Dock = DockStyle.Fill;
+                client.Enabled = true;
+                client.BackColor = Color.Black;
                 // set call back
-                _rdpClient.OnRequestGoFullScreen += (sender, args) =>
+                client.OnRequestGoFullScreen += (sender, args) =>
                 {
                     SimpleLogHelper.Debug("RDP Host:  OnRequestGoFullScreen");
                     OnGoToFullScreenRequested();
                 };
-                _rdpClient.OnRequestLeaveFullScreen += (sender, args) =>
+                client.OnRequestLeaveFullScreen += (sender, args) =>
                 {
                     SimpleLogHelper.Debug("RDP Host:  OnRequestLeaveFullScreen");
                     OnConnectionBarRestoreWindowCall();
                 };
-                _rdpClient.OnRequestContainerMinimize += (sender, args) =>
+                client.OnRequestContainerMinimize += (sender, args) =>
                 {
                     SimpleLogHelper.Debug("RDP Host:  OnRequestContainerMinimize");
                     if (ParentWindow is FullScreenWindowView)
@@ -283,21 +312,48 @@ namespace _1RM.View.Host.ProtocolHosts
                         ParentWindow.WindowState = WindowState.Minimized;
                     }
                 };
-                _rdpClient.OnDisconnected += OnRdpClientDisconnected;
-                _rdpClient.OnConfirmClose += (sender, args) =>
+                client.OnDisconnected += OnRdpClientDisconnected;
+                client.OnConfirmClose += (sender, args) =>
                 {
                     // invoke in the full screen mode.
                     SimpleLogHelper.Debug("RDP Host:  RdpOnConfirmClose");
                     base.OnClosed?.Invoke(base.ConnectionId);
                 };
-                _rdpClient.OnConnected += OnRdpClientConnected;
-                _rdpClient.OnLoginComplete += OnRdpClientLoginComplete;
-                ((System.ComponentModel.ISupportInitialize)(_rdpClient)).EndInit();
-                RdpHost.Child = _rdpClient;
+                client.OnConnected += OnRdpClientConnected;
+                client.OnLoginComplete += OnRdpClientLoginComplete;
+
+                AxMSTSCLib.IMsTscAxEvents_OnNetworkStatusChangedEventHandler networkStatusChangedHandler =
+                    (sender, args) =>
+                    {
+                        if (args is null)
+                        {
+                            SimpleLogHelper.Debug("RDP network status event had no event data.");
+                            return;
+                        }
+
+                        OnRdpClientNetworkStatusChanged(client, generation, args.qualityLevel, args.bandwidth, args.rtt);
+                    };
+                client.OnNetworkStatusChanged += networkStatusChangedHandler;
+                _rdpNetworkMetricsClient = client;
+                _rdpNetworkStatusChangedHandler = networkStatusChangedHandler;
+
+                ((System.ComponentModel.ISupportInitialize)(client)).EndInit();
+                RdpHost.Child = client;
 
                 SimpleLogHelper.Debug("RDP Host: init CreateControl();");
-                _rdpClient.CreateControl();
+                client.CreateControl();
             }
+        }
+
+        private void StartRdpNetworkMetricsCollection()
+        {
+            _rdpNetworkMetricsCollectionEnabled = true;
+        }
+
+        private void StopRdpNetworkMetricsCollection()
+        {
+            _rdpNetworkMetricsCollectionEnabled = false;
+            _rdpNetworkMetrics.Reset();
         }
 
         private void RdpInitConnBar()
@@ -781,11 +837,15 @@ namespace _1RM.View.Host.ProtocolHosts
                     Status = ProtocolHostStatus.Connecting;
                     GridLoading.Visibility = Visibility.Visible;
                     RdpHost.Visibility = Visibility.Collapsed;
+                    // Network-status notifications can be raised before Connect()
+                    // returns, so start collecting before entering the COM call.
+                    StartRdpNetworkMetricsCollection();
                     _rdpClient.Connect();
                     Status = ProtocolHostStatus.Connected;
                 }
                 catch (Exception e)
                 {
+                    StopRdpNetworkMetricsCollection();
                     GridMessageBox.Visibility = Visibility.Visible;
                     TbMessageTitle.Visibility = Visibility.Collapsed;
                     TbMessage.Text = e.Message;
@@ -909,9 +969,12 @@ namespace _1RM.View.Host.ProtocolHosts
             {
                 try
                 {
-                    if (_rdpClient is { IsDisposed: false })
+
+                    var client = _rdpClient;
+                    DetachRdpNetworkStatusHandler(client);
+                    if (client is { IsDisposed: false })
                     {
-                        _rdpClient.Dispose();
+                        client.Dispose();
                     }
                     _rdpClient = null;
                 }
@@ -922,9 +985,34 @@ namespace _1RM.View.Host.ProtocolHosts
             }
         }
 
+        private void DetachRdpNetworkStatusHandler(AxMsRdpClient10NotSafeForScriptingEx? client)
+        {
+            var metricsClient = _rdpNetworkMetricsClient;
+            var handler = _rdpNetworkStatusChangedHandler;
+            _rdpNetworkMetricsClient = null;
+            _rdpNetworkStatusChangedHandler = null;
+
+            if (metricsClient is null || handler is null)
+            {
+                return;
+            }
+
+            try
+            {
+                metricsClient.OnNetworkStatusChanged -= handler;
+            }
+            catch (Exception e)
+            {
+                SimpleLogHelper.Debug($"Unable to detach RDP network status handler: {e.Message}");
+            }
+        }
+
         private void RdpClientDispose()
         {
             GlobalEventHelper.OnScreenResolutionChanged -= OnScreenResolutionChanged;
+            _rdpNetworkMetricsCollectionEnabled = false;
+            _rdpNetworkMetrics.Reset();
+            Interlocked.Increment(ref _rdpNetworkMetricsGeneration);
             try
             {
                 // Use synchronous disposal to ensure the RDP client is fully disposed before continuing

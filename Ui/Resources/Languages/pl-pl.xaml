@@ -365,4 +365,9 @@
     <s:String x:Key="Connected">Connected</s:String>
     <s:String x:Key="Remote desktop">Remote desktop</s:String>
     <s:String x:Key="Connection quality">Connection quality</s:String>
+    <s:String x:Key="Connection quality - Poor">Poor</s:String>
+    <s:String x:Key="Connection quality - Fair">Fair</s:String>
+    <s:String x:Key="Connection quality - Good">Good</s:String>
+    <s:String x:Key="Connection quality - Excellent">Excellent</s:String>
+    <s:String x:Key="Less than 100 Kbps">Less than 100 Kbps</s:String>
 </ResourceDictionary>

@@ -365,6 +365,11 @@
     <s:String x:Key="Connected">已连接</s:String>
     <s:String x:Key="Remote desktop">远程桌面</s:String>
     <s:String x:Key="Connection quality">连接质量</s:String>
+    <s:String x:Key="Connection quality - Poor">较差</s:String>
+    <s:String x:Key="Connection quality - Fair">一般</s:String>
+    <s:String x:Key="Connection quality - Good">良好</s:String>
+    <s:String x:Key="Connection quality - Excellent">极佳</s:String>
+    <s:String x:Key="Less than 100 Kbps">低于 100 Kbps</s:String>
     <s:String x:Key="Unable to show connection information">无法显示连接信息，详细信息已写入日志。</s:String>
     <s:String x:Key="Checking update...">正在检查更新……</s:String>
     <s:String x:Key="Downloading update...">正在下载更新……</s:String>

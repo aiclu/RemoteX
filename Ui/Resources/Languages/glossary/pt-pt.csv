@@ -372,3 +372,8 @@ Waiting for reconnect;Waiting for reconnect
 Connected;Connected
 Remote desktop;Remote desktop
 Connection quality;Connection quality
+Connection quality - Poor;Poor
+Connection quality - Fair;Fair
+Connection quality - Good;Good
+Connection quality - Excellent;Excellent
+Less than 100 Kbps;Less than 100 Kbps

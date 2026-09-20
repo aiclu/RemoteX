@@ -210,43 +210,67 @@ namespace _1RM.View.Host.ProtocolHosts
             }
         }
 
+        protected virtual bool TryShowNativeConnectionInfo() => false;
+
+        private bool _showingConnectionInfo;
+
         private void ShowConnectionInfo()
         {
             try
             {
                 Execute.OnUIThreadSync(() =>
                 {
-                    // Collect the diagnostic data before showing the modal window so the
-                    // dialog remains a stable snapshot and never interferes with a session.
-                    var snapshot = CreateConnectionInfoSnapshot();
-                    var viewModel = new ConnectionInfoViewModel(snapshot);
-                    var owner = ParentWindow?.DataContext as IViewAware
-                        ?? IoC.TryGet<MainWindowViewModel>();
-                    viewModel.ShowDialog(owner);
+                    if (_showingConnectionInfo)
+                        return;
+                    _showingConnectionInfo = true;
+                    try
+                    {
+                        ConnectionInfoPresentation.Show(TryShowNativeConnectionInfo, ShowConnectionInfoSnapshot,
+                            e => SimpleLogHelper.Warning($"Native connection information failed: {e.GetType().Name}, HRESULT=0x{e.HResult:X8}"));
+                    }
+                    finally
+                    {
+                        _showingConnectionInfo = false;
+                    }
                 });
             }
             catch (Exception e)
             {
                 SimpleLogHelper.Error(e);
+                ShowConnectionInfoError();
+            }
+        }
 
-                // A diagnostic command must never take down the whole application.  In
-                // particular, WPF window initialization errors are otherwise routed to
-                // Bootstrapper.OnUnhandledException, which intentionally closes RemoteX.
-                try
+        private void ShowConnectionInfoSnapshot()
+        {
+            // Collect the diagnostic data before showing the modal window so the
+            // dialog remains a stable snapshot and never interferes with a session.
+            var snapshot = CreateConnectionInfoSnapshot();
+            var viewModel = new ConnectionInfoViewModel(snapshot);
+            var owner = ParentWindow?.DataContext as IViewAware
+                ?? IoC.TryGet<MainWindowViewModel>();
+            viewModel.ShowDialog(owner);
+        }
+
+        private void ShowConnectionInfoError()
+        {
+            // A diagnostic command must never take down the whole application.  In
+            // particular, WPF window initialization errors are otherwise routed to
+            // Bootstrapper.OnUnhandledException, which intentionally closes RemoteX.
+            try
+            {
+                Execute.OnUIThreadSync(() =>
                 {
-                    Execute.OnUIThreadSync(() =>
-                    {
-                        var title = ConnectionInfoTranslate("Connection information", "Connection information");
-                        var message = ConnectionInfoTranslate(
-                            "Unable to show connection information",
-                            "Unable to show connection information. Details were written to the log.");
-                        System.Windows.MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-                    });
-                }
-                catch (Exception fallbackException)
-                {
-                    SimpleLogHelper.Error(fallbackException);
-                }
+                    var title = ConnectionInfoTranslate("Connection information", "Connection information");
+                    var message = ConnectionInfoTranslate(
+                        "Unable to show connection information",
+                        "Unable to show connection information. Details were written to the log.");
+                    System.Windows.MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+                });
+            }
+            catch (Exception fallbackException)
+            {
+                SimpleLogHelper.Error(fallbackException);
             }
         }
 

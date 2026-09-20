@@ -368,3 +368,8 @@ Waiting for reconnect;等待重新連線
 Connected;已連線
 Remote desktop;遠端桌面
 Connection quality;連線品質
+Connection quality - Poor;較差
+Connection quality - Fair;一般
+Connection quality - Good;良好
+Connection quality - Excellent;極佳
+Less than 100 Kbps;低於 100 Kbps

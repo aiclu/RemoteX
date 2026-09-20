@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using AxMSTSCLib;
@@ -20,9 +21,52 @@ namespace _1RM.View.Host.ProtocolHosts
 {
     public partial class AxMsRdpClient10Host : HostBase, IDisposable
     {
+        protected override bool TryShowNativeConnectionInfo()
+        {
+            Dispatcher.VerifyAccess();
+            var client = _rdpClient;
+            return ConnectionInfoPresentation.TryShowRdp(
+                () => client is { IsDisposed: false, Disposing: false, IsHandleCreated: true }
+                      && ReferenceEquals(client, _rdpClient),
+                () => client!.Connected,
+                () => client!.TrySetExtendedProperty("ShowConnectionInformation", true));
+        }
+
         protected override string GetConnectionInfoSummary()
         {
-            return $"{ConnectionInfoTranslate("Connection quality", "Connection quality")}: {ConnectionInfoUnavailable}";
+            var metrics = _rdpNetworkMetrics.Snapshot();
+            var qualityKey = RdpNetworkMetricsFormatter.GetQualityTranslationKey(metrics.QualityLevel);
+            var quality = qualityKey is null
+                ? ConnectionInfoUnavailable
+                : ConnectionInfoTranslate(qualityKey, qualityKey);
+            return $"{ConnectionInfoTranslate("Connection quality", "Connection quality")}: {quality}";
+        }
+
+        protected override ConnectionInfoSection BuildNetworkDetailsSection()
+        {
+            var metrics = _rdpNetworkMetrics.Snapshot();
+            return new ConnectionInfoSection(
+                ConnectionInfoTranslate("Network details", "Network details"),
+                new[]
+                {
+                    CreateConnectionInfoRow("Transport protocol", () => null),
+                    CreateConnectionInfoRow("Round-trip time", () => RdpNetworkMetricsFormatter.FormatRoundTripTime(metrics.RoundTripTimeMilliseconds)),
+                    CreateConnectionInfoRow("Available bandwidth", () => FormatRdpBandwidth(metrics.BandwidthKbps)),
+                    CreateConnectionInfoRow("Frame rate", () => null),
+                });
+        }
+
+        private string FormatRdpBandwidth(int? bandwidthKbps)
+        {
+            var formatted = RdpNetworkMetricsFormatter.FormatBandwidth(bandwidthKbps);
+            if (formatted is null)
+            {
+                return ConnectionInfoUnavailable;
+            }
+
+            return formatted == "Less than 100 Kbps"
+                ? ConnectionInfoTranslate("Less than 100 Kbps", formatted)
+                : formatted;
         }
 
         protected override ConnectionInfoSection BuildClientDetailsSection()
@@ -243,6 +287,12 @@ namespace _1RM.View.Host.ProtocolHosts
         private void OnRdpClientDisconnected(object sender, IMsTscAxEvents_OnDisconnectedEvent e)
         {
             SimpleLogHelper.Debug("RDP Host: RdpOnDisconnected");
+            StopRdpNetworkMetricsCollection();
+            // Do not allow late COM callbacks from a disconnected control to
+            // repopulate the snapshot. Reconnect creates a fresh control and
+            // subscribes a fresh handler.
+            Interlocked.Increment(ref _rdpNetworkMetricsGeneration);
+            DetachRdpNetworkStatusHandler(_rdpClient);
 
             lock (this)
             {
@@ -338,6 +388,8 @@ namespace _1RM.View.Host.ProtocolHosts
             SimpleLogHelper.Debug("RDP Host:  RdpOnOnConnected");
             this.ParentWindow?.FlashIfNotActive();
 
+            StartRdpNetworkMetricsCollection();
+
             _lastLoginTime = DateTime.Now;
             _loginResizeTimer.Start();
 
@@ -357,6 +409,35 @@ namespace _1RM.View.Host.ProtocolHosts
                     GoFullScreen();
                 }
             });
+        }
+
+        private void OnRdpClientNetworkStatusChanged(
+            AxMsRdpClient10NotSafeForScriptingEx client,
+            long generation,
+            uint qualityLevel,
+            int bandwidthKbps,
+            int roundTripTimeMilliseconds)
+        {
+            try
+            {
+                if (!_rdpNetworkMetricsCollectionEnabled
+                    || !ReferenceEquals(_rdpNetworkMetricsClient, client)
+                    || generation != Volatile.Read(ref _rdpNetworkMetricsGeneration))
+                {
+                    return;
+                }
+
+                _rdpNetworkMetrics.RecordNetworkStatus(
+                    qualityLevel,
+                    bandwidthKbps,
+                    roundTripTimeMilliseconds);
+            }
+            catch (Exception e)
+            {
+                // COM event handlers must not let a managed exception escape back
+                // into the RDP ActiveX event dispatcher.
+                SimpleLogHelper.Debug($"Unable to record RDP network status: {e.Message}");
+            }
         }
 
         private void OnRdpClientLoginComplete(object? sender, EventArgs e)

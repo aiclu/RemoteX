@@ -368,6 +368,11 @@ Waiting for reconnect;等待重新连接
 Connected;已连接
 Remote desktop;远程桌面
 Connection quality;连接质量
+Connection quality - Poor;较差
+Connection quality - Fair;一般
+Connection quality - Good;良好
+Connection quality - Excellent;极佳
+Less than 100 Kbps;低于 100 Kbps
 Unable to show connection information;无法显示连接信息，详细信息已写入日志。
 Checking update...;正在检查更新……
 Downloading update...;正在下载更新……
