@@ -268,6 +268,12 @@ namespace _1RM.View
         }
 
 
+        public string RepositoryUrl => "https://github.com/aiclu/RemoteX";
+
+        private RelayCommand? _cmdOpenRepository;
+        public RelayCommand CmdOpenRepository => _cmdOpenRepository ??= new RelayCommand(
+            _ => HyperlinkHelper.OpenUriBySystem(RepositoryUrl));
+
         private RelayCommand? _cmdClose;
         public RelayCommand CmdClose
         {

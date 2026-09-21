@@ -95,6 +95,19 @@
 
                                     <TextBlock Text="{Binding CurrentVersionDate}" Margin="0" ToolTip="{x:Static Rm:AppVersion.BuildDate}"></TextBlock>
 
+                                    <Grid Style="{StaticResource RowGrid}" Height="Auto" MinHeight="20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="B"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="GitHub"></TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="0">
+                                            <Hyperlink Command="{Binding CmdOpenRepository}" ToolTip="{Binding RepositoryUrl}">
+                                                <Run Text="aiclu/RemoteX" />
+                                            </Hyperlink>
+                                        </TextBlock>
+                                    </Grid>
+
                                     <Grid>
                                         <Grid.Style>
                                             <Style TargetType="Grid" BasedOn="{StaticResource RowGrid}">
