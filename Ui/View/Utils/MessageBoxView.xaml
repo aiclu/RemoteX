@@ -1,26 +1,16 @@
 ﻿<styles:WindowChromeBase x:Class="_1RM.View.Utils.MessageBoxView"
-                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                  xmlns:utils="clr-namespace:_1RM.View.Utils"
-                  xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles;assembly=Shawn.Utils.WpfResources"
-                  xmlns:s="https://github.com/canton7/Stylet"
-                  mc:Ignorable="d"
-                  d:DataContext="{d:DesignInstance utils:MessageBoxViewModel}"
-                  ResizeMode="NoResize"
-                  SizeToContent="WidthAndHeight"
-                  WindowStyle="None"
-                  Background="Transparent"
-                  Topmost="True"
-                  AllowsTransparency="True"
-                  FlowDirection="{Binding PageViewModel.FlowDirection}"
-                  ShowInTaskbar="False"
-                  MinWidth="160" MaxWidth="485">
-    <Grid Margin="16">
-        <Grid.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.35" Color="#000000"/>
-        </Grid.Effect>
-        <ContentControl s:View.Model="{Binding PageViewModel}"></ContentControl>
-    </Grid>
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:utils="clr-namespace:_1RM.View.Utils" xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles;assembly=Shawn.Utils.WpfResources" xmlns:s="https://github.com/canton7/Stylet" mc:Ignorable="d" d:DataContext="{d:DesignInstance utils:MessageBoxViewModel}" ResizeMode="NoResize" SizeToContent="WidthAndHeight" WindowStyle="None" Background="Transparent" Topmost="True" AllowsTransparency="True" FlowDirection="{Binding PageViewModel.FlowDirection}" ShowInTaskbar="False" MinWidth="160" MaxWidth="485" xmlns:fluent="clr-namespace:_1RM.View" fluent:FluentPage.Scope="True" fluent:FluentWindowBounds.Enabled="True">
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentDialogs.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+  <Grid Margin="16">
+    <Grid.Effect>
+      <DropShadowEffect BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.35" Color="#000000" />
+    </Grid.Effect>
+    <ContentControl s:View.Model="{Binding PageViewModel}"></ContentControl>
+  </Grid>
 </styles:WindowChromeBase>

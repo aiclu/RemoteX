@@ -5,21 +5,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:_1RM.View.Settings.Launcher"
              xmlns:service="clr-namespace:_1RM.Service"
+             xmlns:fluent="clr-namespace:_1RM.View"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:LauncherSettingViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
+    <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries>
         <local:Key2KeyStringConverter x:Key="Key2KeyStringConverter"></local:Key2KeyStringConverter>
         <local:ConverterHotkeyModifierKeys x:Key="ConverterHotkeyModifierKeys"></local:ConverterHotkeyModifierKeys>
-    </UserControl.Resources>
+    </ResourceDictionary></UserControl.Resources>
     <Grid Background="{DynamicResource BackgroundBrush}">
         <ScrollViewer>
 
         <StackPanel>
 
-            <TextBlock Text="{DynamicResource Launcher}" Style="{StaticResource BlockTitleColumn}" />
+            <TextBlock Text="{DynamicResource Launcher}"><TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource FluentBlockTitleColumn}"><Style.Triggers><Trigger Property="fluent:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                     <ColumnDefinition MinWidth="280" SharedSizeGroup="LauncherColumn2"></ColumnDefinition>
@@ -30,13 +31,13 @@
 
             <StackPanel IsEnabled="{Binding LauncherEnabled, Mode=OneWay}" 
                         Visibility="{Binding LauncherEnabled, Converter={StaticResource ConverterBool2Visible}}">
-                <Grid Style="{StaticResource GridOneRow}">
+                <Grid Style="{StaticResource FluentGridOneRow}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                         <ColumnDefinition MinWidth="280" SharedSizeGroup="LauncherColumn2"></ColumnDefinition>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Column3"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource system_options_quick_launcher_hotkey}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource system_options_quick_launcher_hotkey}"></TextBlock>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <ComboBox Width="100" 
                                   ItemsSource="{Binding HotkeyModifierKeys}"
@@ -63,7 +64,7 @@
                 </Grid>
 
 
-                <Grid Style="{StaticResource GridOneRow}">
+                <Grid Style="{StaticResource FluentGridOneRow}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                         <ColumnDefinition MinWidth="280" SharedSizeGroup="LauncherColumn2"></ColumnDefinition>
@@ -72,9 +73,9 @@
                     <CheckBox Grid.Column="1" IsChecked="{Binding ShowCredentials, Mode=TwoWay}" VerticalAlignment="Center" Content="{DynamicResource 'Show credentials info'}"></CheckBox>
                 </Grid>
 
-                <TextBlock Text="{DynamicResource system_options_quick_match_providers}" Style="{StaticResource BlockTitleColumn}" />
+                <TextBlock Text="{DynamicResource system_options_quick_match_providers}" Style="{StaticResource FluentBlockTitleColumn}" />
 
-                <Grid Style="{StaticResource GridOneRow}" IsEnabled="{Binding LauncherEnabled, Mode=OneWay}">
+                <Grid Style="{StaticResource FluentGridOneRow}" IsEnabled="{Binding LauncherEnabled, Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                         <ColumnDefinition MinWidth="280" SharedSizeGroup="LauncherColumn2"></ColumnDefinition>
@@ -82,7 +83,7 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" >
-                        <Grid MinWidth="650">
+                        <Grid><Grid.Style><Style TargetType="Grid"><Setter Property="MinWidth" Value="650"/><Style.Triggers><Trigger Property="fluent:FluentPage.Active" Value="True"><Setter Property="MinWidth" Value="0"/></Trigger></Style.Triggers></Style></Grid.Style>
                             <Grid.Resources>
                                 <DataTemplate x:Key="DataTemplateForMatcher" DataType="service:MatchProviderInfo">
                                     <Grid Margin=" 0 0 5 15">
@@ -148,9 +149,9 @@
                     </StackPanel>
                 </Grid>
 
-                <TextBlock Text="{DynamicResource 'Quick Connect'}" Style="{StaticResource BlockTitleColumn}" />
+                <TextBlock Text="{DynamicResource 'Quick Connect'}" Style="{StaticResource FluentBlockTitleColumn}" />
 
-                <Grid Style="{StaticResource GridOneRow}">
+                <Grid Style="{StaticResource FluentGridOneRow}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                         <ColumnDefinition MinWidth="280" SharedSizeGroup="LauncherColumn2"></ColumnDefinition>

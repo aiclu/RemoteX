@@ -9,6 +9,18 @@ English | [中文](readme_zh-CN.md)
 
 RemoteX is a modern personal remote session manager and launcher. It is a single place to manage all your remote sessions supporting number of different protocols.
 
+## RemoteX 2.0
+
+- **Optional Fluent appearance** across the main workspace, settings, connection editor, launcher, common dialogs, session chrome, and list/card/tree views. Choose light, dark, or system appearance.
+- **Compact connection management** with an “All connections” entry, tag navigation, centered search, clearer protocol selection, and view/sort menus with selection indicators.
+- **Classic mode remains available**. Existing installations keep their classic appearance by default; classic colors and view preferences are preserved separately.
+- **.NET 9 throughout** the supported application libraries and tests; .NET 6 and .NET Framework build targets have been removed.
+- Fixes for language resource loading, search caret positioning, RDP editor completion dismissal, and SSH private-key preservation during sensitive-field encryption.
+
+To enable Fluent, open **Settings → Theme**, choose **Fluent preview**, then select light, dark, or system. In Fluent mode, the sidebar **Appearance** menu switches themes or returns to classic.
+
+See [2.0.0 release notes](docs/releases/2.0.0.md) and the [development guide](DEVELOP.md).
+
 ## Features
 
 - Supports RDP, SSH, VNC, Telnet, FTP/FTPS, SFTP, Serial, [RemoteApp](https://1remote.github.io/usage/protocol/especial/remoteapp/), [NoMachine and other app](https://1remote.github.io/usage/protocol/especial/app/)
@@ -24,13 +36,23 @@ RemoteX is a modern personal remote session manager and launcher. It is a single
 
 ## 🚩Installation
 
-Latest Version: 1.0.9
+Latest Version: 2.0.0
 
 ### 🔻[Download](https://github.com/aiclu/RemoteX/releases)
 
-Grab the `RemoteX-1.0.9-net9-x64.zip` (framework-dependent) or `RemoteX-1.0.9-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
+Grab the `RemoteX-2.0.0-net9-x64.zip` (framework-dependent) or `RemoteX-2.0.0-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
+
+### Requirements and upgrading
+
+- Windows x64; the application targets Windows 10 build 19041 or later.
+- The framework-dependent package requires the **.NET 9 Desktop Runtime (x64)**. The self-contained package includes the runtime.
+- Extract the **entire ZIP**: keep `ssh_rust.dll`, `updater.exe`, and the other bundled files alongside the application. Do not distribute only `RemoteX.exe`.
+- Before upgrading, back up your configuration and connection databases. Close RemoteX before manually replacing application files, and keep your data/configuration.
+- Some installations have reported incomplete automatic updates. This release does **not** claim to resolve that issue; if updating fails, close the application and use the full ZIP from Releases.
 
 ## 👓Overview
+
+The images below are historical protocol/classic-interface examples, not screenshots of the new Fluent appearance.
 
 <img src="https://1remote.github.io/img/home_override/hero1.png" width="800" />
 

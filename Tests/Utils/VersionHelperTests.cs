@@ -56,70 +56,51 @@ namespace Tests.Utils
             var v1 = new Version(0, 6, 1, 0);
             var v2 = new Version(0, 6, 2, 0);
             var v3 = new Version(0, 7, 1, 0);
+            const string url = "https://example.invalid/releases";
+            var result = DefaultCheckMethod($"latest version: {v2}", url, v1, null);
+            Assert.IsTrue(result.NewerPublished);
+            Assert.AreEqual(v2.ToString(), result.NewerVersion);
+            Assert.AreEqual(url, result.NewerUrl);
+            Assert.IsFalse(DefaultCheckMethod($"latest version: {v2}", url, v1, v3).NewerPublished);
+            Assert.IsFalse(DefaultCheckMethod($"latest version: {v2}", url, v1, v2).NewerPublished);
+            Assert.IsTrue(DefaultCheckMethod($"latest version: {v3}", url, v1, v2).NewerPublished);
+            CheckAsync(v1, v2, true);
+            CheckAsync(v3, v2, false);
+        }
+
+        private static void CheckAsync(Version current, Version published, bool expected)
+        {
+            // Serve deterministic release metadata on loopback only; no real update endpoint is contacted.
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            listener.Start();
+            try
             {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v2.ToString()}";
-                var checker = new VersionHelper(v1);
-                var ret = checker.CheckUpdateFromUrl(url, null, content);
-                Assert.IsTrue(ret.Item1);
-                var v = Version.FromString(ret.Item2);
-                Assert.IsTrue(v == v2);
-                Assert.IsTrue(ret.Item3 == url);
-            }
-            {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v2.ToString()}";
-                var checker = new VersionHelper(v1);
-                var ret = checker.CheckUpdateFromUrl(url, v3, content);
-                Assert.IsTrue(ret.Item1 == false);
-            }
-            {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v2.ToString()}";
-                var checker = new VersionHelper(v1);
-                var ret = checker.CheckUpdateFromUrl(url, v2, content);
-                Assert.IsTrue(ret.Item1 == false);
-            }
-            {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v3.ToString()}";
-                var checker = new VersionHelper(v1);
-                var ret = checker.CheckUpdateFromUrl(url, v2, content);
-                Assert.IsTrue(ret.Item1 == true);
-            }
-            {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v2.ToString()}";
-                var checker = new VersionHelper(v1);
-                var e = new ManualResetEvent(false);
-                checker.OnNewVersionRelease += (version, url2) =>
+                var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+                var response = System.Threading.Tasks.Task.Run(async () =>
                 {
-                    var v = Version.FromString(version);
-                    Assert.IsTrue(url == url2);
-                    Assert.IsTrue(v == v2);
-                    e.Set();
-                };
-                checker.CheckUpdateAsync(url, content);
-                if (e.WaitOne(3000) == false)
+                    using var client = await listener.AcceptTcpClientAsync();
+                    using var stream = client.GetStream();
+                    using var reader = new System.IO.StreamReader(stream, System.Text.Encoding.ASCII, false, 1024, true);
+                    while (!string.IsNullOrEmpty(await reader.ReadLineAsync())) { }
+                    var body = System.Text.Encoding.UTF8.GetBytes($"latest version: {published}\n");
+                    var header = System.Text.Encoding.ASCII.GetBytes($"HTTP/1.1 200 OK\r\nContent-Length: {body.Length}\r\nConnection: close\r\n\r\n");
+                    await stream.WriteAsync(header);
+                    await stream.WriteAsync(body);
+                });
+                var checker = new VersionHelper(current, new[] { $"http://127.0.0.1:{port}/" }, new[] { "https://example.invalid/releases" });
+                using var received = new ManualResetEventSlim();
+                CheckUpdateResult? reported = null;
+                checker.OnNewVersionRelease += r => { reported = r; received.Set(); };
+                checker.CheckUpdateAsync();
+                Assert.IsTrue(response.Wait(5000), "Loopback metadata request did not finish.");
+                Assert.AreEqual(expected, received.Wait(expected ? 5000 : 300));
+                if (expected)
                 {
-                    Assert.Fail();
+                    Assert.AreEqual(published.ToString(), reported!.Value.NewerVersion);
+                    Assert.AreEqual("https://example.invalid/releases", reported.Value.NewerUrl);
                 }
             }
-            {
-                var url = "www.xxxx.xx";
-                var content = $"latest version: {v2.ToString()}";
-                var checker = new VersionHelper(v3);
-                var e = new ManualResetEvent(false);
-                checker.OnNewVersionRelease += (version, url2) =>
-                {
-                    e.Set();
-                };
-                checker.CheckUpdateAsync(url, content);
-                if (e.WaitOne(3000) == true)
-                {
-                    Assert.Fail();
-                }
-            }
+            finally { listener.Stop(); }
         }
     }
 }

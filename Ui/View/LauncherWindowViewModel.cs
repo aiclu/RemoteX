@@ -47,6 +47,16 @@ namespace _1RM.View
 
 
         private double _gridMainHeight;
+        private Rect _fluentWorkArea = SystemParameters.WorkArea;
+        private double _gridMainWidth = LAUNCHER_LIST_AREA_WIDTH;
+        public double GridMainWidth
+        {
+            get => _gridMainWidth;
+            private set => SetAndNotifyIfChanged(ref _gridMainWidth, value);
+        }
+        internal FluentLauncherMetrics FluentMetrics => new FluentLauncherMetrics(
+            _configurationService.Theme.Fluent?.Enabled == true, _configurationService.Theme.FontSize,
+            _fluentWorkArea.Width, _fluentWorkArea.Height);
         public double GridMainHeight
         {
             get => _gridMainHeight;
@@ -54,7 +64,7 @@ namespace _1RM.View
             {
                 if (SetAndNotifyIfChanged(ref _gridMainHeight, value))
                 {
-                    GridMainClip = new RectangleGeometry(new Rect(new Size(LAUNCHER_LIST_AREA_WIDTH, GridMainHeight)), LAUNCHER_OUTLINE_CORNER_RADIUS, LAUNCHER_OUTLINE_CORNER_RADIUS);
+                    GridMainClip = new RectangleGeometry(new Rect(new Size(GridMainWidth, GridMainHeight)), LAUNCHER_OUTLINE_CORNER_RADIUS, LAUNCHER_OUTLINE_CORNER_RADIUS);
                 }
             }
         }
@@ -68,7 +78,8 @@ namespace _1RM.View
         }
 
 
-        public double GridNoteHeight { get; }
+        public double GridNoteHeight => _configurationService.Theme.Fluent?.Enabled == true
+            ? FluentMetrics.HeightFor(MAX_SERVER_COUNT) : MAX_WINDOW_HEIGHT;
 
         private double _noteWidth = 500;
 
@@ -85,7 +96,6 @@ namespace _1RM.View
             ServerSelectionsViewModel = serverSelectionsViewModel;
             QuickConnectionViewModel = quickConnectionViewModel;
             _configurationService = configurationService;
-            GridNoteHeight = MAX_WINDOW_HEIGHT;
         }
 
         protected override void OnViewLoaded()
@@ -129,8 +139,18 @@ namespace _1RM.View
             if (IoC.TryGet<LauncherWindowView>()?.IsClosing != false) return;
             Execute.OnUIThread(() =>
             {
+                var metrics = FluentMetrics;
+                GridMainWidth = metrics.Width;
+                if (View is LauncherWindowView window)
+                {
+                    FluentLauncher.SetRowHeight(window, metrics.RowHeight);
+                    FluentLauncher.SetSearchHeight(window, metrics.SearchHeight);
+                    FluentLauncher.SetActionHeight(window, metrics.ActionHeight);
+                }
                 var height = ServerSelectionsViewVisibility == Visibility.Visible ? ServerSelectionsViewModel.ReCalcGridMainHeight() : QuickConnectionViewModel.ReCalcGridMainHeight();
                 GridMainHeight = height;
+                GridMainClip = new RectangleGeometry(new Rect(0, 0, GridMainWidth, height), 8, 8);
+                RaisePropertyChanged(nameof(GridNoteHeight));
             });
         }
 
@@ -152,6 +172,9 @@ namespace _1RM.View
                     // show position
                     var p = ScreenInfoEx.GetMouseSystemPosition();
                     var screenEx = ScreenInfoEx.GetCurrentScreenBySystemPosition(p);
+                    _fluentWorkArea = new Rect(screenEx.VirtualWorkingArea.X, screenEx.VirtualWorkingArea.Y,
+                        screenEx.VirtualWorkingArea.Width, screenEx.VirtualWorkingArea.Height);
+                    ReSetWindowHeight();
                     window.Top = screenEx.VirtualWorkingAreaCenter.Y - GridMainHeight / 2 - 40; // 40: margin of BorderMainContent
                     window.Left = screenEx.VirtualWorkingAreaCenter.X - window.BorderMainContent.ActualWidth / 2;
 
@@ -159,6 +182,13 @@ namespace _1RM.View
                     if (noteWidth < 100)
                         noteWidth = 100;
                     NoteWidth = Math.Min(noteWidth, NoteWidth);
+                    if (_configurationService.Theme.Fluent?.Enabled == true)
+                    {
+                        NoteWidth = Math.Max(0, Math.Min(500, _fluentWorkArea.Width - GridMainWidth - 60));
+                        window.Top = Math.Max(_fluentWorkArea.Top, _fluentWorkArea.Top + (_fluentWorkArea.Height - GridMainHeight - 80) / 2);
+                        window.Left = Math.Max(_fluentWorkArea.Left, _fluentWorkArea.Left + (_fluentWorkArea.Width - GridMainWidth - 20 -
+                            (ServerSelectionsViewModel.GridNoteVisibility == Visibility.Visible ? NoteWidth + 20 : 0)) / 2);
+                    }
 
                     window.Show();
                     window.Visibility = Visibility.Visible;

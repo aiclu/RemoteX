@@ -393,3 +393,17 @@ The previous update did not complete. The current version is still running.;上�
 Administrator permission was not granted.;未获得管理员权限。
 Updater log;更新器日志
 Update rollback failed. The old version may need manual recovery.;更新回滚失败，旧版本可能需要手动恢复。
+FluentPreview;Fluent 预览
+FluentAppearance;外观
+FluentConnections;连接
+FluentAllConnections;全部连接
+FluentSystem;跟随系统
+FluentLight;浅色
+FluentDark;深色
+FluentClassic;经典外观
+FluentSort;排序
+FluentMore;更多
+FluentTags;管理标签
+FluentClassicThemeHint;下方主题与自定义颜色仅影响经典外观；字体设置对两种外观均生效。
+FluentQuickConnectHint;快速连接，例如 192.0.2.10:3389
+FluentSearchConnections;搜索连接

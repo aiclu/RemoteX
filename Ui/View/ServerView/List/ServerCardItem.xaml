@@ -12,6 +12,8 @@
              d:DataContext="{d:DesignInstance view:ProtocolBaseViewModel}"
              d:DesignHeight="450" d:DesignWidth="800" >
     <UserControl.Resources>
+        <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentServerViews.xaml"/></ResourceDictionary.MergedDictionaries>
         <s:Double x:Key="CardWidth">144</s:Double>
         <RectangleGeometry x:Key="CardClip" RadiusX="8" RadiusY="8" Rect="0 0 144 144"></RectangleGeometry>
 
@@ -41,10 +43,13 @@
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
                     <Setter Property="Background" Value="#14FFFFFF"></Setter>
                 </Trigger>
+                <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/></Trigger>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"></Setter>
                     <Setter Property="Background" Value="#1FFFFFFF"></Setter>
                 </DataTrigger>
+                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsMouseOver" Value="True"/></MultiTrigger.Conditions><Setter Property="BorderBrush" Value="{DynamicResource FluentAccent}"/><Setter Property="Background" Value="{DynamicResource FluentHover}"/></MultiTrigger>
+                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsKeyboardFocusWithin" Value="True"/></MultiTrigger.Conditions><Setter Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></MultiTrigger>
             </Style.Triggers>
         </Style>
 
@@ -79,6 +84,7 @@
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
+                <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger>
                 <DataTrigger Binding="{Binding ElementName=CardRealBorder,Path=IsMouseOver}" Value="True">
                     <Setter Property="Visibility" Value="Visible"></Setter>
                 </DataTrigger>
@@ -104,6 +110,7 @@
                 <DataTrigger Binding="{Binding ElementName=PopupCardSettingMenu,Path=IsOpen}" Value="True">
                     <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"></Setter>
                 </DataTrigger>
+            <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Foreground" Value="{DynamicResource FluentText}"/></Trigger>
             </Style.Triggers>
         </Style>
 
@@ -119,12 +126,14 @@
                 <DataTrigger Binding="{Binding ElementName=PopupCardSettingMenu,Path=IsOpen}" Value="True">
                     <Setter Property="Visibility" Value="Hidden"></Setter>
                 </DataTrigger>
+            <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger>
             </Style.Triggers>
         </Style>
 
         <Style x:Key="ButtonSettingStyle" TargetType="Button" BasedOn="{StaticResource ButtonBarAccentStyle}">
+            <Setter Property="Width" Value="22"/><Setter Property="Height" Value="22"/>
             <Setter Property="Background" Value="Transparent"></Setter>
-            <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"></Setter>
             <Setter Property="Visibility" Value="Hidden"></Setter>
             <Setter Property="attachProperty:VisionElement.BackgroundAccent" Value="{StaticResource PrimaryMidBrush}"></Setter>
             <Setter Property="attachProperty:VisionElement.BorderCornerRadius" Value="4"></Setter>
@@ -137,6 +146,7 @@
                     <Setter Property="Background" Value="{StaticResource PrimaryMidBrush}"></Setter>
                     <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"></Setter>
                 </DataTrigger>
+            <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/><Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="Width" Value="28"/><Setter Property="Height" Value="28"/></Trigger>
             </Style.Triggers>
         </Style>
 
@@ -175,10 +185,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
+    </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Width="{StaticResource CardWidth}" Height="{StaticResource CardWidth}" Clip="{StaticResource CardClip}">
+    <Grid Style="{StaticResource FluentCardBody}">
         <!-- Card Content: icon centered, thin color bar at bottom -->
-        <Grid Name="CardContent" Background="{DynamicResource PrimaryMidBrush}" >
+        <Border CornerRadius="8" Background="{DynamicResource FluentSurface}"><Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers></Style></Border.Style></Border>
+        <Grid Name="CardContent"><Grid.Style><Style TargetType="Grid"><Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Background" Value="Transparent"/></Trigger></Style.Triggers></Style></Grid.Style>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="3"></RowDefinition>
@@ -188,7 +200,7 @@
                 <Image Source="{Binding Server.IconImg, Mode=OneWay}" 
                        RenderOptions.BitmapScalingMode="LowQuality"
                        Width="72" Height="72"
-                       Stretch="UniformToFill"/>
+                       Stretch="UniformToFill"><Image.Style><Style TargetType="Image"><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="VerticalAlignment" Value="Top"/><Setter Property="Margin" Value="0,28,0,0"/></Trigger></Style.Triggers></Style></Image.Style></Image>
             </Grid>
 
             <!-- thin server-color bar at bottom of icon area -->
@@ -208,7 +220,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="38"></RowDefinition>
+                    <RowDefinition><RowDefinition.Style><Style TargetType="RowDefinition"><Setter Property="Height" Value="38"/><Style.Triggers><DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=(view:FluentPage.Active)}" Value="True"><Setter Property="Height" Value="Auto"/></DataTrigger></Style.Triggers></Style></RowDefinition.Style></RowDefinition>
                 </Grid.RowDefinitions>
 
                 <CheckBox Width="20" Height="20"
@@ -228,7 +240,7 @@
                         <TextBlock FontSize="{DynamicResource GlobalFontSizeBody}"
                                    TextTrimming="CharacterEllipsis"
                                    Style="{StaticResource TextNameStyle}"
-                                   Text="{Binding Server.DisplayName, Mode=OneWay}">
+                                   Text="{Binding Server.DisplayName, Mode=OneWay}" ToolTip="{Binding Server.DisplayName}">
                         </TextBlock>
                         <TextBlock FontSize="{DynamicResource GlobalFontSizeSmall}"
                                    Opacity="0.6"
@@ -236,11 +248,11 @@
                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                    Text="{Binding Server.ProtocolDisplayName, Mode=OneWay}">
                         </TextBlock>
+                    <TextBlock Text="{Binding Server.SubTitle}" ToolTip="{Binding Server.SubTitle}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource FluentMuted}" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0,4,24,4"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
                     </StackPanel>
                     <Grid>
                         <!-- setting menu button - VSCode-style more icon -->
                         <Button x:Name="BtnSettingMenu"
-                                Width="22" Height="22"
                                 Margin="0 0 4 4"
                                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                 BorderThickness="0"
@@ -277,4 +289,3 @@
               Height="38"/>
     </Grid>
 </UserControl>
-    

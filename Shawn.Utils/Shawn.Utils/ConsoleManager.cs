@@ -52,18 +52,7 @@ namespace Shawn.Utils
         static void InvalidateOutAndError()
         {
 
-#if NETCOREAPP
-#else
-            var type = typeof(System.Console);
-            var @out = type.GetField("_out", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            var @error = type.GetField("_error", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            var initializeStdOutError = type.GetMethod("InitializeStdOutError", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            System.Diagnostics.Debug.Assert(@out != null);
-            System.Diagnostics.Debug.Assert(@error != null);
-            System.Diagnostics.Debug.Assert(initializeStdOutError != null);
-            @out?.SetValue(null, null);
-            @error?.SetValue(null, null); 
-#endif
+
             //_InitializeStdOutError.Invoke(null, new object[] { true });
         }
         static void SetOutAndErrorNull()

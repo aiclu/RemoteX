@@ -3,38 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:_1RM.View.Settings.Theme"
              xmlns:colorPickerWpf="clr-namespace:ColorPickerWPF;assembly=Shawn.Utils.Wpf"
              xmlns:controls="clr-namespace:_1RM.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:ThemeSettingViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <Grid>
         <ScrollViewer>
 
         <StackPanel>
+            <TextBlock Text="{DynamicResource FluentAppearance}" Style="{StaticResource FluentBlockTitleColumn}"/>
+            <StackPanel Margin="0,0,0,16">
+                <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding Appearance.IsFluentPreview, Mode=TwoWay}" MinWidth="200" MaxWidth="300" HorizontalAlignment="Left">
+ <ComboBoxItem Content="{DynamicResource FluentClassic}"><ComboBoxItem.Tag><system:Boolean>False</system:Boolean></ComboBoxItem.Tag></ComboBoxItem>
+ <ComboBoxItem Content="{DynamicResource FluentPreview}"><ComboBoxItem.Tag><system:Boolean>True</system:Boolean></ComboBoxItem.Tag></ComboBoxItem>
+ </ComboBox>
+                <ComboBox Margin="0,8,0,0" MaxWidth="300" HorizontalAlignment="Left" MinWidth="200"
+                          IsEnabled="{Binding Appearance.IsFluentPreview}" SelectedValuePath="Tag"
+                          SelectedValue="{Binding Appearance.FluentTheme, Mode=TwoWay}">
+                    <ComboBoxItem Tag="System" Content="{DynamicResource FluentSystem}"/>
+                    <ComboBoxItem Tag="Light" Content="{DynamicResource FluentLight}"/>
+                    <ComboBoxItem Tag="Dark" Content="{DynamicResource FluentDark}"/>
+                </ComboBox>
+                <TextBlock Text="{DynamicResource FluentClassicThemeHint}" TextWrapping="Wrap" Margin="0,12,0,0"
+                           Foreground="{DynamicResource BackgroundTextBrush}"/>
+            </StackPanel>
 
-            <TextBlock Text="{DynamicResource Theme}" Style="{StaticResource BlockTitleColumn}" />
+            <TextBlock Text="{DynamicResource Theme}" Style="{StaticResource FluentBlockTitleColumn}" />
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Column1"></ColumnDefinition>
                     <ColumnDefinition MinWidth="280" SharedSizeGroup="ThemeColumn2"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Column3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource Theme}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource Theme}"></TextBlock>
 
                 <ComboBox Grid.Column="1"
                           ItemsSource="{Binding ThemeList}"
                           SelectedItem="{Binding ThemeName}">
                 </ComboBox>
 
-                <Button Grid.Column="2" HorizontalAlignment="Left" Margin="5 0 0 0" Style="{StaticResource ButtonPrimaryStyle}" Content="{DynamicResource Reset}" Command="{Binding CmdResetTheme}"></Button>
+                <Button Grid.Column="2" HorizontalAlignment="Left" Margin="5 0 0 0" Style="{StaticResource FluentPageButton}" Content="{DynamicResource Reset}" Command="{Binding CmdResetTheme}"></Button>
             </Grid>
 
 
-            <TextBlock Text="{DynamicResource Custom}" Style="{StaticResource BlockTitleColumn}" />
+            <TextBlock Text="{DynamicResource Custom}" Style="{StaticResource FluentBlockTitleColumn}" />
 
             <Grid Width="450" HorizontalAlignment="Left">
                 <Grid.RowDefinitions>
@@ -69,28 +87,28 @@
                 <TextBlock Grid.Row="0" Grid.Column="4" Text="{DynamicResource Darker}"></TextBlock>
                 <TextBlock Grid.Row="0" Grid.Column="5" Text="{DynamicResource Font}"></TextBlock>
 
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Grid.Row="1" Grid.Column="0" Text="{DynamicResource Color1}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Grid.Row="1" Grid.Column="0" Text="{DynamicResource Color1}"></TextBlock>
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="1" Grid.Column="2" HexColor="{Binding PrimaryMidColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="1" Grid.Column="3" HexColor="{Binding PrimaryLightColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="1" Grid.Column="4" HexColor="{Binding PrimaryDarkColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="1" Grid.Column="5" HexColor="{Binding PrimaryTextColor}" />
 
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Grid.Row="2" Grid.Column="0" Text="{DynamicResource Color2}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Grid.Row="2" Grid.Column="0" Text="{DynamicResource Color2}"></TextBlock>
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="2" Grid.Column="2" HexColor="{Binding AccentMidColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="2" Grid.Column="3" HexColor="{Binding AccentLightColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="2" Grid.Column="4" HexColor="{Binding AccentDarkColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="2" Grid.Column="5" HexColor="{Binding AccentTextColor}" />
 
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Grid.Row="3" Grid.Column="0" Text="{DynamicResource Background}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Grid.Row="3" Grid.Column="0" Text="{DynamicResource Background}"></TextBlock>
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="3" Grid.Column="2" HexColor="{Binding BackgroundColor}" />
                 <colorPickerWpf:ColorPickRowPopup Grid.Row="3" Grid.Column="5" HexColor="{Binding BackgroundTextColor}" />
             </Grid>
 
 
 
-            <TextBlock Text="Font" Style="{StaticResource BlockTitleColumn}" />
+            <TextBlock Text="Font" Style="{StaticResource FluentBlockTitleColumn}" />
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.Resources>
                     <Style x:Key="YaHeiComboBoxItemStyle" TargetType="ComboBoxItem" BasedOn="{StaticResource ComboBoxItemAccentStyle}">
                         <Setter Property="FontFamily" Value="Microsoft YaHei"></Setter>
@@ -105,7 +123,7 @@
                     <ColumnDefinition MinWidth="280" MaxWidth="500" SharedSizeGroup="GeneralColumn2"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Column3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="Font family" FontFamily="Microsoft YaHei"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="Font family" FontFamily="Microsoft YaHei"></TextBlock>
 
                 <ComboBox Grid.Column="1" MinWidth="200" HorizontalAlignment="Left"
                           IsEditable="True" IsTextSearchEnabled="True"
@@ -116,7 +134,7 @@
                 </ComboBox>
             </Grid>
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.Resources>
                     <Style x:Key="YaHeiComboBoxItemStyle" TargetType="ComboBoxItem" BasedOn="{StaticResource ComboBoxItemAccentStyle}">
                         <Setter Property="FontFamily" Value="Microsoft YaHei"></Setter>
@@ -132,7 +150,7 @@
                     <ColumnDefinition MinWidth="280" MaxWidth="500" SharedSizeGroup="GeneralColumn2"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Column3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="Font size" FontFamily="Microsoft YaHei"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="Font size" FontFamily="Microsoft YaHei"></TextBlock>
 
                 <ComboBox Grid.Column="1" MinWidth="200" HorizontalAlignment="Left" 
                           IsEditable="False"

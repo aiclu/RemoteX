@@ -105,7 +105,6 @@ namespace Shawn.Utils.Wpf.FileSystem
             try
             {
                 FileSystemSecurity security;
-#if NETCOREAPP
                 // nuget import System.IO.FileSystem.AccessControl
                 if (File.Exists(filePath))
                 {
@@ -120,20 +119,7 @@ namespace Shawn.Utils.Wpf.FileSystem
                     else
                         return false;
                 }
-#else
-                if (fi.Exists)
-                {
-                    security = File.GetAccessControl(filePath);
-                }
-                else if(fi?.Directory != null)
-                {
-                    return HasWritePermissionOnDir(fi.Directory.FullName);
-                }
-                else
-                {
-                    return false;
-                }
-#endif
+
 
                 if (System.IO.File.GetAttributes(fi.FullName).ToString().IndexOf("ReadOnly") != -1)
                 {

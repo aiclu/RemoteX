@@ -76,10 +76,18 @@ namespace _1RM.View.Settings
         }
 
         private EnumMainWindowPage _currentPage = EnumMainWindowPage.SettingsGeneral;
+        public EnumMainWindowPage NavigationPage
+        {
+            get => CurrentPage;
+            set => ShowPage(value);
+        }
         public EnumMainWindowPage CurrentPage
         {
             get => _currentPage;
-            private set => SetAndNotifyIfChanged(ref _currentPage, value);
+            private set
+            {
+                if (SetAndNotifyIfChanged(ref _currentPage, value)) RaisePropertyChanged(nameof(NavigationPage));
+            }
         }
 
         private Visibility _progressBarVisibility = Visibility.Collapsed;

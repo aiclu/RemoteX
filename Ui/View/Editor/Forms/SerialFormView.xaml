@@ -8,22 +8,23 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:SerialFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
         <StackPanel>
 
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Serial port"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}" Width="100">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Serial port"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="100">
                         <controls:AutoCompleteComboBox Text="{Binding New.SerialPort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                                        Width="100"
                                                        Tag="e.g. COM1"
                                                        Selections="{Binding New.SerialPorts, Mode=OneTime}"/>
                     </Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitleFollowing}" Width="70" Text="Speed(bps)"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitleFollowing}" Width="70" Text="Speed(bps)"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <controls:AutoCompleteComboBox Text="{Binding New.BitRate, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                                        MinWidth="100" HorizontalAlignment="Left"
                                                        Tag="e.g. 9600"
@@ -34,21 +35,21 @@
         </StackPanel>
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}"></TextBlock>
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_startup_auto_command}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_startup_auto_command}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.StartupAutoCommand, UpdateSourceTrigger=PropertyChanged}"
                                                                   Tag="e.g. cd /home/user/Desktop/"></TextBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_character_set}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_character_set}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <ComboBox ItemsSource="{Binding New.CodePages}"
                                   SelectedValue="{Binding New.EncodingCodePage}"
                                   DisplayMemberPath="Value"
@@ -57,40 +58,40 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Data bits"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Data bits"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <ComboBox SelectedItem="{Binding New.DataBits}" ItemsSource="{Binding New.DataBitsCollection}">
                         </ComboBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Stop bits"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Stop bits"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <ComboBox SelectedItem="{Binding New.StopBits}" ItemsSource="{Binding New.StopBitsCollection}">
                         </ComboBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Parity"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Parity"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <ComboBox SelectedItem="{Binding New.Parity}" ItemsSource="{Binding New.ParityCollection}">
                         </ComboBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Flow control"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Flow control"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <ComboBox SelectedItem="{Binding New.FlowControl}" ItemsSource="{Binding New.FlowControlCollection}">
                         </ComboBox>
                     </Grid>

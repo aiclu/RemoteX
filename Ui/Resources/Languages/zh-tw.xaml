@@ -370,4 +370,18 @@
     <s:String x:Key="Connection quality - Good">良好</s:String>
     <s:String x:Key="Connection quality - Excellent">極佳</s:String>
     <s:String x:Key="Less than 100 Kbps">低於 100 Kbps</s:String>
+    <s:String x:Key="FluentPreview">Fluent 预览</s:String>
+    <s:String x:Key="FluentAppearance">外观</s:String>
+    <s:String x:Key="FluentConnections">连接</s:String>
+    <s:String x:Key="FluentAllConnections">全部連線</s:String>
+    <s:String x:Key="FluentSystem">跟随系统</s:String>
+    <s:String x:Key="FluentLight">浅色</s:String>
+    <s:String x:Key="FluentDark">深色</s:String>
+    <s:String x:Key="FluentClassic">经典外观</s:String>
+    <s:String x:Key="FluentSort">排序</s:String>
+    <s:String x:Key="FluentMore">更多</s:String>
+    <s:String x:Key="FluentTags">管理标签</s:String>
+    <s:String x:Key="FluentClassicThemeHint">下方主題與自訂色彩僅影響經典外觀；字型設定對兩種外觀均生效。</s:String>
+    <s:String x:Key="FluentQuickConnectHint">快速連線，例如 192.0.2.10:3389</s:String>
+    <s:String x:Key="FluentSearchConnections">搜尋連線</s:String>
 </ResourceDictionary>

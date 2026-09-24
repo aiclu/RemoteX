@@ -2,12 +2,12 @@
 
 ## What this is
 
-RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / Telnet / FTP / SFTP / Serial / RemoteApp). UI uses **Stylet** MVVM with a StyletIoC container. Root namespace is `_1RM` (assembly `RemoteX`). Default target framework is `net9.0-windows10.0.19041.0`; `ReleaseNet6` and `ReleaseNet48` configurations also exist. Nullable is enabled and `LangVersion=latest`.
+RemoteX — a WPF desktop remote-session manager & launcher (RDP / SSH / VNC / Telnet / FTP / SFTP / Serial / RemoteApp). UI uses **Stylet** MVVM with a StyletIoC container. Root namespace is `_1RM` (assembly `RemoteX`). Default target framework is `net9.0-windows10.0.19041.0`; only .NET 9 targets are supported in the application dependency chain. Nullable is enabled and `LangVersion=latest`.
 
 ## Commands
 
 - Build (CLI): `.\Invoke-Build.ps1 Clean, Build -aReleaseType Debug` — or open `RemoteX.sln` in Visual Studio 2022 and build the `Debug` configuration. Available Invoke-Build tasks: `Deps`, `Build`, `BuildInSandbox`, `Clean` (see `prm.build.ps1`).
-- Test: `dotnet test Tests\Tests.csproj` (MSTest, targets `net6.0-windows10.0.17763.0`, references the `Ui` project).
+- Test: `dotnet test Tests\Tests.csproj` (MSTest, targets `net9.0-windows10.0.19041.0`, references the `Ui` project).
 
 ## Where things live
 

@@ -9,17 +9,18 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:SftpFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
-        <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+        <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
         <ContentControl s:View.Model="{Binding HostViewModel}"></ContentControl>
         <ContentControl s:View.Model="{Binding CredentialViewModel}"></ContentControl>
         <ContentControl s:View.Model="{Binding AlternativeCredentialListViewModel}"></ContentControl>
 
-        <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sftp_startup_path}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sftp_startup_path}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.StartupPath, UpdateSourceTrigger=PropertyChanged}"
                              Tag="e.g. /home/user/Desktop"></TextBox>
                 </Grid>

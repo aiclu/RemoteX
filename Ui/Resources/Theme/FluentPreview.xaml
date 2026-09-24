@@ -1,0 +1,141 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:view="clr-namespace:_1RM.View">
+    <SolidColorBrush x:Key="FluentCanvas" Color="#F3F3F3"/>
+    <SolidColorBrush x:Key="FluentSurface" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="FluentText" Color="#1B1B1B"/>
+    <SolidColorBrush x:Key="FluentMuted" Color="#606060"/>
+    <SolidColorBrush x:Key="FluentStroke" Color="#DDDDDD"/>
+    <SolidColorBrush x:Key="FluentHover" Color="#E9E9E9"/>
+    <SolidColorBrush x:Key="FluentAccent" Color="#005FB8"/>
+    <SolidColorBrush x:Key="FluentAccentText" Color="White"/>
+    <Style x:Key="FluentFocus" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value><ControlTemplate><Border BorderBrush="{DynamicResource FluentAccent}" BorderThickness="2" CornerRadius="6" Margin="1"/></ControlTemplate></Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="FluentButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocus}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+                        <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Opacity" Value="0.7"/></Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- Explicit styles: only the Fluent workspace menus opt in. -->
+    <Style x:Key="FluentWorkspaceMenuItem" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Chrome" Background="{TemplateBinding Background}" CornerRadius="4"
+                            BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="{TemplateBinding Tag}" Foreground="{DynamicResource FluentAccent}" VerticalAlignment="Center"/>
+                            <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
+                        <Trigger Property="IsChecked" Value="True"><Setter Property="FontWeight" Value="SemiBold"/></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{DynamicResource FluentMuted}"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="FluentWorkspaceMenu" TargetType="ContextMenu">
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+        <Setter Property="MinWidth" Value="160"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Resources>
+            <Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"/>
+            <Style TargetType="Separator">
+                <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator">
+                    <Border Height="1" Margin="8,4" Background="{DynamicResource FluentStroke}"/>
+                </ControlTemplate></Setter.Value></Setter>
+            </Style>
+        </Style.Resources>
+    </Style>
+    <Style x:Key="FluentNavigationIcon" TargetType="TextBlock">
+        <Setter Property="Width" Value="16"/><Setter Property="Height" Value="16"/>
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/><Setter Property="FontSize" Value="14"/>
+        <Setter Property="TextAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="FluentNavButton" TargetType="Button" BasedOn="{StaticResource FluentButton}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="0,2"/>
+    </Style>
+    <Style x:Key="FluentSearch" TargetType="TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource FluentText}"/>
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Chrome" BorderThickness="1" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <Path Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" Stretch="Uniform"
+                                  Stroke="{DynamicResource FluentMuted}" StrokeThickness="1.5" IsHitTestVisible="False"
+                                  Data="M 11,6 A 5,5 0 1 1 1,6 A 5,5 0 1 1 11,6 M 10,10 L 15,15"/>
+                            <TextBlock x:Name="Hint" Grid.Column="1" Margin="2,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                       Text="{TemplateBinding Tag}" Foreground="{DynamicResource FluentMuted}" Visibility="Collapsed" IsHitTestVisible="False"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Grid.Column="1" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="Shortcut" Grid.Column="2" Margin="12,0,0,0" VerticalAlignment="Center" Text="Ctrl+F"
+                                       Foreground="{DynamicResource FluentMuted}" IsHitTestVisible="False"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value=""><Setter TargetName="Hint" Property="Visibility" Value="Visible"/></Trigger>
+                        <Trigger Property="view:FluentWorkspace.IsCompact" Value="True"><Setter TargetName="Shortcut" Property="Visibility" Value="Collapsed"/></Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

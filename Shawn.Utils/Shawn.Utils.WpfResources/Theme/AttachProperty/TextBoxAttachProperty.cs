@@ -56,9 +56,11 @@ namespace Shawn.Utils.WpfResources.Theme.AttachProperty
 
         private static void SelectionChangedForCaretIndex(object sender, RoutedEventArgs eventArgs)
         {
-            if (sender is TextBox textBox)
+            // Multiple views can bind the same text/caret. An inactive view resets its
+            // selection when text is synchronized; it must not move the active view's caret.
+            if (sender is TextBox textBox && textBox.IsKeyboardFocusWithin)
             {
-                SetCaretIndex(textBox, textBox.CaretIndex);
+                textBox.SetCurrentValue(CaretIndexProperty, textBox.CaretIndex);
             }
         }
     }

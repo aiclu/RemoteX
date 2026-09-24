@@ -9,6 +9,18 @@
 
 RemoteX 是一款现代化的个人远程会话管理与启动器。它可以在一个统一界面中管理所有远程会话，支持多种协议。
 
+## RemoteX 2.0
+
+- **可选 Fluent 外观**：覆盖主界面、设置、连接编辑器、启动器、常用弹窗、会话窗口边框及列表／卡片／树形视图，支持浅色、深色与跟随系统。
+- **紧凑连接管理**：全部连接入口、标签导航、居中搜索框、清晰的协议选择栏，以及带选中标记和排序方向的菜单。
+- **保留经典模式**：现有配置默认继续使用经典外观；经典配色和视图偏好独立保留。
+- **统一到 .NET 9**：应用依赖链及相关测试移除 .NET 6、.NET Framework 构建目标。
+- 修复语言资源加载、搜索光标位置、RDP 编辑器补全弹层关闭，以及敏感字段加密时 SSH 私钥被清空的问题。
+
+启用方式：进入 **设置 → 主题**，选择 **Fluent 预览**，再选择浅色、深色或跟随系统。Fluent 模式下也可通过左侧 **外观** 菜单切换主题或返回经典模式。
+
+详见 [2.0.0 发布说明](docs/releases/2.0.0.md) 与 [开发指南](DEVELOP.md)。
+
 ## 功能特性
 
 - 支持 RDP、SSH、VNC、Telnet、FTP/FTPS、SFTP、串口（Serial）、[RemoteApp](https://1remote.github.io/usage/protocol/especial/remoteapp/)、[NoMachine 等应用](https://1remote.github.io/usage/protocol/especial/app/)
@@ -24,13 +36,23 @@ RemoteX 是一款现代化的个人远程会话管理与启动器。它可以在
 
 ## 🚩安装
 
-最新版本：1.0.9
+最新版本：2.0.0
 
 ### 🔻[下载](https://github.com/aiclu/RemoteX/releases)
 
-在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-1.0.9-net9-x64.zip`（框架依赖版）或 `RemoteX-1.0.9-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
+在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-2.0.0-net9-x64.zip`（框架依赖版）或 `RemoteX-2.0.0-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
+
+### 运行要求与升级
+
+- Windows x64；应用目标为 Windows 10 build 19041 或更高版本。
+- 框架依赖版需要 **.NET 9 Desktop Runtime（x64）**；自包含版已包含运行时。
+- 请**完整解压 ZIP**，保留随包提供的 `ssh_rust.dll`、`updater.exe` 等文件，不要只复制 `RemoteX.exe`。
+- 升级前备份配置和连接数据库。手动替换程序文件前先退出 RemoteX，保留原配置和数据。
+- 部分安装环境曾出现自动更新未完成。本版**不宣称修复该问题**；更新失败时，请退出程序并使用 Releases 中的完整 ZIP 手动更新。
 
 ## 👓概览
+
+以下图片为历史协议功能／经典界面示例，并非新版 Fluent 外观截图。
 
 <img src="https://1remote.github.io/img/home_override/hero1.png" width="800" />
 

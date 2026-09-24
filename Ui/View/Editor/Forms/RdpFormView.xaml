@@ -11,37 +11,38 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:RdpFormViewModel}"
              d:DesignHeight="1850" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
         <StackPanel>
 
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
             <ContentControl s:View.Model="{Binding HostViewModel}"></ContentControl>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="Domain"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="Domain"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.Domain, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
 
-            <!--<Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"></TextBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <controls:PasswordInput Height="28"
                                                 Tag="leave it blank and it will prompt for the password later."
                                                 Password="{Binding New.Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"/>
@@ -51,10 +52,10 @@
             </Grid>-->
 
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="LoadBalanceInfo"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="LoadBalanceInfo"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.LoadBalanceInfo, UpdateSourceTrigger=PropertyChanged}" Tag="tsv://MS Terminal Services Plugin.1.Wortell_sLab_Ses"></TextBox>
                     </Grid>
                 </StackPanel>
@@ -66,10 +67,10 @@
 
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_display}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_display}"></TextBlock>
             <Grid>
                 <Grid.Style>
-                    <Style TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+                    <Style TargetType="Grid" BasedOn="{StaticResource FluentEditorRowGrid}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding New.RdpFullScreenFlag}" Value="{x:Static protocol:ERdpFullScreenFlag.EnableFullScreen}">
                                 <Setter Property="Margin" Value="0"></Setter>
@@ -81,8 +82,8 @@
                     </Style>
                 </Grid.Style>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_display_full_screen_flag}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_display_full_screen_flag}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterERdpFullScreenFlag x:Key="ConverterERdpFullScreenFlag" />
                         </Grid.Resources>
@@ -95,13 +96,13 @@
                     </Grid>
                 </StackPanel>
             </Grid>
-            <Grid Style="{StaticResource EditorRowGrid}" 
+            <Grid Style="{StaticResource FluentEditorRowGrid}"
                   Visibility="{Binding New.RdpFullScreenFlag, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter={x:Static protocol:ERdpFullScreenFlag.Disable}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
                     <Grid>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Grid Style="{StaticResource EditorRowGridInput}" Width="Auto">
+                            <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="Auto">
                                 <StackPanel>
                                     <CheckBox Content="{DynamicResource 'New session always use full screen'}" 
                                               IsChecked="{Binding New.IsConnWithFullScreen}">
@@ -144,10 +145,10 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Resolution}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Resolution}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterERdpWindowResizeMode x:Key="ConverterERdpWindowResizeMode" />
                         </Grid.Resources>
@@ -184,12 +185,12 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Width="80" Text="W = " Margin="20 0 0 0"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}" Width="Auto">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Width="80" Text="W = " Margin="20 0 0 0"></TextBlock>
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="Auto">
                             <TextBox Text="{Binding New.RdpWidth, UpdateSourceTrigger=PropertyChanged}" Width="50" HorizontalAlignment="Left"></TextBox>
                         </Grid>
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Width="40" Text="H = " Margin="5 0 0 0"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}" Width="Auto">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Width="40" Text="H = " Margin="5 0 0 0"></TextBlock>
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="Auto">
                             <TextBox Text="{Binding New.RdpHeight, UpdateSourceTrigger=PropertyChanged}" Width="50" HorizontalAlignment="Left"></TextBox>
                         </Grid>
                     </StackPanel>
@@ -197,11 +198,11 @@
             </Grid>
 
 
-            <Grid Style="{StaticResource EditorRowGrid}" 
+            <Grid Style="{StaticResource FluentEditorRowGrid}"
                   Visibility="{Binding New.MstscModeEnabled, Converter={StaticResource ConverterBool2VisibleInv}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Scale}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}" Width="Auto">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Scale}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="Auto">
                         <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" 
                                   Content="{DynamicResource 'Follow system'}" 
                                   IsChecked="{Binding New.IsScaleFactorFollowSystem}"></CheckBox>
@@ -211,7 +212,7 @@
 
             <Grid>
                 <Grid.Style>
-                    <Style TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+                    <Style TargetType="Grid" BasedOn="{StaticResource FluentEditorRowGrid}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding New.MstscModeEnabled}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed"></Setter>
@@ -223,8 +224,8 @@
                     </Style>
                 </Grid.Style>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -238,10 +239,10 @@
             </Grid>
 
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_display_rdp_performance}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_display_rdp_performance}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterEDisplayPerformance x:Key="ConverterEDisplayPerformance" />
                         </Grid.Resources>
@@ -259,12 +260,12 @@
 
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'mstsc.exe mode'}" Width="500"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'mstsc.exe mode'}" Width="500"></TextBlock>
 
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" VerticalAlignment="Top" Text=""></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" VerticalAlignment="Top" Text=""></TextBlock>
                     <StackPanel>
                         <CheckBox Margin="0 2"
                                   IsChecked="{Binding New.MstscModeEnabled}">
@@ -289,12 +290,12 @@
             </Grid>
 
             <StackPanel Visibility="{Binding New.MstscModeEnabled, Converter={StaticResource ConverterBool2Visible}}">
-                <Grid Style="{StaticResource EditorRowGrid}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                <Grid Style="{StaticResource FluentEditorRowGrid}">
+                    <StackPanel Style="{StaticResource FluentFieldStack}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                    Text="{DynamicResource 'Additional settings'}" VerticalAlignment="Top" 
                                    Margin="0 7 30 0"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}" Width="500">
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="500">
                             <Border>
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -359,9 +360,9 @@
                         </TextBlock>
                     </StackPanel>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGrid}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Helper'}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGrid}">
+                    <StackPanel Style="{StaticResource FluentFieldStack}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Helper'}"></TextBlock>
                         <Grid>
                             <StackPanel Orientation="Horizontal">
                                 <Button Click="ButtonPreviewRdpFile_OnClick" Margin="0 0 5 0" Content="{DynamicResource 'Preview rdp file'}"></Button>
@@ -375,22 +376,22 @@
 
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}" Width="500"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}" Width="500"></TextBlock>
 
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="/admin"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="/admin"></TextBlock>
                     <CheckBox HorizontalAlignment="Right" Margin="0 0 10 0" 
                               Content="{DynamicResource server_editor_advantage_admin}"
                               IsChecked="{Binding New.IsAdministrativePurposes}"></CheckBox>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sounds}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sounds}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterEAudioRedirectionMode x:Key="ConverterEAudioRedirectionMode" />
                         </Grid.Resources>
@@ -404,10 +405,10 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.AudioRedirectionMode, Converter={StaticResource ConverterEqual2Visible}, ConverterParameter={x:Static protocol:EAudioRedirectionMode.RedirectToLocal}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sound_quality}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.AudioRedirectionMode, Converter={StaticResource ConverterEqual2Visible}, ConverterParameter={x:Static protocol:EAudioRedirectionMode.RedirectToLocal}}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sound_quality}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterEAudioQualityMode x:Key="ConverterEAudioQualityMode" />
                         </Grid.Resources>
@@ -421,9 +422,9 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_resources}"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_resources}"></TextBlock>
                     <UniformGrid Columns="3" Rows="3" Width="500" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <UniformGrid.Resources>
                             <Style TargetType="CheckBox" BasedOn="{StaticResource CheckBoxAccentStyle}">
@@ -450,12 +451,12 @@
                 <forms:ConverterEGatewayLogonMethod x:Key="ConverterEGatewayLogonMethod" />
             </StackPanel.Resources>
 
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_gateway}" Width="500"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_gateway}" Width="500"></TextBlock>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_mode}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_mode}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterEGatewayMode x:Key="ConverterEGatewayMode" />
                         </Grid.Resources>
@@ -471,7 +472,7 @@
 
             <Grid>
                 <Grid.Style>
-                    <Style TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+                    <Style TargetType="Grid" BasedOn="{StaticResource FluentEditorRowGrid}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding New.GatewayMode}" Value="{x:Static protocol:EGatewayMode.DoNotUseGateway}">
                                 <Setter Property="Visibility" Value="Collapsed"></Setter>
@@ -483,15 +484,15 @@
                     </Style>
                 </Grid.Style>
                 <StackPanel Margin="70 10 0 0">
-                    <Grid Style="{StaticResource EditorRowGrid}" Margin="0 3 0 0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_server_host_name}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGrid}" Margin="0 3 0 0">
+                        <StackPanel Style="{StaticResource FluentFieldStack}">
+                            <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_server_host_name}"></TextBlock>
                             <TextBox Text="{Binding New.GatewayHostName, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
                         </StackPanel>
                     </Grid>
-                    <Grid Style="{StaticResource EditorRowGrid}" Margin="0 6 0 0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_logon_method}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGrid}" Margin="0 6 0 0">
+                        <StackPanel Style="{StaticResource FluentFieldStack}">
+                            <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_gateway_logon_method}"></TextBlock>
                             <ComboBox SelectedIndex="{Binding New.GatewayLogonMethod, Converter={StaticResource ConverterEGatewayLogonMethod}}" Width="200">
                                 <ComboBoxItem Content="{DynamicResource server_editor_gateway_logon_method_psw}" ToolTip="{DynamicResource server_editor_gateway_logon_method_psw}" />
                                 <ComboBoxItem Content="{DynamicResource server_editor_gateway_logon_method_smart_card}" ToolTip="{DynamicResource server_editor_gateway_logon_method_smart_card}" />
@@ -501,19 +502,19 @@
                     </Grid>
 
                     <Grid Visibility="{Binding New.GatewayLogonMethod, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter={x:Static protocol:EGatewayLogonMethod.SmartCard}}"
-                          Style="{StaticResource EditorRowGrid}"
+                          Style="{StaticResource FluentEditorRowGrid}"
                           Margin="0 6 0 0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                            <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
                             <TextBox Text="{Binding New.GatewayUserName, UpdateSourceTrigger=PropertyChanged}" Width="200"></TextBox>
                         </StackPanel>
                     </Grid>
 
                     <Grid Visibility="{Binding New.GatewayLogonMethod, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter={x:Static protocol:EGatewayLogonMethod.SmartCard}}"
-                          Style="{StaticResource EditorRowGrid}"
+                          Style="{StaticResource FluentEditorRowGrid}"
                           Margin="0 6 0 0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                            <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
                             <controls:PasswordInput Height="28" Password="{Binding New.GatewayPassword, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay }" Width="200"/>
                         </StackPanel>
                     </Grid>
@@ -523,16 +524,16 @@
 
 
         <StackPanel Visibility="{Binding New.MstscModeEnabled, Converter={StaticResource ConverterBool2VisibleInv}}">
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="MISC"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="MISC"></TextBlock>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                Text="{DynamicResource 'Additional settings'}" VerticalAlignment="Top" 
                                Margin="0 7 30 0"></TextBlock>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Grid Style="{StaticResource EditorRowGridInput}" Width="500">
+                            <Grid Style="{StaticResource FluentEditorRowGridInput}" Width="500">
                                 <Border>
                                     <Border.Style>
                                         <Style TargetType="Border">
@@ -611,7 +612,7 @@
         </StackPanel>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
         </Grid>
     </StackPanel>
 </UserControl>

@@ -373,3 +373,17 @@ Connection quality - Fair;Fair
 Connection quality - Good;Good
 Connection quality - Excellent;Excellent
 Less than 100 Kbps;Less than 100 Kbps
+FluentPreview;Fluent preview
+FluentAppearance;Appearance
+FluentConnections;Connections
+FluentAllConnections;Wszystkie połączenia
+FluentSystem;Follow system
+FluentLight;Light
+FluentDark;Dark
+FluentClassic;Classic appearance
+FluentSort;Sort
+FluentMore;More
+FluentTags;Manage tags
+FluentClassicThemeHint;The theme and custom colors below affect classic appearance only. Font settings apply to both appearances.
+FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
+FluentSearchConnections;Szukaj połączeń

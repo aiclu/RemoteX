@@ -1,0 +1,40 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:_1RM.View">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    <!-- Header hosts existing action controls. Both presenters keep their original bindings. -->
+    <Style x:Key="FluentDialogFrame" TargetType="HeaderedContentControl">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value><ControlTemplate TargetType="HeaderedContentControl">
+                <StackPanel><ContentPresenter ContentSource="Content"/><ContentPresenter ContentSource="Header"/></StackPanel>
+            </ControlTemplate></Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="fluent:FluentPage.Active" Value="True">
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="fluent:FluentWindowBounds.Body" Value="True"/>
+                <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="HeaderedContentControl">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                      MaxHeight="{DynamicResource FluentDialogBodyMaxHeight}" Padding="16,12">
+                            <ContentPresenter ContentSource="Content"/>
+                        </ScrollViewer>
+                        <Border Grid.Row="1" Background="{DynamicResource FluentSurface}" BorderBrush="{DynamicResource FluentStroke}"
+                                BorderThickness="0,1,0,0" Padding="12,8"><ContentPresenter ContentSource="Header"/></Border>
+                    </Grid>
+                </ControlTemplate></Setter.Value></Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="FluentDialogText" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
+        <Style.Triggers><Trigger Property="fluent:FluentPage.Active" Value="True">
+            <Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="TextWrapping" Value="Wrap"/>
+        </Trigger></Style.Triggers>
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource FluentPageButton}"/>
+</ResourceDictionary>

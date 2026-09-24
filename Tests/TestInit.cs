@@ -10,28 +10,30 @@ namespace Tests
 {
     public static class TestInit
     {
+        public static string CreateDirectory()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "RemoteX.Tests", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
         public static void Init()
         {
-            AppPathHelper.Instance = new AppPathHelper(Environment.CurrentDirectory);
-            if (File.Exists(AppPathHelper.Instance.ProfileJsonPath))
-                File.Delete(AppPathHelper.Instance.ProfileJsonPath);
-            if (File.Exists(AppPathHelper.Instance.SqliteDbDefaultPath))
-                File.Delete(AppPathHelper.Instance.SqliteDbDefaultPath);
-
-
-
+            var root = CreateDirectory();
+            AppPathHelper.Instance = new AppPathHelper(root, root);
+            var configuration = new Configuration { SqliteDatabasePath = Path.Combine(root, "test.db") };
+            var configurationService = new ConfigurationService(new KeywordMatchService(), configuration);
+            var dataSource = new DataSourceService();
             IoC.GetByType = (type, key) =>
             {
-                if (type == typeof(IDataService) || type == typeof(DataService))
-                    return new DataService();
                 if (type == typeof(ILanguageService) || type == typeof(LanguageService) || type == typeof(MockLanguageService))
                     return new MockLanguageService();
                 if (type == typeof(_1RM.Service.Configuration))
-                    return new _1RM.Service.Configuration();
+                    return configuration;
                 if (type == typeof(_1RM.Service.ConfigurationService))
-                    return new ConfigurationService(new Configuration(), new KeywordMatchService());
+                    return configurationService;
                 if (type == typeof(DataSourceService))
-                    return new DataSourceService(new ProtocolConfigurationService(), new GlobalData(new ConfigurationService(new _1RM.Service.Configuration(), new KeywordMatchService())));
+                    return dataSource;
                 return null;
             };
         }

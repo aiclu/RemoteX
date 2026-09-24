@@ -13,8 +13,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ProtocolConfiogDictionary.xaml"></ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/>
+                <ResourceDictionary Source="ProtocolConfiogDictionary.xaml"/>
+</ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -66,13 +67,13 @@
         <StackPanel Grid.Row="1">
             <Grid Height="20"></Grid>
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn1"></ColumnDefinition>
                     <ColumnDefinition Width="290"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource 'Exe path'}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource 'Exe path'}"></TextBlock>
                 <TextBox Grid.Column="1" 
                          Text="{Binding ExternalRunner.ExePath, UpdateSourceTrigger=PropertyChanged}" 
                          ToolTip="{Binding ExternalRunner.ExePath}"
@@ -89,20 +90,20 @@
                     </TextBox.Style>
                 </TextBox>
                 <Button Grid.Column="2" 
-                        Style="{StaticResource ButtonPrimaryStyle}" 
+                        Style="{StaticResource FluentPageButton}"
                         Margin="5 0 50 0" VerticalAlignment="Top" HorizontalAlignment="Left"
                         Content="{DynamicResource Select}" 
                         Command="{Binding CmdSelectExePath}"></Button>
             </Grid>
 
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn1"></ColumnDefinition>
                     <ColumnDefinition Width="290"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource 'Cmd parameter'}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource 'Cmd parameter'}"></TextBlock>
                 <Border Grid.Column="1">
                     <Border.Style>
                         <Style TargetType="Border">
@@ -156,14 +157,14 @@
 
 
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn1"></ColumnDefinition>
                     <ColumnDefinition Width="290"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource 'Environment variables'}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource 'Environment variables'}"></TextBlock>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
@@ -261,14 +262,14 @@
 
 
 
-            <Grid Style="{StaticResource GridOneRow}">
+            <Grid Style="{StaticResource FluentGridOneRow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn1"></ColumnDefinition>
                     <ColumnDefinition Width="290"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="Special Characters"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="Special Characters"></TextBlock>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.ColumnSpan="2">
@@ -370,13 +371,13 @@
             </Grid>
 
 
-            <Grid Style="{StaticResource GridOneRow}" ToolTip="{DynamicResource 'Hosting this exe in RemoteX tab view?'}">
+            <Grid Style="{StaticResource FluentGridOneRow}" ToolTip="{DynamicResource 'Hosting this exe in RemoteX tab view?'}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn1"></ColumnDefinition>
                     <ColumnDefinition Width="290"></ColumnDefinition>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="ExternalRunnerColumn3"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Style="{StaticResource TextBlockTitleColumn}" Text="{DynamicResource 'Hosting'}"></TextBlock>
+                <TextBlock Style="{StaticResource FluentTextBlockTitleColumn}" Text="{DynamicResource 'Hosting'}"></TextBlock>
                 <CheckBox Grid.Column="1" IsChecked="{Binding ExternalRunner.RunWithHosting}">
                     <TextBlock Foreground="{DynamicResource AccentMidBrush}" Text="{DynamicResource 'Caution: some exe can not be hosted in RemoteX.'}" TextWrapping="Wrap"></TextBlock>
                 </CheckBox>

@@ -14,7 +14,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <DataTemplate DataType="{x:Type dragablz:HeaderedItemViewModel}">
+            <DataTemplate DataType="{x:Type dragablzDemo:HeaderedItemViewModel}">
                 <ContentControl Content="{Binding Content}" Margin="4 4 4 4" FontSize="14" />
             </DataTemplate>
             <DataTemplate DataType="{x:Type dragablzDemo:CustomHeaderViewModel}">

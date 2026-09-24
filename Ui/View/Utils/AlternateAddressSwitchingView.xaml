@@ -1,6 +1,7 @@
 ﻿<styles:WindowChromeBase x:Class="_1RM.View.Utils.AlternateAddressSwitchingView"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:fluent="clr-namespace:_1RM.View" fluent:FluentPage.Scope="True"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:utils="clr-namespace:_1RM.View.Utils"
@@ -15,6 +16,7 @@
                   ShowInTaskbar="False"
                   Topmost="True"
                   Width="250" Height="120">
+    <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentDialogs.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
     <Grid Background="Transparent">
         <Border Margin="1"
                 CornerRadius="{StaticResource DefaultCornerRadius}" 
@@ -40,7 +42,7 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid Background="Transparent" Width="12" Height="12" Margin="2 0">
-                            <Image Source="/Resources/Image/Logo/logo32.png"></Image>
+                            <Image Source="/RemoteX;component/Resources/Image/Logo/logo32.png"></Image>
                         </Grid>
                     <TextBlock Grid.Column="1" VerticalAlignment="Center" 
                                FontWeight="Bold"

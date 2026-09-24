@@ -148,6 +148,8 @@ namespace _1RM.Service
 
     public class ThemeConfig
     {
+        public FluentPreferences Fluent { get; set; } = new FluentPreferences();
+
         public string ThemeName = "Dark";
 
         public string PrimaryMidColor = "#323233";

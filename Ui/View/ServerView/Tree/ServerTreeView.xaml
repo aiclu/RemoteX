@@ -4,6 +4,7 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                 xmlns:local="clr-namespace:_1RM.View.ServerView.Tree"
+                xmlns:view="clr-namespace:_1RM.View" view:FluentPage.Scope="True"
                 xmlns:controls="clr-namespace:Shawn.Utils.Wpf.Controls;assembly=Shawn.Utils.Wpf"
                 xmlns:attachProperty="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
                 xmlns:s="https://github.com/canton7/Stylet"
@@ -18,9 +19,11 @@
 
     <serverView:ServerViewBase.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentServerViews.xaml"/></ResourceDictionary.MergedDictionaries>
             <Style x:Key="SelectedCheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
                 <Setter Property="Visibility" Value="Hidden"></Setter>
                 <Style.Triggers>
+                    <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger>
                     <DataTrigger Binding="{Binding ElementName=GridNode,Path=IsMouseOver}" Value="True">
                         <Setter Property="Visibility" Value="Visible"></Setter>
                     </DataTrigger>
@@ -187,6 +190,11 @@
                                 <DataTrigger Binding="{Binding IsRootFolder}" Value="True">
                                     <Setter Property="Margin" Value="0,0,0,16"/>
                                 </DataTrigger>
+                                <Trigger Property="view:FluentPage.Active" Value="True">
+                                    <Setter Property="Template" Value="{StaticResource FluentTreeItemTemplate}"/>
+                                    <Setter Property="Margin" Value="0,2"/><Setter Property="Focusable" Value="True"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </TreeView.ItemContainerStyle>
@@ -232,6 +240,7 @@
                                                     </Setter.Value>
                                                 </Setter>
                                             </Trigger>
+                                            <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Background" Value="Transparent"/></Trigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Grid.Style>

@@ -17,6 +17,7 @@ namespace _1RM.View.Settings.Theme
     {
         private readonly ConfigurationService _configurationService;
         private readonly ThemeService _themeService;
+        public _1RM.View.MainWindowViewModel Appearance => IoC.Get<_1RM.View.MainWindowViewModel>();
 
         public ThemeSettingViewModel(ConfigurationService configurationService, ThemeService themeService)
         {
@@ -260,6 +261,7 @@ namespace _1RM.View.Settings.Theme
                 _configurationService.Theme.FontSize = v;
                 RaisePropertyChanged();
                 _themeService.ApplyTheme(_configurationService.Theme);
+                IoC.Get<FluentAppearanceService>().NotifyChanged();
             }
         }
 

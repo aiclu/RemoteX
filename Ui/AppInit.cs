@@ -382,11 +382,8 @@ namespace _1RM
                         kys.Add("Distributor", $"{Assert.APP_NAME} Exe");
 #endif
 
-#if NETFRAMEWORK
-                kys.Add($"App start with - Net", $"4.8");
-#else
                         kys.Add($"App start with - Net", $"6.x");
-#endif
+
                         UnifyTracing.TraceSpecial(kys);
                     }
                     catch (Exception ex)

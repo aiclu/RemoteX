@@ -12,7 +12,7 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance forms:LocalAppFormViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
+    <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries>
         <system:Double x:Key="AppArgumentHeight">30</system:Double>
         <Thickness x:Key="AppArgumentMargin">0 0 0 10</Thickness>
         <system:Double x:Key="WidthName">100</system:Double>
@@ -100,7 +100,7 @@
                              Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
                              ToolTip="{Binding HintDescription}"
                              Tag="{Binding HintDescription}"/>
-                    <Button Height="28" Grid.Column="1" Style="{StaticResource ButtonPrimaryStyle}" 
+                    <Button Height="28" Grid.Column="1" Style="{StaticResource FluentPageButton}"
                             Content="{DynamicResource Select}" 
                             Command="{Binding CmdSelectArgumentFile}"></Button>
                 </Grid>
@@ -143,16 +143,16 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </UserControl.Resources>
+    </ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
 
         <StackPanel Orientation="Horizontal" Margin="0 20 0 10">
 
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Margin="80 0 0 0" Text="{DynamicResource 'Cmd parameter'}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Margin="80 0 0 0" Text="{DynamicResource 'Cmd parameter'}"></TextBlock>
 
             <Button Command="{Binding Path=DataContext.CmdToggleEditMode, RelativeSource={RelativeSource AncestorType={x:Type editor:ServerEditorPageView}}}"
-                    Style="{StaticResource ButtonPrimaryStyle}"
+                    Style="{StaticResource FluentPageButton}"
                     Visibility="{Binding New.ArgumentList.Count, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter=0}"
                     ToolTip="{DynamicResource 'Edit'}" 
                     Margin="10 0 5 0">
@@ -166,7 +166,7 @@
 
 
             <Button Command="{Binding Path=DataContext.CmdEditArgument, RelativeSource={RelativeSource AncestorType={x:Type editor:ServerEditorPageView}}}"
-                    Style="{StaticResource ButtonPrimaryStyle}"
+                    Style="{StaticResource FluentPageButton}"
                     ToolTip="{DynamicResource 'Add'}" 
                     Margin="5 0 5 0">
                 <Grid Height="15" Width="15">
@@ -180,12 +180,12 @@
         </StackPanel>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}" 
+        <Grid Style="{StaticResource FluentEditorRowGrid}"
               Visibility="{Binding New.ArgumentList.Count, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter=0}" 
               Margin="0 0 0 50">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Preview}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}" VerticalAlignment="Center" Width="Auto" Height="Auto">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Preview}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}" VerticalAlignment="Center" Width="Auto" Height="Auto">
                     <TextBox IsReadOnly="True" 
                              Opacity="0.5"
                              Text="{Binding Demo, Mode=OneWay}"
@@ -196,7 +196,7 @@
                              TextWrapping="Wrap">
                     </TextBox>
                 </Grid>
-                <Button Style="{StaticResource ButtonPrimaryStyle}" 
+                <Button Style="{StaticResource FluentPageButton}"
                         Margin="5 0 0 0"
                         ToolTip="{DynamicResource 'Test'}" 
                         Command="{Binding CmdTest}">
@@ -228,13 +228,13 @@
         </StackPanel>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}" 
+        <Grid Style="{StaticResource FluentEditorRowGrid}"
               Margin="0 50 0 30"
               Visibility="{Binding New.ArgumentList.Count, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter=0}"
               >
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Preview}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}" VerticalAlignment="Center" Width="Auto" Height="Auto">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Preview}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}" VerticalAlignment="Center" Width="Auto" Height="Auto">
                     <TextBox IsReadOnly="True" 
                              Opacity="0.5"
                              Text="{Binding Demo, Mode=OneWay}"
@@ -245,7 +245,7 @@
                              TextWrapping="Wrap">
                     </TextBox>
                 </Grid>
-                <Button Style="{StaticResource ButtonPrimaryStyle}" 
+                <Button Style="{StaticResource FluentPageButton}"
                         Margin="5 0 0 0"
                         ToolTip="{DynamicResource 'Test'}" 
                         Command="{Binding CmdTest}">

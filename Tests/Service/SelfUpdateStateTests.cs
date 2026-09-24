@@ -3,6 +3,7 @@ using System.IO;
 using _1RM;
 using _1RM.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Tests.Service
 {

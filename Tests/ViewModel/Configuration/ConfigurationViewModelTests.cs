@@ -1,123 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using _1RM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using _1RM.Model;
-using _1RM.Model.DAO;
-using _1RM.Model.Protocol;
-using _1RM.Resources.Icons;
 using _1RM.Service;
-using _1RM.Service.DataSource;
-using _1RM.View.Settings;
-using Shawn.Utils.Interface;
-using Shawn.Utils.Wpf.Image;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Tests.ViewModel.Configuration
 {
-    [TestClass()]
+    [TestClass]
     public class ConfigurationViewModelTests
     {
-        private DataService _dataService = null!;
-        private _1RM.Service.Configuration _cfg = null!;
-        private ConfigurationService _configurationService = null!;
-        private RDP _rdp = null!;
-        private SSH _ssh = null!;
-        private VNC _vnc = null!;
-        private LocalApp _app = null!;
-        private string _ppkPath = "";
-
-        [TestMethod()]
+        [TestMethod]
         public void ConfigurationViewModelTest()
         {
-            UriParser.Register(new GenericUriParser(GenericUriParserOptions.GenericAuthority), "pack", -1);
-
-            Init();
-            _dataService.Database_OpenConnection(DatabaseType.Sqlite, DbExtensions.GetSqliteConnectionString(AppPathHelper.Instance.SqliteDbDefaultPath));
-            Assert.IsTrue(_dataService.Database_SelfCheck() == EnumDbStatus.OK);
-            _dataService.Database_InsertServer(_rdp);
-            _dataService.Database_InsertServer(_ssh);
-            _dataService.Database_InsertServer(_vnc);
-            _dataService.Database_InsertServer(_app);
-            _dataService.Database_CloseConnection();
-
-            var gd = new GlobalData(_configurationService);
-            var ctx = new DataSourceService(new ProtocolConfigurationService(), gd);
-
-
-
-            if (File.Exists(AppPathHelper.Instance.ProfileJsonPath))
-                File.Delete(AppPathHelper.Instance.ProfileJsonPath);
-            _configurationService.DataSource.LocalDataSourceConfig = AppPathHelper.Instance.SqliteDbDefaultPath;
-            ctx.InitSqliteDb(_configurationService.DataSource.LocalDataSourceConfig, new DataService());
-            SettingsPageViewModel vm = new SettingsPageViewModel(ctx, gd);
-            vm.GenRsa(_ppkPath);
-            vm.CleanRsa().Wait();
-        }
-
-
-        public void MockData()
-        {
-            var r = new Random(DateTime.Now.Millisecond);
-            _rdp = new RDP()
-            {
-                DisplayName = "RDP test",
-                UserName = "username",
-                Password = "password",
-                Address = "123.123.123.123",
-                IconBase64 = ServerIcons.Instance.Icons[r.Next(0, ServerIcons.Instance.Icons.Count)].ToBase64(),
-                Tags = new List<string>() { "t1", "t2", "rdp" },
+            TestInit.Init();
+            var databasePath = Path.Combine(AppPathHelper.Instance.BaseDirPath, "isolated.db");
+            var configuration = new _1RM.Service.Configuration {
+                SqliteDatabasePath = databasePath, DatabaseCheckPeriod = 73, DatabaseReconnectPeriod = 121
             };
-            _ssh = new SSH()
-            {
-                DisplayName = "Ssh test",
-                UserName = "username",
-                Password = "password",
-                Address = "123.123.123.123",
-                PrivateKey = "PrivateKey",
-                IconBase64 = ServerIcons.Instance.Icons[r.Next(0, ServerIcons.Instance.Icons.Count)].ToBase64(),
-                Tags = new List<string>() { "t1", "t2", "ssh" },
-            };
-            _vnc = new VNC()
-            {
-                DisplayName = "VNC test",
-                UserName = "username",
-                Password = "password",
-                IconBase64 = ServerIcons.Instance.Icons[r.Next(0, ServerIcons.Instance.Icons.Count)].ToBase64(),
-                Tags = new List<string>() { "t1", "t2", "vnc" },
-            };
-            _app = new LocalApp()
-            {
-                Arguments = "123",
-                DisplayName = "AppTest",
-                ExePath = "xxxx.exe",
-                IconBase64 = ServerIcons.Instance.Icons[r.Next(0, ServerIcons.Instance.Icons.Count)].ToBase64(),
-                Tags = new List<string>() { "t1", "t2" },
-            };
-        }
-
-        public void Init()
-        {
-            if (_dataService != null) return;
-            lock (this)
-            {
-                TestInit.Init();
-                if (_dataService != null) return;
-                if (Directory.Exists(nameof(ConfigurationViewModelTests)))
-                {
-                    Directory.Delete(nameof(ConfigurationViewModelTests), true);
-                }
-                Directory.CreateDirectory(nameof(ConfigurationViewModelTests));
-                _ppkPath = new FileInfo(nameof(ConfigurationViewModelTests) + "/test.ppk").FullName;
-                if (File.Exists(AppPathHelper.Instance.SqliteDbDefaultPath)) File.Delete(AppPathHelper.Instance.SqliteDbDefaultPath);
-                if (File.Exists(_ppkPath)) File.Delete(_ppkPath);
-                _dataService = new DataService();
-                _dataService.Database_OpenConnection(DatabaseType.Sqlite, DbExtensions.GetSqliteConnectionString(AppPathHelper.Instance.SqliteDbDefaultPath));
-                MockData();
-                _dataService.Database_CloseConnection();
-                _cfg = new _1RM.Service.Configuration();
-                _configurationService = new ConfigurationService(_cfg, new KeywordMatchService());
-            }
+            configuration.PinnedTags.Add("unit-test");
+            configuration.Theme.Fluent.Enabled = true;
+            var service = new ConfigurationService(new KeywordMatchService(), configuration);
+            service.Save();
+            Assert.IsTrue(File.Exists(AppPathHelper.Instance.ProfileJsonPath));
+            var loaded = _1RM.Service.Configuration.Load(AppPathHelper.Instance.ProfileJsonPath);
+            Assert.IsNotNull(loaded);
+            Assert.AreEqual(databasePath, loaded!.SqliteDatabasePath);
+            Assert.AreEqual(73, loaded.DatabaseCheckPeriod);
+            Assert.AreEqual(121, loaded.DatabaseReconnectPeriod);
+            CollectionAssert.AreEqual(configuration.PinnedTags, loaded.PinnedTags);
+            Assert.IsTrue(loaded.Theme.Fluent.Enabled);
+            var reloadedService = ConfigurationService.LoadFromAppPath(new KeywordMatchService());
+            Assert.AreEqual(databasePath, reloadedService.LocalDataSource.Path);
+            Assert.IsFalse(File.Exists(databasePath), "Saving configuration must not create/open the database.");
         }
     }
 }

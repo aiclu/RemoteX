@@ -42,7 +42,7 @@ namespace _1RM.View
         SettingsTheme,
         SettingsRunners,
     }
-    public class MainWindowViewModel : MaskLayerContainerScreenBase
+    public partial class MainWindowViewModel : MaskLayerContainerScreenBase
     {
         public DataSourceService SourceService { get; }
         public ConfigurationService ConfigurationService { get; }
@@ -63,7 +63,8 @@ namespace _1RM.View
             {
                 if (SetAndNotifyIfChanged(ref _currentView, value) || ActiveServerViewModel == null)
                 {
-                    IoC.Get<ConfigurationService>().General.ServerViewStatus = value;
+                    FluentOptions.RememberView(value.ToString(),
+                        _ => ConfigurationService.General.ServerViewStatus = value);
                     IoC.Get<ConfigurationService>().Save();
                     // When switching to TreeView, force rebuild the tree to ensure data is displayed
                     ActiveServerViewModel?.Release();
@@ -191,7 +192,9 @@ namespace _1RM.View
             _appData = appData;
             SourceService = sourceService;
             ConfigurationService = configurationService;
-            CurrentView = IoC.Get<ConfigurationService>().General.ServerViewStatus;
+            CurrentView = IsFluentPreview
+                ? (EnumServerViewStatus)Enum.Parse(typeof(EnumServerViewStatus), FluentPreferences.NormalizeView(FluentOptions.View))
+                : configurationService.General.ServerViewStatus;
         }
 
         public Action? OnMainWindowViewLoaded = null;

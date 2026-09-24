@@ -157,6 +157,9 @@ namespace _1RM.View
         {
             if (this.DataContext is MainWindowViewModel vm)
             {
+                // Keep keyboard activation on Fluent navigation and row actions.
+                if (vm.IsFluentPreview && e.Key is Key.Tab or Key.Enter or Key.Space or Key.Up or Key.Down or Key.Left or Key.Right)
+                    return;
                 if (Keyboard.FocusedElement is TextBox)
                 {
                     //SimpleLogHelper.Debug($"Current FocusedElement is " + textBox.Name);

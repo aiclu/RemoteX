@@ -1,0 +1,225 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:view="clr-namespace:_1RM.View">
+  <ControlTemplate x:Key="FluentProtocolItemTemplate" TargetType="ListBoxItem">
+    <Grid SnapsToDevicePixels="True">
+      <Border x:Name="Chrome" Background="Transparent" CornerRadius="4" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
+        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+      <Border x:Name="SelectionMark" Height="3" Margin="12,0" CornerRadius="1.5" VerticalAlignment="Bottom"
+              Background="{DynamicResource FluentAccent}" Visibility="Collapsed"/>
+    </Grid>
+    <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+      <Trigger Property="IsSelected" Value="True"><Setter Property="FontWeight" Value="SemiBold"/><Setter TargetName="SelectionMark" Property="Visibility" Value="Visible"/></Trigger>
+      <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+  <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorRowGrid" TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="view:FluentFieldLayout.Enabled" Value="True" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentGridOneRow" TargetType="Grid" BasedOn="{StaticResource GridOneRow}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Margin" Value="0,0,0,12" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="view:FluentFieldLayout.Enabled" Value="True" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorRowGridTitle" TargetType="TextBlock" BasedOn="{StaticResource EditorRowGridTitle}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,4,16,4" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorRowGridTitle2" TargetType="TextBlock" BasedOn="{StaticResource EditorRowGridTitle2}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,4,16,4" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorRowGridTitleFollowing" TargetType="TextBlock" BasedOn="{StaticResource EditorRowGridTitleFollowing}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,4,16,4" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentTextBlockTitleColumn" TargetType="TextBlock" BasedOn="{StaticResource TextBlockTitleColumn}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,4,16,4" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentBlockTitleColumn" TargetType="TextBlock" BasedOn="{StaticResource BlockTitleColumn}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,16,0,12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Width" Value="Auto" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorGroupTextBlockTitle" TargetType="TextBlock" BasedOn="{StaticResource EditorGroupTextBlockTitle}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="TextAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,16,0,12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Width" Value="Auto" />
+      </Trigger>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Margin" Value="0,4,0,8" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentEditorRowGridInput" TargetType="Grid" BasedOn="{StaticResource EditorRowGridInput}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="FluentFieldStack" TargetType="StackPanel">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Narrow" Value="True">
+        <Setter Property="view:FluentFieldLayout.Enabled" Value="True" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <ControlTemplate x:Key="FluentPageButtonTemplate" TargetType="Button">
+    <Border x:Name="Chrome" CornerRadius="6" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+      <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" RecognizesAccessKey="True" />
+    </Border>
+    <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}" />
+      </Trigger>
+      <Trigger Property="IsPressed" Value="True">
+        <Setter Property="Opacity" Value="0.7" />
+      </Trigger>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Opacity" Value="0.45" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+  <Style x:Key="FluentPageButton" TargetType="Button" BasedOn="{StaticResource ButtonPrimaryStyle}">
+    <Style.Triggers>
+      <Trigger Property="view:FluentPage.Active" Value="True">
+        <Setter Property="Template" Value="{StaticResource FluentPageButtonTemplate}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}" />
+        <Setter Property="Background" Value="{DynamicResource FluentSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+</ResourceDictionary>

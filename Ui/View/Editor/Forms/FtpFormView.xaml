@@ -8,19 +8,20 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms1:FtpFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
-        <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+        <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.Address, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                                                   Tag="e.g. 192.168.0.101"></TextBox>
                 </Grid>
-                <TextBlock Style="{StaticResource EditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                  MinWidth="50" HorizontalAlignment="Left"
                                  InputMethod.IsInputMethodEnabled="False"
@@ -31,10 +32,10 @@
         </Grid>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Availability detection'}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Availability detection'}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <CheckBox Content="{DynamicResource 'Check if address is available before connect'}" 
                               IsChecked="{Binding New.IsPingBeforeConnect}"
                               Margin="0 5 0 0"></CheckBox>
@@ -42,19 +43,19 @@
             </StackPanel>
         </Grid>
 
-        <!--<Grid Style="{StaticResource EditorRowGrid}" Name="GridUserName">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <!--<Grid Style="{StaticResource FluentEditorRowGrid}" Name="GridUserName">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"></TextBox>
                 </Grid>
             </StackPanel>
         </Grid>
 
-        <Grid Name="GridPwd" Style="{StaticResource EditorRowGrid}">
+        <Grid Name="GridPwd" Style="{StaticResource FluentEditorRowGrid}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <controls:PasswordInput Height="28" Password="{Binding New.Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"/>
                 </Grid>
                 <CheckBox Margin="5 0 0 0" Content="{DynamicResource 'Ask for password when open connect'}" IsChecked="{Binding New.AskPasswordWhenConnect}"></CheckBox>
@@ -64,10 +65,10 @@
         <ContentControl s:View.Model="{Binding CredentialViewModel}"></ContentControl>
         <ContentControl s:View.Model="{Binding AlternativeCredentialListViewModel}"></ContentControl>
 
-        <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sftp_startup_path}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sftp_startup_path}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.StartupPath, UpdateSourceTrigger=PropertyChanged}"
                              Tag="e.g. /home/user/Desktop"></TextBox>
                 </Grid>

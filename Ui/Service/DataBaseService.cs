@@ -14,7 +14,10 @@ namespace _1RM.Service
             // encrypt password
             if (server is ProtocolBaseWithAddressPortUserPwd s)
             {
-                s.Password = UnSafeStringEncipher.EncryptOnce(s.Password);
+                // Assigning a nonempty password switches authentication and clears PrivateKey.
+                // Never turn an empty password into ciphertext for a private-key session.
+                if (!string.IsNullOrEmpty(s.Password))
+                    s.Password = UnSafeStringEncipher.EncryptOnce(s.Password);
                 foreach (var credential in s.AlternateCredentials)
                 {
                     credential.EncryptToDatabaseLevel();

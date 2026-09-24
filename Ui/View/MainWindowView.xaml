@@ -33,7 +33,7 @@
         <KeyBinding Gesture="Ctrl+F" Command="{StaticResource CommandFocusFilter}"></KeyBinding>
     </styles:WindowChromeBase.InputBindings>
 
-    <Grid Background="{DynamicResource PrimaryMidBrush}">
+    <Grid x:Name="MainChrome" Background="{DynamicResource PrimaryMidBrush}">
         <Grid>
             <Grid.Style>
                 <Style TargetType="Grid">
@@ -66,9 +66,18 @@
             </Grid>
 
             <!-- System Button Area -->
-            <StackPanel Grid.Row="0"
+            <StackPanel x:Name="ChromeButtons" Grid.Row="0"
                         Orientation="Horizontal" HorizontalAlignment="Right">
                 <Grid Height="35" VerticalAlignment="Top" Margin="0 0 4 0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFluentPreview}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <TextBox Width="150" Height="25" FontSize="12"
                              attachProperty:FocusExtension.IsFocused="{Binding MainFilterIsFocused}"
                              attachProperty:TextBoxAttachProperty.CaretIndex="{Binding MainFilterCaretIndex, UpdateSourceTrigger=PropertyChanged}"
@@ -120,7 +129,10 @@
                     </TextBox>
                 </Grid>
 
-                <Grid Width="45" Height="35" Margin="0" VerticalAlignment="Top">
+                <Grid x:Name="MainMenuChrome" Width="45" Height="35" Margin="0" VerticalAlignment="Top" IsVisibleChanged="MainMenuChrome_OnIsVisibleChanged">
+                    <Grid.Style><Style TargetType="Grid"><Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFluentPreview}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                    </Style.Triggers></Style></Grid.Style>
                     <CheckBox Name="CbPopForMenu" Width="45" Height="35" VerticalAlignment="Top" Margin="0">
                         <CheckBox.Template>
                             <ControlTemplate>
@@ -170,6 +182,8 @@
                        PlacementTarget="{Binding ElementName=CbPopForMenu}">
                     <Border CornerRadius="{DynamicResource DefaultCornerRadius}" Background="{DynamicResource PrimaryDarkBrush}">
                         <StackPanel Orientation="Vertical" MinWidth="138">
+                            <MenuItem Header="{DynamicResource FluentPreview}" IsCheckable="True" IsChecked="{Binding IsFluentPreview, Mode=TwoWay}"/>
+                            <Separator/>
                             <MenuItem Header="{DynamicResource Options}" Command="{Binding CmdGoSysOptionsPage}">
                                 <MenuItem.Icon>
                                     <Path Width="10" Height="10" UseLayoutRounding="True" Data="{StaticResource GeometrySetting}" Fill="{DynamicResource PrimaryTextBrush}" Stretch="Uniform"/>
@@ -537,7 +551,7 @@
                     </Style>
                 </Grid.Style>
 
-                <ContentControl s:View.Model="{Binding ActiveServerViewModel}"/>
+                <view:FluentWorkspace/>
 
 
                 <ContentControl s:View.Model="{Binding SettingViewModel}">

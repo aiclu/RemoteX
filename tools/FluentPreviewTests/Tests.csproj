@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><TargetFramework>net9.0-windows</TargetFramework><UseWPF>true</UseWPF><Nullable>enable</Nullable><IsPackable>false</IsPackable><NuGetAudit>false</NuGetAudit></PropertyGroup>
+ <ItemGroup>
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0"/>
+  <PackageReference Include="MSTest.TestAdapter" Version="2.2.7"/>
+  <PackageReference Include="MSTest.TestFramework" Version="2.2.7"/>
+  <Reference Include="RemoteX"><HintPath>../../Ui/bin/FluentDialogsTest/RemoteX.dll</HintPath></Reference>
+  <Reference Include="Stylet"><HintPath>../../Ui/bin/FluentDialogsTest/Stylet.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils.WpfResources"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.WpfResources.dll</HintPath></Reference>
+  <Compile Include="../../Tests/ViewModel/FluentPageTests.cs" Link="FluentPageTests.cs"/>
+  <Compile Include="../../Tests/ViewModel/FluentMenuTests.cs" Link="FluentMenuTests.cs"/>
+  <Compile Include="../../Tests/ViewModel/FluentLauncherMetricsTests.cs" Link="FluentLauncherMetricsTests.cs"/>
+  <Compile Include="../../Tests/ViewModel/FluentPreferencesTests.cs" Link="FluentPreferencesTests.cs"/>
+ </ItemGroup>
+</Project>

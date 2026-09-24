@@ -14,11 +14,12 @@
                 xmlns:serverView="clr-namespace:_1RM.View.ServerView"
                 xmlns:dao="clr-namespace:_1RM.Service.DataSource.DAO"
                 xmlns:locality="clr-namespace:_1RM.Service.Locality"
-                mc:Ignorable="d"
+                mc:Ignorable="d" view:FluentPage.Scope="True"
                 d:DataContext="{d:DesignInstance serverView:ServerListPageViewModel}"
                 d:DesignHeight="450" d:DesignWidth="800">
     <serverView:ServerViewBase.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentServerViews.xaml"/></ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Key="ServerListItemSource" 
                                   Source="{Binding VmServerList}"
                                   Filter="ServerListItemSource_OnFilter">
@@ -54,6 +55,27 @@
                                                   SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Grid>
                             <ControlTemplate.Triggers>
+                                <Trigger Property="view:FluentWorkspace.IsPreview" Value="True">
+                                    <Setter TargetName="SelectedIndicator" Property="Opacity" Value="0.10"/>
+                                    <Setter TargetName="SelectedIndicator" Property="CornerRadius" Value="4"/>
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="view:FluentWorkspace.IsPreview" Value="True"/>
+                                        <Condition Property="IsMouseOver" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="GridContainer" Property="Background" Value="{DynamicResource PrimaryLightBrush}"/>
+                                    <Setter TargetName="GridContainer" Property="CornerRadius" Value="6"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="view:FluentWorkspace.IsPreview" Value="True"/>
+                                        <Condition Property="IsKeyboardFocusWithin" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="GridContainer" Property="BorderBrush" Value="{DynamicResource AccentMidBrush}"/>
+                                    <Setter TargetName="GridContainer" Property="BorderThickness" Value="1"/>
+                                    <Setter TargetName="GridContainer" Property="CornerRadius" Value="6"/>
+                                </MultiTrigger>
                                 <!-- VSCode-like selected: faint accent fill + 3px accent left bar -->
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter TargetName="SelectedIndicator" Property="Visibility" Value="Visible"/>
@@ -72,7 +94,7 @@
 
             <DataTemplate x:Key="DataTemplateForServerCards" DataType="view:ProtocolBaseViewModel">
                 <Grid Visibility="{Binding IsVisible, Converter={StaticResource ConverterBool2Visible}}"
-                      Height="164" Width="165">
+                      Style="{StaticResource FluentCardCell}">
                     <Grid.InputBindings>
                         <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding CmdConnServer}"></MouseBinding>
                         <MouseBinding MouseAction="RightClick" Command="{Binding CmdEditServer}"></MouseBinding>
@@ -103,6 +125,15 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
+            <DataTemplate x:Key="FluentListTemplate">
+                <Grid Visibility="{Binding IsVisible, Converter={StaticResource ConverterBool2Visible}}">
+                    <Grid.InputBindings>
+                        <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding CmdConnServer}"/>
+                        <MouseBinding MouseAction="RightClick" Command="{Binding CmdEditServer}"/>
+                    </Grid.InputBindings>
+                    <view:FluentConnectionRow/>
+                </Grid>
+            </DataTemplate>
             <Style x:Key="ServerListStyle" TargetType="ListBox">
                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                 <Setter Property="ItemTemplate" Value="{StaticResource DataTemplateForServerList}"></Setter>
@@ -125,6 +156,10 @@
                 </Setter>
 
                 <Style.Triggers>
+                    <Trigger Property="view:FluentWorkspace.IsPreview" Value="True">
+                        <Setter Property="ItemTemplate" Value="{StaticResource FluentListTemplate}"/>
+                        <Setter Property="Margin" Value="0"/>
+                    </Trigger>
                     <DataTrigger Binding="{Binding CurrentViewInListPage}" Value="{x:Static view:EnumServerViewStatus.Card}">
                         <Setter Property="ItemsPanel">
                             <Setter.Value>
@@ -143,6 +178,12 @@
                 </Style.Triggers>
             </Style>
             <serverView:NameMaxWidthConverter x:Key="NameMaxWidthConverter" />
+            <Style x:Key="ClassicOnboarding" TargetType="Border">
+                <Setter Property="Visibility" Value="{Binding IsAddToolTipShow, Converter={StaticResource ConverterBool2Visible}}"/>
+                <Style.Triggers>
+                    <Trigger Property="view:FluentWorkspace.IsPreview" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger>
+                </Style.Triggers>
+            </Style>
             <serverView:NoteMaxWidthConverter x:Key="NoteMaxWidthConverter" />
         </ResourceDictionary>
     </serverView:ServerViewBase.Resources>
@@ -153,10 +194,29 @@
 
 
     <Grid Background="{DynamicResource PrimaryMidBrush}" Grid.IsSharedSizeScope="True">
-        <Grid Margin="0 21 0 0" Background="{DynamicResource BackgroundBrush}">
+        <Grid Background="{DynamicResource BackgroundBrush}">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Margin" Value="0,21,0,0"/>
+                    <Style.Triggers>
+                        <Trigger Property="view:FluentWorkspace.IsPreview" Value="True"><Setter Property="Margin" Value="0"/></Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="*" MinHeight="300"></RowDefinition>
+                <RowDefinition Height="*">
+                    <RowDefinition.Style>
+                        <Style TargetType="RowDefinition">
+                            <Setter Property="MinHeight" Value="300"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=serverView:ServerViewBase}, Path=(view:FluentWorkspace.IsPreview)}" Value="True">
+                                    <Setter Property="MinHeight" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </RowDefinition.Style>
+                </RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
 
@@ -272,6 +332,9 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentWorkspace.IsPreview)}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsAddToolTipShow}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
@@ -680,6 +743,9 @@
                         <Style TargetType="Grid">
                             <Setter Property="Opacity" Value="0.9"></Setter>
                             <Style.Triggers>
+                                <Trigger Property="view:FluentWorkspace.IsPreview" Value="True">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </Trigger>
                                 <DataTrigger Binding="{Binding SelectedServerViewModel}" Value="{x:Null}">
                                     <Setter Property="Opacity" Value="0"></Setter>
                                 </DataTrigger>
@@ -704,7 +770,7 @@
 
 
             <!-- tooltip for how to add -->
-            <Border Grid.Row="1" HorizontalAlignment="Right" Visibility="{Binding IsAddToolTipShow, Converter={StaticResource ConverterBool2Visible}}">
+            <Border Grid.Row="1" HorizontalAlignment="Right" Style="{StaticResource ClassicOnboarding}">
                 <StackPanel>
                     <Path Fill="{DynamicResource BackgroundTextBrush}" 
                           Margin="25 10 30 5" Width="50" HorizontalAlignment="Right"
@@ -729,7 +795,7 @@
 
             <Border Grid.Row="1" HorizontalAlignment="Left" MinHeight="100" MinWidth="100" 
                     Margin="10 0 0 0"
-                    Visibility="{Binding IsAddToolTipShow, Converter={StaticResource ConverterBool2Visible}}">
+                    Style="{StaticResource ClassicOnboarding}">
                 <StackPanel>
                     <Path Fill="{DynamicResource BackgroundTextBrush}" 
                           Margin="80 10 30 5" Width="60" HorizontalAlignment="Left"
@@ -777,6 +843,13 @@
                                     </BeginStoryboard>
                                 </DataTrigger.ExitActions>
                             </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentWorkspace.IsPreview)}" Value="True"/>
+                                    <Condition Binding="{Binding IsAnySelected}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
@@ -818,6 +891,13 @@
 
         <!-- tags list -->
         <Grid VerticalAlignment="Top">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <Trigger Property="view:FluentWorkspace.IsPreview" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Border BorderThickness="0 0 0 1" BorderBrush="{DynamicResource AccentMidBrush}" Background="{DynamicResource PrimaryTextBrush}" Height="20">
                 <Border.Effect>
                     <DropShadowEffect ShadowDepth="3" Direction="270"  Opacity="0.6" Color="Black"></DropShadowEffect>

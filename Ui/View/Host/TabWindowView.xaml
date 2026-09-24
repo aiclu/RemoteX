@@ -7,6 +7,7 @@
                        xmlns:attachProperty="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
                        xmlns:controls="clr-namespace:Shawn.Utils.Wpf.Controls;assembly=Shawn.Utils.Wpf"
                        xmlns:host="clr-namespace:_1RM.View.Host"
+                       xmlns:view="clr-namespace:_1RM.View" host:FluentSessionAppearance.Enabled="True"
                        xmlns:s="https://github.com/canton7/Stylet"
                        xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles;assembly=Shawn.Utils.WpfResources"
                        mc:Ignorable="d"
@@ -42,6 +43,7 @@
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
+                <Trigger Property="host:FluentSessionAppearance.Active" Value="True"><Setter TargetName="WindowBorder" Property="Background" Value="{DynamicResource FluentCanvas}"/><Setter TargetName="WindowBorder" Property="BorderBrush" Value="{DynamicResource FluentStroke}"/></Trigger>
                 <Trigger Property="WindowState" Value="Maximized">
                     <!--注意修改这里后，需要修改会影响RDP模块对应的缩放分辨率计算函数的正确性，导致部分用户全屏后RDP显示出滚动条-->
                     <Setter TargetName="WindowContentGrid" Property="Margin" Value="8 8 8 8" />
@@ -53,6 +55,7 @@
     </Window.Template>
     <Window.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentSessions.xaml"/></ResourceDictionary.MergedDictionaries>
             <Thickness x:Key="TabContentBorderWithColor">5,0,5,5</Thickness>
             <Thickness x:Key="TabContentBorderWithOutColor">0,0,0,0</Thickness>
             <!--Tab header content DataTemplate-->
@@ -96,7 +99,7 @@
                                   controls:MouseMiddleClick.MouseMiddleDownParameter="{Binding Content.ConnectionId}"
                                   VerticalAlignment="Bottom">
                                 <Grid.ContextMenu>
-                                    <ContextMenu ItemsSource="{Binding Content.MenuItems}">
+                                    <ContextMenu view:FluentPage.Scope="True" ItemsSource="{Binding Content.MenuItems}">
                                         <ContextMenu.Style>
                                             <Style TargetType="{x:Type ContextMenu}">
                                                 <Setter Property="OverridesDefaultStyle" Value="True" />
@@ -107,6 +110,7 @@
                                                             <Border BorderThickness="1" BorderBrush="{DynamicResource DefaultBorderBrush}" x:Name="Border" Background="{DynamicResource PrimaryMidBrush}">
                                                                 <StackPanel ClipToBounds="True" Orientation="Vertical" IsItemsHost="True" />
                                                             </Border>
+                                                            <ControlTemplate.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter TargetName="Border" Property="CornerRadius" Value="8"/><Setter TargetName="Border" Property="Padding" Value="4"/></Trigger></ControlTemplate.Triggers>
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
@@ -115,6 +119,7 @@
                                     </ContextMenu>
                                 </Grid.ContextMenu>
                                 <Border Name="DragablzHeaderItemBorder"></Border>
+                                <Border x:Name="FluentSelectedMark" Height="3" Margin="8,0" VerticalAlignment="Bottom" Background="{DynamicResource FluentAccent}" CornerRadius="2" Visibility="Collapsed"/>
                                 <Grid Name="Trapezoid" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" 
                                       ToolTip="{Binding DisplayName, Mode=OneWay}"
                                       VerticalAlignment="Center">
@@ -162,9 +167,9 @@
                                         </Thumb.Style>
                                     </Thumb>
 
-                                    <Button Grid.Column="4" Width="13" Height="13" 
+                                    <Button Grid.Column="4"
                                             Visibility="{Binding Content.SettingsPage.TabHeaderShowReConnectButton, Converter={StaticResource ConverterBool2Visible}}"
-                                            Style="{StaticResource ButtonBarAccentStyle}"
+                                            Style="{StaticResource SessionTabButton}"
                                             Background="Transparent"
                                             attachProperty:VisionElement.Opacity="0.6"
                                             attachProperty:VisionElement.OpacityAccent="0.9"
@@ -180,9 +185,9 @@
                                         </Grid>
                                     </Button>
 
-                                    <Button Grid.Column="5" Width="13" Height="13" 
+                                    <Button Tag="SessionDanger" Grid.Column="5"
                                             Visibility="{Binding Content.SettingsPage.TabHeaderShowCloseButton, Converter={StaticResource ConverterBool2Visible}}"
-                                            Style="{StaticResource ButtonBarAccentStyle}"
+                                            Style="{StaticResource SessionTabButton}"
                                             Background="Transparent"
                                             attachProperty:VisionElement.Opacity="0.5"
                                             attachProperty:VisionElement.OpacityAccent="0.9"
@@ -228,6 +233,22 @@
                                     <Setter Property="BorderThickness" TargetName="DragablzHeaderItemBorder" Value="5 5 5 0"/>
                                     <Setter Property="BorderBrush" TargetName="DragablzHeaderItemBorder" Value="{Binding ColorHex, Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"/>
                                 </Trigger>
+                                <Trigger Property="view:FluentPage.Active" Value="True">
+                                    <Setter TargetName="DragablzHeaderItemContent" Property="Background" Value="{DynamicResource FluentCanvas}"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="CornerRadius" Value="6,6,0,0"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+                                </Trigger>
+                                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsMouseOver" Value="True"/></MultiTrigger.Conditions>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="Background" Value="{DynamicResource FluentHover}"/>
+                                </MultiTrigger>
+                                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsSelected" Value="True"/></MultiTrigger.Conditions>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="Background" Value="{DynamicResource FluentSurface}"/>
+                                    <Setter TargetName="FluentSelectedMark" Property="Visibility" Value="Visible"/>
+                                </MultiTrigger>
+                                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsKeyboardFocusWithin" Value="True"/></MultiTrigger.Conditions>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/><Setter TargetName="DragablzHeaderItemBorder" Property="BorderThickness" Value="1"/>
+                                </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -294,7 +315,7 @@
                             </StackPanel>
 
                             <Grid Width="20" Height="20" VerticalAlignment="Center">
-                                <Image Source="/Resources/Image/Logo/logo32.png"></Image>
+                                <Image Source="/RemoteX;component/Resources/Image/Logo/logo32.png"></Image>
                             </Grid>
                         </StackPanel>
                     </Setter.Value>
@@ -322,7 +343,7 @@
 
                                 <Button Grid.Column="0" Width="25" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Center"
                                         Visibility="{Binding SettingsPage.LauncherSettingViewModel.LauncherEnabled, Converter={StaticResource ConverterBool2Visible}}"
-                                        Style="{StaticResource ButtonBarPrimaryStyle}"
+                                        Style="{StaticResource SessionChromeButton}"
                                         attachProperty:VisionElement.Opacity="0.5"
                                         attachProperty:VisionElement.OpacityAccent="0.9"
                                         HorizontalAlignment="Left" Command="{Binding CmdInvokeLauncher}">
@@ -376,7 +397,7 @@
                                         <Grid x:Name="PART_ItemsHolder" Margin="0" />
                                     </Grid>
                                 </Border>
-                                <Grid Grid.Column="0" Grid.Row="0" Margin="0" x:Name="HeaderContainerGrid" Visibility="{TemplateBinding IsHeaderPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Grid Grid.Column="0" Grid.Row="0" Margin="0" view:FluentPage.Scope="True" x:Name="HeaderContainerGrid" Visibility="{TemplateBinding IsHeaderPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
@@ -459,7 +480,7 @@
 
 
         <!-- Function buttons -->
-        <StackPanel VerticalAlignment="Top">
+        <StackPanel x:Name="SessionWindowButtons" view:FluentPage.Scope="True" VerticalAlignment="Top">
             <StackPanel.Style>
                 <Style TargetType="StackPanel">
                     <Setter Property="Orientation" Value="Horizontal" />
@@ -472,7 +493,7 @@
                 </Style>
             </StackPanel.Style>
             <StackPanel.ContextMenu>
-                <ContextMenu StaysOpen="False">
+                <ContextMenu view:FluentPage.Scope="True" StaysOpen="False">
                     <CheckBox Content="{DynamicResource 'Place the close button on the left side to prevent accidental touches'}" IsChecked="{Binding SettingsPage.GeneralSettingViewModel.TabWindowCloseButtonOnLeft}"></CheckBox>
                 </ContextMenu>
             </StackPanel.ContextMenu>
@@ -522,7 +543,7 @@
                     Width="45" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Top" Background="Transparent"
                     >
                 <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource ButtonBarPrimaryStyle}">
+                    <Style TargetType="Button" BasedOn="{StaticResource SessionChromeButton}">
                         <Setter Property="Visibility" Value="Visible"></Setter>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding WindowResizeMode}" Value="NoResize">
@@ -540,10 +561,10 @@
                 </Grid>
             </Button>
 
-            <Button ToolTip="{DynamicResource 'Close all'}" 
+            <Button Tag="SessionDanger" ToolTip="{DynamicResource 'Close all'}"
                     Command="{Binding CmdCloseAll}" 
                     Width="45" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Top" Background="Transparent"
-                    Style="{StaticResource ButtonBarPrimaryStyle}"
+                    Style="{StaticResource SessionChromeButton}"
                     attachProperty:VisionElement.ForegroundAccent="White"
                     attachProperty:VisionElement.BackgroundAccent="Red"
                     attachProperty:VisionElement.ForegroundOnMouseDown="White"
@@ -557,7 +578,7 @@
 
             <Button Command="{Binding CmdGoMinimize}" 
                     Width="45" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Top" Background="Transparent"
-                    Style="{StaticResource ButtonBarPrimaryStyle}">
+                    Style="{StaticResource SessionChromeButton}">
                 <Rectangle Width="10" Height="1" Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" StrokeThickness="0.5" />
             </Button>
 
@@ -568,7 +589,7 @@
                     <MouseBinding Gesture="RightClick" Command="{Binding CmdGoMaximizeF11}" />
                 </Button.InputBindings>
                 <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource ButtonBarPrimaryStyle}">
+                    <Style TargetType="Button" BasedOn="{StaticResource SessionChromeButton}">
                         <Setter Property="Visibility" Value="Visible"></Setter>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding WindowResizeMode}" Value="NoResize">
@@ -614,10 +635,10 @@
                 </Grid>
             </Button>
 
-            <Button ToolTip="{DynamicResource Close}" 
+            <Button Tag="SessionDanger" ToolTip="{DynamicResource Close}"
                     Width="45" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Top" Background="Transparent"
                     Command="{Binding CmdClose}" 
-                    Style="{StaticResource ButtonBarPrimaryStyle}"
+                    Style="{StaticResource SessionChromeButton}"
                     attachProperty:VisionElement.ForegroundAccent="White"
                     attachProperty:VisionElement.BackgroundAccent="Red"
                     attachProperty:VisionElement.ForegroundOnMouseDown="White"

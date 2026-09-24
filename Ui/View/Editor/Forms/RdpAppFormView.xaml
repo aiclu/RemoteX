@@ -11,20 +11,21 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:RdpAppFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
-        <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+        <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
         <ContentControl s:View.Model="{Binding HostViewModel}"></ContentControl>
 
-        <!--<Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.Address, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="e.g. 192.168.0.101"></TextBox>
                 </Grid>
-                <TextBlock Style="{StaticResource EditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox MinWidth="50" 
                              Text="{Binding New.Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              HorizontalAlignment="Left"
@@ -35,19 +36,19 @@
             </StackPanel>
         </Grid>-->
 
-        <!--<Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"></TextBox>
                 </Grid>
             </StackPanel>
         </Grid>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <controls1:PasswordInput Height="28" Password="{Binding New.Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"></controls1:PasswordInput>
                 </Grid>
                 <CheckBox Margin="5 0 0 0" Content="{DynamicResource 'Ask for password when open connect'}" IsChecked="{Binding New.AskPasswordWhenConnect}"></CheckBox>
@@ -57,10 +58,10 @@
         <ContentControl s:View.Model="{Binding CredentialViewModel}"></ContentControl>
         <ContentControl s:View.Model="{Binding AlternativeCredentialListViewModel}"></ContentControl>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_remote_app_name}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_remote_app_name}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.RemoteApplicationName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="{DynamicResource server_editor_remote_app_name_tag}"
                              ToolTip="{DynamicResource server_editor_remote_app_name_tag}"
@@ -69,10 +70,10 @@
             </StackPanel>
         </Grid>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_remote_app_fullname}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_remote_app_fullname}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.RemoteApplicationProgram, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="{DynamicResource server_editor_remote_app_fullname_tag}"
                              ToolTip="{DynamicResource server_editor_remote_app_fullname_tag}"></TextBox>
@@ -82,8 +83,8 @@
 
         <Grid Opacity="0.7" Margin="0 0 0 20">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource TextBlockBase}" TextWrapping="Wrap" Foreground="{DynamicResource BackgroundTextBrush}" Text="Note: You can not register a RemoteApp directly, you have to config it on the server side first, or you will get the error 'The following RemoteApp program is not in the list of authorized programs'."></TextBlock>
                         <TextBlock Style="{StaticResource TextBlockBase}">
@@ -97,10 +98,10 @@
         </Grid>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sounds}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sounds}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <Grid.Resources>
                         <forms:ConverterEAudioRedirectionMode x:Key="ConverterEAudioRedirectionMode" />
                     </Grid.Resources>
@@ -115,10 +116,10 @@
         </Grid>
 
 
-        <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.AudioRedirectionMode, Converter={StaticResource ConverterEqual2Visible}, ConverterParameter={x:Static protocol:EAudioRedirectionMode.RedirectToLocal}}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sound_quality}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.AudioRedirectionMode, Converter={StaticResource ConverterEqual2Visible}, ConverterParameter={x:Static protocol:EAudioRedirectionMode.RedirectToLocal}}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_sound_quality}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <Grid.Resources>
                         <forms:ConverterEAudioQualityMode x:Key="ConverterEAudioQualityMode" />
                     </Grid.Resources>
@@ -135,12 +136,12 @@
 
         <Grid>
             <StackPanel>
-                <Grid Style="{StaticResource EditorRowGrid}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                <Grid Style="{StaticResource FluentEditorRowGrid}">
+                    <StackPanel Style="{StaticResource FluentFieldStack}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                        Text="{DynamicResource 'Additional settings'}" VerticalAlignment="Top" 
                                        Margin="0 7 30 0"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}">
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}">
                             <Border>
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -204,10 +205,10 @@
                         </TextBlock>
                     </StackPanel>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGrid}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Helper'}"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}">
+                <Grid Style="{StaticResource FluentEditorRowGrid}">
+                    <StackPanel Style="{StaticResource FluentFieldStack}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Helper'}"></TextBlock>
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}">
                             <StackPanel Orientation="Horizontal">
                                 <Button Click="ButtonPreviewRdpFile_OnClick" Margin="0 0 5 0" Content="{DynamicResource 'Preview rdp file'}"></Button>
                             </StackPanel>

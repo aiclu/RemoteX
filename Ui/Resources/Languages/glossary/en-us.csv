@@ -393,3 +393,17 @@ The previous update did not complete. The current version is still running.;The 
 Administrator permission was not granted.;Administrator permission was not granted.
 Updater log;Updater log
 Update rollback failed. The old version may need manual recovery.;Update rollback failed. The old version may need manual recovery.
+FluentPreview;Fluent preview
+FluentAppearance;Appearance
+FluentConnections;Connections
+FluentAllConnections;All connections
+FluentSystem;Follow system
+FluentLight;Light
+FluentDark;Dark
+FluentClassic;Classic appearance
+FluentSort;Sort
+FluentMore;More
+FluentTags;Manage tags
+FluentClassicThemeHint;The theme and custom colors below affect classic appearance only. Font settings apply to both appearances.
+FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
+FluentSearchConnections;Search connections

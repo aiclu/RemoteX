@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:_1RM.View"
                     xmlns:controls="clr-namespace:_1RM.Controls">
 
     <Style x:Key="GridOneRow" TargetType="Grid">
@@ -32,11 +33,26 @@
                 <DropShadowEffect BlurRadius="10" Opacity="0.5" ShadowDepth="5"></DropShadowEffect>
             </Setter.Value>
         </Setter>-->
-    </Style>
+    <Style.Triggers><Trigger Property="fluent:FluentPage.Active" Value="True"><Setter Property="Width" Value="Auto"/><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="Margin" Value="0,8"/><Setter Property="MinWidth" Value="0"/></Trigger></Style.Triggers></Style>
 
     <Style TargetType="controls:BindableAvalonEditor">
         <Setter Property="MinWidth" Value="100"></Setter>
         <Setter Property="MaxWidth" Value="290"></Setter>
         <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+    </Style>
+
+    <Style x:Key="FluentTextBlockTitleColumn" TargetType="TextBlock" BasedOn="{StaticResource TextBlockTitleColumn}">
+        <Style.Triggers>
+            <Trigger Property="fluent:FluentPage.Active" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Margin" Value="0,4,16,4"/>
+            </Trigger>
+            <Trigger Property="fluent:FluentPage.Narrow" Value="True">
+                <Setter Property="Width" Value="Auto"/>
+                <Setter Property="Margin" Value="0,4,0,8"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

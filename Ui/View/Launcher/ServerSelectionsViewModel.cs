@@ -217,6 +217,10 @@ namespace _1RM.View.Launcher
             if (this.View is not ServerSelectionsView view) return LauncherWindowViewModel.MAX_WINDOW_HEIGHT;
             if (IoC.TryGet<LauncherWindowView>()?.IsClosing != false) return LauncherWindowViewModel.MAX_WINDOW_HEIGHT;
             double ret = LauncherWindowViewModel.MAX_WINDOW_HEIGHT;
+            if (IoC.Get<ConfigurationService>().Theme.Fluent?.Enabled == true)
+                return IoC.Get<LauncherWindowViewModel>().FluentMetrics.HeightFor(
+                    view.GridActionsList.Visibility == Visibility.Visible ? Actions.Count : VmServerList.Count,
+                    view.GridActionsList.Visibility == Visibility.Visible);
             // show server list
             if (view.GridActionsList.Visibility != Visibility.Visible)
             {

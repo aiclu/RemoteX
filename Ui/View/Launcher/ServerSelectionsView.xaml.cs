@@ -206,7 +206,7 @@ namespace _1RM.View.Launcher
             IoC.Get<LauncherWindowViewModel>().ReSetWindowHeight();
 
             var sb = new Storyboard();
-            sb.AddSlideFromLeft(0.3, LauncherWindowViewModel.LAUNCHER_LIST_AREA_WIDTH);
+            sb.AddSlideFromLeft(0.3, IoC.Get<LauncherWindowViewModel>().GridMainWidth);
             sb.Begin(GridActionsList);
         }
 
@@ -215,7 +215,7 @@ namespace _1RM.View.Launcher
         {
             if (IoC.Get<LauncherWindowViewModel>().View is LauncherWindowView { IsClosing: true }) return;
             var sb = new Storyboard();
-            sb.AddSlideToLeft(0.3, LauncherWindowViewModel.LAUNCHER_LIST_AREA_WIDTH);
+            sb.AddSlideToLeft(0.3, IoC.Get<LauncherWindowViewModel>().GridMainWidth);
             sb.Completed += (o, args) =>
             {
                 GridActionsList.Visibility = Visibility.Hidden;

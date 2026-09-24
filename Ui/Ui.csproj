@@ -10,7 +10,7 @@
         <UseWindowsForms>True</UseWindowsForms>
         <RootNamespace>_1RM</RootNamespace>
         <AssemblyName>RemoteX</AssemblyName>
-        <Configurations>Debug;Release;StoreDebug;StoreRelease;ReleaseNet48;ReleaseNet6</Configurations>
+        <Configurations>Debug;Release;StoreDebug;StoreRelease</Configurations>
         <ApplicationManifest>app.manifest</ApplicationManifest>
 
         <ApplicationIcon Condition="$(Configuration.Contains('Debug'))">LOGO_D.ico</ApplicationIcon>
@@ -37,35 +37,11 @@
 
 
 
-    <PropertyGroup Condition="!$(Configuration.Contains('Net6')) and !$(Configuration.Contains('Net48'))">
+    <PropertyGroup>
         <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
         <!-- RUST_SSH gates the Rust-backed SSH terminal (net9 only). -->
         <DefineConstants>$(DefineConstants);RUST_SSH</DefineConstants>
     </PropertyGroup>
-
-    <PropertyGroup Condition="$(Configuration.Contains('Net6'))">
-        <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-    </PropertyGroup>
-
-
-
-
-    <PropertyGroup Condition="$(Configuration.Contains('Net48'))">
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <ItemGroup Condition="$(Configuration.Contains('Net48'))">
-        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.0" />
-        <!-- 
-		<PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.0" />
-		二选一
-		<Reference Include="System.Runtime.WindowsRuntime">
-			<HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5\System.Runtime.WindowsRuntime.dll</HintPath>
-		</Reference>
-		<Reference Include="Windows">
-			<HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.19041.0\Windows.winmd</HintPath>
-			<IsWinMDFile>true</IsWinMDFile>
-		</Reference>-->
-    </ItemGroup>
 
 
     <PropertyGroup>
@@ -172,25 +148,17 @@
     </ItemGroup>
 
     <!-- Rust-backed SSH terminal: only compiled into net9 (Debug/Release/Store*) builds. -->
-    <ItemGroup Condition="!$(Configuration.Contains('Net6')) and !$(Configuration.Contains('Net48'))">
+    <ItemGroup>
         <PackageReference Include="EasyWindowsTerminalControl" Version="1.0.38" />
     </ItemGroup>
 
     <!-- Rust SSH core dll + related code (net9 only). -->
-    <ItemGroup Condition="!$(Configuration.Contains('Net6')) and !$(Configuration.Contains('Net48'))">
+    <ItemGroup>
         <None Include="..\ssh-rust\target\release\ssh_rust.dll" Condition="Exists('..\ssh-rust\target\release\ssh_rust.dll')">
             <Link>ssh_rust.dll</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>false</Visible>
         </None>
-    </ItemGroup>
-    <!-- Exclude the Rust terminal host XAML from net6/net48 builds (its code-behind
-         and TerminalControl dependency only exist under RUST_SSH). The .cs files
-         under Service\RustSsh and RustTerminalHost.xaml.cs are self-gated with
-         `#if RUST_SSH` so they compile to empty on net6/net48. -->
-    <ItemGroup Condition="$(Configuration.Contains('Net6')) or $(Configuration.Contains('Net48'))">
-        <Page Remove="View\Host\ProtocolHosts\RustTerminalHost.xaml" />
-        <Compile Remove="View\Host\ProtocolHosts\RustTerminalHost.xaml.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -387,6 +355,23 @@
         <Page Update="Resources\Theme\Markdown.xaml">
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
             <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Resources\Theme\FluentServerViews.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+        <Page Update="Resources\Theme\FluentSessions.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
+        <Page Update="Resources\Theme\FluentPreview.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Resources\Theme\FluentForms.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Resources\Theme\FluentDialogs.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="View\FluentWorkspace.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="View\FluentConnectionRow.xaml">
+            <Generator>MSBuild:Compile</Generator>
         </Page>
         <Page Update="View\AboutPageView.xaml">
             <SubType>Designer</SubType>

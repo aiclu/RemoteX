@@ -1,0 +1,197 @@
+<UserControl x:Class="_1RM.View.FluentWorkspace"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:s="https://github.com/canton7/Stylet"
+ xmlns:local="clr-namespace:_1RM.View"
+ xmlns:locality="clr-namespace:_1RM.Service.Locality"
+ xmlns:attach="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
+ UseLayoutRounding="True">
+ <UserControl.Resources>
+  <ResourceDictionary>
+   <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="pack://application:,,,/RemoteX;component/Resources/Theme/FluentPreview.xaml"/></ResourceDictionary.MergedDictionaries>
+   <BooleanToVisibilityConverter x:Key="BoolVisibility"/>
+  </ResourceDictionary>
+ </UserControl.Resources>
+ <Grid x:Name="Shell">
+  <Grid.ColumnDefinitions><ColumnDefinition x:Name="NavColumn" Width="0"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+  <Border x:Name="Sidebar" Padding="12" Visibility="Collapsed" Background="{DynamicResource FluentCanvas}">
+   <DockPanel>
+    <StackPanel DockPanel.Dock="Bottom">
+     <Button Style="{StaticResource FluentNavButton}" Command="{Binding CmdGoSysOptionsPage}" ToolTip="{DynamicResource Options}">
+      <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE713;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="SettingsLabel" Text="{DynamicResource Options}" Margin="12,0,0,0" VerticalAlignment="Center"/></StackPanel>
+     </Button>
+     <Button x:Name="AboutNavigation" Style="{StaticResource FluentNavButton}" Command="{Binding CmdGoAboutPage}" AutomationProperties.Name="{DynamicResource About}" AutomationProperties.HelpText="{Binding AboutViewModel.NewVersion}">
+      <Button.ToolTip><StackPanel><TextBlock Text="{DynamicResource About}"/><TextBlock Text="{Binding AboutViewModel.NewVersion}"/></StackPanel></Button.ToolTip>
+      <StackPanel Orientation="Horizontal">
+       <Grid Width="16" Height="16" VerticalAlignment="Center">
+        <TextBlock Text="&#xE946;" Style="{StaticResource FluentNavigationIcon}"/>
+        <Border x:Name="AboutUpdateBadge" Width="8" Height="8" CornerRadius="4" Background="{DynamicResource FluentAccent}" BorderBrush="{DynamicResource FluentCanvas}" BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-3,-3,0" IsHitTestVisible="False">
+         <Border.Style><Style TargetType="Border"><Style.Triggers>
+          <DataTrigger Binding="{Binding AboutViewModel.NewVersion}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+          <DataTrigger Binding="{Binding AboutViewModel.NewVersion}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+         </Style.Triggers></Style></Border.Style>
+        </Border>
+       </Grid>
+       <TextBlock x:Name="AboutLabel" Text="{DynamicResource About}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+      </StackPanel>
+     </Button>
+     <Button Style="{StaticResource FluentNavButton}" Click="OpenMenu" ToolTip="{DynamicResource FluentAppearance}">
+      <Button.ContextMenu>
+       <ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+        <MenuItem Header="{DynamicResource FluentSystem}" Command="{Binding CmdFluentTheme}" CommandParameter="System">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding FluentTheme}" Value="System"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+        <MenuItem Header="{DynamicResource FluentLight}" Command="{Binding CmdFluentTheme}" CommandParameter="Light">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding FluentTheme}" Value="Light"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+        <MenuItem Header="{DynamicResource FluentDark}" Command="{Binding CmdFluentTheme}" CommandParameter="Dark">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding FluentTheme}" Value="Dark"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+        <Separator/>
+        <MenuItem Header="{DynamicResource FluentClassic}" Command="{Binding CmdClassicAppearance}"/>
+       </ContextMenu>
+      </Button.ContextMenu>
+      <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE790;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="AppearanceLabel" Text="{DynamicResource FluentAppearance}" Margin="12,0,0,0" VerticalAlignment="Center"/></StackPanel>
+     </Button>
+    </StackPanel>
+    <Button DockPanel.Dock="Top" Style="{StaticResource FluentNavButton}" Command="{Binding ActiveServerViewModel.CmdShowMainTab}" ToolTip="{DynamicResource FluentAllConnections}">
+     <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8F1;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="ConnectionsLabel" Text="{DynamicResource FluentAllConnections}" Margin="12,0,0,0" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel>
+    </Button>
+    <ListBox x:Name="Tags" ItemsSource="{Binding ActiveServerViewModel.HeaderTags}" Background="Transparent" BorderThickness="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
+             VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
+     <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/></Style></ListBox.ItemContainerStyle>
+     <ListBox.ItemTemplate>
+      <DataTemplate>
+       <Button Style="{StaticResource FluentNavButton}" HorizontalContentAlignment="Stretch"
+               Command="{Binding DataContext.ActiveServerViewModel.CmdTagAddIncluded, RelativeSource={RelativeSource AncestorType=local:FluentWorkspace}}"
+               CommandParameter="{Binding}" ToolTip="{Binding Name}"
+               Tag="{Binding DataContext.ActiveServerViewModel.TagsPanelViewModel, RelativeSource={RelativeSource AncestorType=local:FluentWorkspace}}">
+        <Button.InputBindings>
+         <MouseBinding Gesture="Alt+LeftClick"
+                       Command="{Binding DataContext.ActiveServerViewModel.CmdTagAddExcluded, RelativeSource={RelativeSource AncestorType=local:FluentWorkspace}}"
+                       CommandParameter="{Binding}"/>
+        </Button.InputBindings>
+        <Button.ContextMenu>
+         <ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+          <MenuItem Header="{DynamicResource Rename}" Command="{Binding PlacementTarget.Tag.CmdTagRename, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+          <MenuItem Header="{DynamicResource Pin}" Command="{Binding PlacementTarget.Tag.CmdTagPin, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+          <MenuItem Header="{DynamicResource Connect}" Command="{Binding PlacementTarget.Tag.CmdTagConnect, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+          <MenuItem Header="{DynamicResource Delete}" Command="{Binding PlacementTarget.Tag.CmdTagDelete, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+         </ContextMenu>
+        </Button.ContextMenu>
+        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+       </Button>
+      </DataTemplate>
+     </ListBox.ItemTemplate>
+    </ListBox>
+   </DockPanel>
+  </Border>
+  <Grid Grid.Column="1">
+   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+   <StackPanel x:Name="Toolbar" Margin="12,4,16,8" Visibility="Collapsed">
+    <Grid>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <TextBox x:Name="Search" Style="{StaticResource FluentSearch}" Margin="0,0,8,0"
+              Text="{Binding MainFilterString, UpdateSourceTrigger=PropertyChanged}" Tag="{DynamicResource FluentSearchConnections}" ToolTip="{DynamicResource 'Search (Ctrl+F)'}"
+              attach:FocusExtension.IsFocused="{Binding MainFilterIsFocused}"
+              attach:TextBoxAttachProperty.CaretIndex="{Binding MainFilterCaretIndex, UpdateSourceTrigger=PropertyChanged}" KeyUp="SearchKeyUp"/>
+     <Button Grid.Column="1" Style="{StaticResource FluentButton}" Content="{DynamicResource Add}" Command="{Binding ActiveServerViewModel.CmdAdd}"/>
+    </Grid>
+    <WrapPanel Margin="0,4,0,0">
+     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource ListViewMode}" Click="OpenMenu" Margin="0,0,8,4">
+      <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+       <MenuItem Header="{DynamicResource ListViewMode_List}" Command="{Binding CmdToggleListView}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding CurrentView}" Value="{x:Static local:EnumServerViewStatus.List}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource ListViewMode_Card}" Command="{Binding CmdToggleCardView}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding CurrentView}" Value="{x:Static local:EnumServerViewStatus.Card}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource ListViewMode_Tree}" Command="{Binding CmdToggleTreeView}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding CurrentView}" Value="{x:Static local:EnumServerViewStatus.Tree}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+      </ContextMenu></Button.ContextMenu>
+     </Button>
+     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource FluentSort}" Click="OpenMenu" Margin="0,0,8,4">
+      <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+       <MenuItem Header="ID" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.IdAsc}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.IdAsc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↑"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource Name}" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.NameAsc}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.NameAsc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↑"/></DataTrigger>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.NameDesc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource Protocol}" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.ProtocolAsc}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.ProtocolAsc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↑"/></DataTrigger>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.ProtocolDesc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource Target}" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.AddressAsc}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.AddressAsc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↑"/></DataTrigger>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.AddressDesc}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="↓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+       <MenuItem Header="{DynamicResource Custom}" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.Custom}">
+        <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
+         <DataTrigger Binding="{Binding ServerOrderBy}" Value="{x:Static locality:EnumServerOrderBy.Custom}"><Setter Property="IsChecked" Value="True"/><Setter Property="Tag" Value="✓"/></DataTrigger>
+        </Style.Triggers></Style></MenuItem.Style>
+       </MenuItem>
+      </ContextMenu></Button.ContextMenu>
+     </Button>
+     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource FluentMore}" Click="OpenMenu" Margin="0,0,0,4">
+      <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+       <MenuItem Header="{DynamicResource import_from_json}" Command="{Binding ActiveServerViewModel.CmdImportFromJson}"/>
+       <MenuItem Header="{DynamicResource import_from_rdp_file}" Command="{Binding ActiveServerViewModel.CmdImportFromRdp}"/>
+       <MenuItem Header="{DynamicResource import_from_mremoteng_csv}" Command="{Binding ActiveServerViewModel.CmdImportFromCsv}"/>
+       <MenuItem Header="{DynamicResource import_from_sqlite_db}" Command="{Binding ActiveServerViewModel.CmdImportFromDatabase}"/>
+       <MenuItem Header="{DynamicResource Export}" Command="{Binding ActiveServerViewModel.CmdExportSelectedToJson}"/>
+       <MenuItem Header="{DynamicResource FluentTags}" Command="{Binding ActiveServerViewModel.CmdShowTagTab}"/>
+       <Separator/>
+       <MenuItem Header="{DynamicResource Exit}" Command="{Binding CmdExit}"/>
+      </ContextMenu></Button.ContextMenu>
+     </Button>
+    </WrapPanel>
+   </StackPanel>
+   <Border x:Name="ListSurface" Grid.Row="1" ClipToBounds="True">
+    <Grid>
+     <ContentControl x:Name="ServerPresenter" s:View.Model="{Binding ActiveServerViewModel}"/>
+     <Button Content="{DynamicResource Add}"
+             Command="{Binding ActiveServerViewModel.CmdAdd}" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Button.Style>
+       <Style TargetType="Button" BasedOn="{StaticResource FluentButton}">
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Style.Triggers>
+         <MultiDataTrigger>
+          <MultiDataTrigger.Conditions>
+           <Condition Binding="{Binding IsFluentPreview}" Value="True"/>
+           <Condition Binding="{Binding ActiveServerViewModel.IsAddToolTipShow}" Value="True"/>
+          </MultiDataTrigger.Conditions>
+          <Setter Property="Visibility" Value="Visible"/>
+         </MultiDataTrigger>
+        </Style.Triggers>
+       </Style>
+      </Button.Style>
+     </Button>
+    </Grid>
+   </Border>
+  </Grid>
+ </Grid>
+</UserControl>

@@ -13,6 +13,7 @@
                          SizeToContent="WidthAndHeight"
                          ShowInTaskbar="False"
                          Background="Transparent"
+                         view:FluentPage.Scope="True"
                          mc:Ignorable="d"
                          MinWidth="100"
                          MinHeight="100"
@@ -35,16 +36,16 @@
 
 
         <Border Name="BorderMainContent" Padding="10 40">
-            <StackPanel MinHeight="{x:Static view:LauncherWindowViewModel.LAUNCHER_GRID_KEYWORD_HEIGHT}">
+            <StackPanel MinHeight="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
                 <Border CornerRadius="{x:Static view:LauncherWindowViewModel.LauncherOutlineCornerRadiusObj}" Background="{DynamicResource PrimaryMidBrush}">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="10" />
                     </Border.Effect>
 
-                    <Grid Clip="{Binding GridMainClip}" 
-                          Width="{x:Static view:LauncherWindowViewModel.LAUNCHER_LIST_AREA_WIDTH}" 
+                    <Grid Clip="{Binding GridMainClip}"
+                          Width="{Binding GridMainWidth}"
                           Height="{Binding GridMainHeight}">
-                        <ContentControl Name="ServerSelectionsView" 
+                        <ContentControl Name="ServerSelectionsView"
                                         IsTabStop="False"
                                         Visibility="{Binding ServerSelectionsViewVisibility}"
                                         s:View.Model="{Binding ServerSelectionsViewModel}"
@@ -61,7 +62,7 @@
         </Border>
 
         <!--Note 显示备注-->
-        <Border Name="NoteField" Grid.Column="1" Padding="10 40" 
+        <Border Name="NoteField" Grid.Column="1" Padding="10 40"
                 Visibility="{Binding  ServerSelectionsViewModel.GridNoteVisibility}">
             <Border.Style>
                 <Style TargetType="Border">
@@ -72,8 +73,8 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <noteDisplay:NoteDisplayAndEditor Width="{Binding NoteWidth}" 
-                                              Height="{Binding GridNoteHeight}" 
+            <noteDisplay:NoteDisplayAndEditor Width="{Binding NoteWidth}"
+                                              Height="{Binding GridNoteHeight}"
                                               Server="{Binding ServerSelectionsViewModel.SelectedItem.Server, Mode=OneWay}"
                                               EditEnable="True"
                                               CloseButtonVisibility="Visible"

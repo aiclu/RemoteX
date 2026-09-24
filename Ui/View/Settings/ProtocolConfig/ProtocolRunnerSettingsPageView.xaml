@@ -9,13 +9,15 @@
              xmlns:runner="clr-namespace:_1RM.Model.ProtocolRunner"
              xmlns:controls="clr-namespace:Shawn.Utils.Wpf.Controls;assembly=Shawn.Utils.Wpf"
              d:DataContext="{d:DesignInstance protocolConfig:ProtocolRunnerSettingsPageViewModel}"
+             xmlns:fluent="clr-namespace:_1RM.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ProtocolConfiogDictionary.xaml"></ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/>
+                <ResourceDictionary Source="ProtocolConfiogDictionary.xaml"/>
+</ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
                 <Setter Property="Foreground" Value="{DynamicResource BackgroundTextBrush}"></Setter>
@@ -144,12 +146,14 @@
     </UserControl.Resources>
 
     <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
         <Grid MinWidth="130" Background="{DynamicResource BackgroundBrush}">
+<Grid.Style><Style TargetType="Grid"><Setter Property="Grid.RowSpan" Value="2"/><Style.Triggers><Trigger Property="fluent:FluentPage.Narrow" Value="True"><Setter Property="Grid.ColumnSpan" Value="2"/><Setter Property="Grid.RowSpan" Value="1"/><Setter Property="MaxHeight" Value="120"/></Trigger></Style.Triggers></Style></Grid.Style>
             <Border BorderThickness="0" Background="{DynamicResource BackgroundBrush}">
                 <Border.Effect>
                     <DropShadowEffect Direction="0" Opacity="0.5" ShadowDepth="3"></DropShadowEffect>
@@ -168,7 +172,8 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="1" ClipToBounds="True">
+        <Grid ClipToBounds="True">
+<Grid.Style><Style TargetType="Grid"><Setter Property="Grid.Column" Value="1"/><Setter Property="Grid.RowSpan" Value="2"/><Style.Triggers><Trigger Property="fluent:FluentPage.Narrow" Value="True"><Setter Property="Grid.Column" Value="0"/><Setter Property="Grid.ColumnSpan" Value="2"/><Setter Property="Grid.Row" Value="1"/><Setter Property="Grid.RowSpan" Value="1"/></Trigger></Style.Triggers></Style></Grid.Style>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>

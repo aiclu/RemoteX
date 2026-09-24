@@ -9,20 +9,21 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:ProtocolBaseWithAddressPortUserPwdFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
-        <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+        <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
         <ContentControl s:View.Model="{Binding HostViewModel}"></ContentControl>
 
-        <!--<Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.Address, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="e.g. 192.168.0.101"></TextBox>
                 </Grid>
-                <TextBlock Style="{StaticResource EditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox MinWidth="50" 
                              Text="{Binding New.Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              HorizontalAlignment="Left"
@@ -33,20 +34,20 @@
             </StackPanel>
         </Grid>-->
 
-        <!--<Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding New.UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              />
                 </Grid>
             </StackPanel>
         </Grid>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <controls:PasswordInput Height="28" Password="{Binding New.Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                             />
                 </Grid>

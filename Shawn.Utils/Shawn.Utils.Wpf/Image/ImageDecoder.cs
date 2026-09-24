@@ -13,18 +13,6 @@ namespace Shawn.Utils.Wpf.Image
     {
 
         #region Bitmap
-#if NETFRAMEWORK
-        public static async Task<Bitmap?> GetBitmapAsync(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0)
-        {
-            var imageBytes = File.ReadAllBytes(filePath);
-            if (imageBytes.Length == 0)
-            {
-                SimpleLogHelper.Warning($"{filePath} read 0 byte");
-                return null;
-            }
-            return await GetBitmapAsync(imageBytes, decodePixelWidth, decodePixelHeight);
-        }
-#else
         public static async Task<Bitmap?> GetBitmapAsync(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0)
         {
             var imageBytes = await File.ReadAllBytesAsync(filePath);
@@ -35,7 +23,7 @@ namespace Shawn.Utils.Wpf.Image
             }
             return await GetBitmapAsync(imageBytes, decodePixelWidth, decodePixelHeight);
         }
-#endif
+
 
         public static async Task<Bitmap?> GetBitmapAsync(byte[] imageBytes, int decodePixelWidth = 0, int decodePixelHeight = 0)
         {
@@ -73,18 +61,6 @@ namespace Shawn.Utils.Wpf.Image
 
 
         #region BitmapSource
-#if NETFRAMEWORK
-        public static async Task<BitmapSource?> GetBitmapSourceAsync(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0)
-        {
-            var imageBytes = File.ReadAllBytes(filePath);
-            if (imageBytes.Length == 0)
-            {
-                SimpleLogHelper.Warning($"{filePath} read 0 byte");
-                return null;
-            }
-            return await GetBitmapSourceAsync(imageBytes, decodePixelWidth, decodePixelHeight);
-        }
-#else
         public static async Task<BitmapSource?> GetBitmapSourceAsync(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0)
         {
             if (File.Exists(filePath) == false)
@@ -97,7 +73,7 @@ namespace Shawn.Utils.Wpf.Image
             }
             return await GetBitmapSourceAsync(imageBytes, decodePixelWidth, decodePixelHeight);
         }
-#endif
+
 
         public static async Task<BitmapSource?> GetBitmapSourceAsync(byte[] imageBytes, int decodePixelWidth = 0, int decodePixelHeight = 0)
         {
@@ -146,18 +122,6 @@ namespace Shawn.Utils.Wpf.Image
         #region Image
 
 
-#if NETFRAMEWORK
-        public static async Task<System.Drawing.Image?> GetImageAsync(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0)
-        {
-            var imageBytes = File.ReadAllBytes(filePath);
-            if (imageBytes.Length == 0)
-            {
-                SimpleLogHelper.Warning($"{filePath} read 0 byte");
-                return null;
-            }
-            return await GetImageAsync(filePath);
-        }
-#else
         public static async Task<System.Drawing.Image?> GetImageAsync(string filePath)
         {
             var imageBytes = await File.ReadAllBytesAsync(filePath);
@@ -168,7 +132,7 @@ namespace Shawn.Utils.Wpf.Image
             }
             return await GetImageAsync(imageBytes);
         }
-#endif
+
         public static async Task<System.Drawing.Image?> GetImageAsync(byte[] imageBytes)
         {
             var ret = await Task.Run(() => GetImage(imageBytes));

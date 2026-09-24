@@ -33,11 +33,8 @@ namespace _1RM.Utils
             {
                 var cts = new CancellationTokenSource();
                 cancellationToken ??= cts.Token;
-#if NETCOREAPP
                 var connectTask = client.ConnectAsync(address, port, (CancellationToken)cancellationToken).AsTask();
-#else
-                var connectTask = isIPv6 ? client.ConnectAsync(iPv6, port) : client.ConnectAsync(address, port);
-#endif
+
                 if (timeOutMillisecond <= 0)
                     timeOutMillisecond = 30 * 1000;
                 var timeoutTask = Task.Delay(TimeSpan.FromMilliseconds(timeOutMillisecond), (CancellationToken)cancellationToken);

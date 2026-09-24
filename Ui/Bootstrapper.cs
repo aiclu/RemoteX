@@ -53,6 +53,7 @@ namespace _1RM
             builder.Bind<KeywordMatchService>().ToInstance(AppInitHelper.KeywordMatchServiceObj);
             builder.Bind<ConfigurationService>().ToInstance(AppInitHelper.ConfigurationServiceObj);
             builder.Bind<ThemeService>().ToInstance(AppInitHelper.ThemeServiceObj);
+            builder.Bind<FluentAppearanceService>().ToSelf().InSingletonScope();
             builder.Bind<GlobalData>().ToInstance(AppInitHelper.GlobalDataObj);
             builder.Bind<ProtocolConfigurationService>().ToSelf().InSingletonScope();
             builder.Bind<DataSourceService>().ToSelf().InSingletonScope();
@@ -114,6 +115,7 @@ namespace _1RM
 
         protected override void OnExit(ExitEventArgs e)
         {
+            IoC.Get<FluentAppearanceService>().Dispose();
             // workaround
             Task.Factory.StartNew(() =>
             {

@@ -11,37 +11,37 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:LocalAppFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
-    <UserControl.Resources>
+    <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries>
         <GridLength x:Key="RowHeight1">30</GridLength>
         <GridLength x:Key="RowHeight2">20</GridLength>
         <system:Double x:Key="InputHeight">30</system:Double>
         <system:Double x:Key="WidthName">100</system:Double>
         <system:Double x:Key="WidthKey">100</system:Double>
         <system:Double x:Key="WidthValue">300</system:Double>
-    </UserControl.Resources>
+    </ResourceDictionary></UserControl.Resources>
     <StackPanel>
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Exe path'}"></TextBlock>
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Exe path'}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Exe path'}"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Exe path'}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Tag="e.g. C:/vnc/viewer.exe or %VNC%/viewer.exe"
                                  LostFocus="TextBoxExePath_OnLostFocus"
                                  Text="{Binding ExePath, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                  ></TextBox>
                     </Grid>
-                    <Button Style="{StaticResource ButtonPrimaryStyle}" 
+                    <Button Style="{StaticResource FluentPageButton}"
                             Margin="5 0 0 0"
                             Content="{DynamicResource Select}" 
                             Command="{Binding CmdSelectExePath}"></Button>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}" ToolTip="{DynamicResource 'Hosting this exe in 1 tab view?'}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Hosting'}"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}" ToolTip="{DynamicResource 'Hosting this exe in 1 tab view?'}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Hosting'}"></TextBlock>
                     <CheckBox IsChecked="{Binding New.RunWithHosting}">
                         <TextBlock Style="{StaticResource TextBlockBase}" Foreground="Red" Text="{DynamicResource 'Caution: some exe can not be hosted in RemoteX.'}" TextWrapping="Wrap"></TextBlock>
                     </CheckBox>
@@ -49,10 +49,10 @@
             </Grid>
         </StackPanel>
 
-        <Grid Style="{StaticResource EditorRowGrid}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Protocol}"></TextBlock>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+        <Grid Style="{StaticResource FluentEditorRowGrid}">
+            <StackPanel Style="{StaticResource FluentFieldStack}">
+                <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Protocol}"></TextBlock>
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Tag="{DynamicResource Optional}"
                              Text="{Binding New.AppProtocolDisplayName, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 </Grid>
@@ -62,18 +62,18 @@
 
         <StackPanel>
 
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
 
             <StackPanel Orientation="Horizontal" MinHeight="{StaticResource InputHeight}"  Margin="0 0 0 15"
                         Visibility="{Binding RequiredHostName, Converter={StaticResource ConverterBool2Visible}}">
                 <Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                VerticalAlignment="Top"
                                Opacity="0.5" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0 25 30 0"
                                Text="%1RM_HOSTNAME%"></TextBlock>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="{Binding HintHostName}"
                              Height="{StaticResource InputHeight}" 
@@ -85,13 +85,13 @@
             <StackPanel Orientation="Horizontal" MinHeight="{StaticResource InputHeight}"  Margin="0 0 0 15"
                         Visibility="{Binding RequiredPort, Converter={StaticResource ConverterBool2Visible}}">
                 <Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Port}"></TextBlock>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Port}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                VerticalAlignment="Top"
                                Opacity="0.5" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0 25 30 0" 
                                Text="%1RM_PORT%"></TextBlock>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="{Binding HintPort}"
                              Height="{StaticResource InputHeight}" 
@@ -103,13 +103,13 @@
             <StackPanel Orientation="Horizontal" MinHeight="{StaticResource InputHeight}"  Margin="0 0 0 15"
                         Visibility="{Binding RequiredUserName, Converter={StaticResource ConverterBool2Visible}}">
                 <Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                VerticalAlignment="Top"
                                Opacity="0.5" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0 25 30 0" 
                                Text="%1RM_USERNAME%"></TextBlock>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                              Tag="{Binding HintUserName}"
                              Height="{StaticResource InputHeight}" 
@@ -121,13 +121,13 @@
             <StackPanel Orientation="Horizontal" MinHeight="{StaticResource InputHeight}" Margin="0 0 0 15" 
                         Visibility="{Binding RequiredPassword, Converter={StaticResource ConverterBool2Visible}}">
                 <Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                VerticalAlignment="Top"
                                Opacity="0.5" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0 25 30 0" 
                                Text="%1RM_PASSWORD%"></TextBlock>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGridInput}">
+                <Grid Style="{StaticResource FluentEditorRowGridInput}">
                     <controls:PasswordInput Height="{StaticResource InputHeight}" 
                                             Tag="{Binding HintPassword}"
                                             Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
@@ -141,17 +141,17 @@
             <StackPanel Orientation="Horizontal" MinHeight="{StaticResource InputHeight}" Margin="0 0 0 15" 
                         Visibility="{Binding RequiredPrivateKey, Converter={StaticResource ConverterBool2Visible}}">
                 <Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Private key'}"></TextBlock>
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" 
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Private key'}"></TextBlock>
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}"
                                VerticalAlignment="Top"
                                Opacity="0.5" FontSize="{DynamicResource GlobalFontSizeSmall}" Margin="0 25 30 0" 
                                Text="%1RM_PRIVATE_KEY_PATH%"></TextBlock>
                 </Grid>
-                <Grid Style="{StaticResource EditorRowGridInput}" Height="{StaticResource InputHeight}">
+                <Grid Style="{StaticResource FluentEditorRowGridInput}" Height="{StaticResource InputHeight}">
                     <TextBox Name="TbPrivateKey" Text="{Binding PrivateKey}" 
                              Tag="{Binding HintPrivateKey}"></TextBox>
                 </Grid>
-                <Button Style="{StaticResource ButtonPrimaryStyle}" 
+                <Button Style="{StaticResource FluentPageButton}"
                         Margin="5"
                         Content="{DynamicResource Select}" 
                         Click="ButtonOpenPrivateKey_OnClick" 

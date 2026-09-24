@@ -222,15 +222,9 @@ namespace _1RM.Service
                     host.ProtocolServer.RunScriptAfterDisconnected();
                     PrintCacheCount();
 
-#if NETFRAMEWORK
-                    foreach (var kv in _token2TabWindows.ToArray())
-                    {
-                        var key = kv.Key;
-                        var tab = kv.Value;
-#else
                     foreach (var (key, tab) in _token2TabWindows.ToArray())
                     {
-#endif
+
                         if (tab.GetViewModel().TryRemoveItem(connectionId))
                         {
                             var items = tab.GetViewModel().Items.ToList();
@@ -246,15 +240,9 @@ namespace _1RM.Service
                     }
 
                     // hide full
-#if NETFRAMEWORK
-                    foreach (var kv in _connectionId2FullScreenWindows.Where(x => x.Key == connectionId).ToArray())
-                    {
-                        var key = kv.Key;
-                        var full = kv.Value;
-#else
                     foreach (var (key, full) in _connectionId2FullScreenWindows.Where(x => x.Key == connectionId).ToArray())
                     {
-#endif
+
                         if (full.Host == null || _connectionId2Hosts.ContainsKey(full.Host.ConnectionId) == false)
                         {
                             _connectionId2FullScreenWindows.TryRemove(key, out _);

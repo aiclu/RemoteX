@@ -35,7 +35,13 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Background" Value="Transparent" />
-    </Style>
+    <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
+<Setter Property="Height" Value="Auto"/><Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeTitle}"/>
+<Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
+<Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource FluentStroke}" Padding="12,4" Background="{DynamicResource FluentSurface}">
+<Grid><TextBlock x:Name="FluentHint" Text="{TemplateBinding Tag}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="{DynamicResource FluentMuted}" Visibility="Collapsed" IsHitTestVisible="False"/><ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/></Grid>
+</Border><ControlTemplate.Triggers><Trigger Property="Text" Value=""><Setter TargetName="FluentHint" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers>
+</ControlTemplate></Setter.Value></Setter></Trigger></Style.Triggers></Style>
 
 
 
@@ -48,14 +54,16 @@
                     <Grid>
                         <Grid x:Name="GridColor" Opacity="0.4" Background="{Binding Server.ColorHex,Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"></Grid>
                         <Border x:Name="GridHighLight"></Border>
-                        <Grid x:Name="GridColorOnSelected" 
+                        <Grid x:Name="GridColorOnSelected"
                               Visibility="Collapsed"
-                              Width="40" 
-                              HorizontalAlignment="Left" 
+                              Width="40"
+                              HorizontalAlignment="Left"
                               Background="{Binding Server.ColorHex, Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"></Grid>
                         <ContentPresenter x:Name="ContentPresenter"/>
                     </Grid>
                     <ControlTemplate.Triggers>
+<Trigger Property="view:FluentPage.Active" Value="True"><Setter TargetName="GridHighLight" Property="CornerRadius" Value="6"/><Setter TargetName="GridHighLight" Property="Margin" Value="4,1"/><Setter TargetName="GridColor" Property="Opacity" Value="0.1"/><Setter TargetName="GridColorOnSelected" Property="Width" Value="3"/></Trigger>
+<MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsKeyboardFocusWithin" Value="True"/></MultiTrigger.Conditions><Setter TargetName="GridHighLight" Property="BorderThickness" Value="1"/><Setter TargetName="GridHighLight" Property="BorderBrush" Value="{DynamicResource FluentText}"/></MultiTrigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" TargetName="GridHighLight" Value="{DynamicResource PrimaryTextBrush}"></Setter>
                             <Setter Property="Opacity" Value="0.2" TargetName="GridHighLight" />
@@ -80,7 +88,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBox}">
                     <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="0" SnapsToDevicePixels="true">
-                        <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}" 
+                        <ScrollViewer CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" Focusable="false" Padding="{TemplateBinding Padding}"
                                       Background="{DynamicResource PrimaryMidBrush}"
                                       attachProperty:VisionElement.ForegroundAccent="{DynamicResource PrimaryTextBrush}"
                                       attachProperty:VisionElement.BackgroundAccent="{DynamicResource PrimaryTextBrush}"
@@ -102,6 +110,11 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Trigger></Style.Triggers>
     </Style>
 
 
@@ -123,7 +136,7 @@
 
 
     <DataTemplate x:Key="DataTemplateForProtocolAction" DataType="model:ProtocolAction">
-        <Grid Height="{x:Static view:LauncherWindowViewModel.LAUNCHER_ACTION_LIST_ITEM_HEIGHT}">
+        <Grid Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.ActionHeight)}">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="5"></ColumnDefinition>
@@ -131,8 +144,8 @@
                     <ColumnDefinition Width="5"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" 
-                           Grid.Column="3" 
+                <TextBlock Grid.Row="0"
+                           Grid.Column="3"
                            Text="{Binding ActionName}"
                            Style="{StaticResource TextBlockDataTemplateForProtocolActionStyle}">
                 </TextBlock>

@@ -23,6 +23,27 @@ namespace _1RM.View
             InitializeComponent();
             ShowInTaskbar = false;
             this.Visibility = Visibility.Hidden;
+            FluentAppearanceService? appearance = null;
+            void AppearanceChanged(object? sender, EventArgs args) => _vm.ReSetWindowHeight();
+            IsVisibleChanged += (_, _) =>
+            {
+                if (IsVisible && appearance == null)
+                {
+                    appearance = IoC.Get<FluentAppearanceService>();
+                    appearance.Changed += AppearanceChanged;
+                    _vm.ReSetWindowHeight();
+                }
+                else if (!IsVisible && appearance != null)
+                {
+                    appearance.Changed -= AppearanceChanged;
+                    appearance = null;
+                }
+            };
+            Closed += (_, _) =>
+            {
+                if (appearance != null) appearance.Changed -= AppearanceChanged;
+                appearance = null;
+            };
             Loaded += (sender, args) =>
             {
                 var myWindowHandle = new WindowInteropHelper(this).Handle;

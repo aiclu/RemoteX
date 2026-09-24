@@ -22,37 +22,10 @@ namespace _1RM.View.Editor.Forms
         private void ShowCompletionWindow(IEnumerable<string> completions, TextArea textArea)
         {
             _completionWindow?.Close();
-            var enumerable = completions as string[] ?? completions.ToArray();
-            if (enumerable?.Any() != true) return;
-            // ref: http://avalonedit.net/documentation/html/47c58b63-f30c-4290-a2f2-881d21227446.htm
-            _completionWindow = new CompletionWindow(textArea)
+            _completionWindow = RdpCompletionPopup.Show(completions, textArea, window =>
             {
-                CloseWhenCaretAtBeginning = true,
-                CloseAutomatically = true,
-                BorderThickness = new System.Windows.Thickness(0),
-                Background = (App.ResourceDictionary?["BackgroundBrush"] as Brush) ?? Brushes.White ,
-                Foreground = (App.ResourceDictionary?["BackgroundTextBrush"] as Brush) ?? Brushes.Black,
-                ResizeMode = ResizeMode.NoResize,
-                WindowStyle = WindowStyle.None,
-                Width = 500,
-            };
-            _completionWindow.KeyDown += (sender, e) =>
-            {
-                if (e.Key == Key.Escape)
-                {
-                    _completionWindow.Close();
-                    e.Handled = true;
-                }
-            };
-            var completionData = _completionWindow.CompletionList.CompletionData;
-            foreach (var str in enumerable)
-            {
-                completionData.Add(new RdpFileSettingCompletionData(str));
-            }
-            _completionWindow.Show();
-            if (enumerable.Count() == 1)
-                _completionWindow.CompletionList.SelectItem(enumerable.First());
-            _completionWindow.Closed += (o, args) => _completionWindow = null;
+                if (ReferenceEquals(_completionWindow, window)) _completionWindow = null;
+            });
         }
 
 
@@ -66,12 +39,12 @@ namespace _1RM.View.Editor.Forms
             
             // RDP File Settings TextBox
             TextBoxRdpFileAdditionalSettings.TextArea.TextEntered += rdpFileTextEnteredHandler;
-            TextBoxRdpFileAdditionalSettings.GotFocus += RdpFileTextBox_GotFocus;
+            TextBoxRdpFileAdditionalSettings.PreviewMouseLeftButtonUp += RdpFileTextBox_GotFocus;
             TextBoxRdpFileAdditionalSettings.TextChanged += RdpFileTextBox_TextChanged;
 
             // RDP Control Settings TextBox  
             TextBoxRdpControlAdditionalSettings.TextArea.TextEntered += rdpControlTextEnteredHandler;
-            TextBoxRdpControlAdditionalSettings.GotFocus += RdpControlTextBox_GotFocus;
+            TextBoxRdpControlAdditionalSettings.PreviewMouseLeftButtonUp += RdpControlTextBox_GotFocus;
             TextBoxRdpControlAdditionalSettings.TextChanged += RdpControlTextBox_TextChanged;
         }
 
@@ -208,7 +181,7 @@ namespace _1RM.View.Editor.Forms
 
         public object Content => Text;
 
-        public object Description => this.Text;
+        public object Description => null!; // Repeating the candidate in a second floating tooltip adds no information.
 
         /// <inheritdoc />
         public double Priority { get; }

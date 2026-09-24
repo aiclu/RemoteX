@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0-windows</TargetFramework><UseWPF>true</UseWPF><Nullable>enable</Nullable><NuGetAudit>false</NuGetAudit></PropertyGroup>
+ <ItemGroup>
+  <Reference Include="RemoteX"><HintPath>../../Ui/bin/FluentDialogsTest/RemoteX.dll</HintPath></Reference>
+  <Reference Include="Stylet"><HintPath>../../Ui/bin/FluentDialogsTest/Stylet.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils.Wpf"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.Wpf.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils.WpfResources"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.WpfResources.dll</HintPath></Reference>
+ </ItemGroup>
+</Project>

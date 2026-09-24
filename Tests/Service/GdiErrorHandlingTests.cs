@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests.Service
 {
@@ -12,6 +12,7 @@ namespace Tests.Service
     /// Note: These tests verify that the Bootstrapper correctly identifies and suppresses
     /// transient GDI+ errors that occur during WindowsFormsHost painting operations.
     /// </summary>
+    [TestClass]
     public class GdiErrorHandlingTests
     {
         private static MethodInfo GetIsTransientGdiErrorMethod()
@@ -26,7 +27,7 @@ namespace Tests.Service
             return method;
         }
 
-        [Fact]
+        [TestMethod]
         public void IsTransientGdiError_ShouldReturnFalse_ForNonGdiError()
         {
             // Arrange
@@ -37,10 +38,10 @@ namespace Tests.Service
             var result = (bool)method.Invoke(null, new object[] { normalException });
 
             // Assert
-            Assert.False(result, "Should not identify non-GDI errors as transient");
+            Assert.IsFalse(result, "Should not identify non-GDI errors as transient");
         }
 
-        [Fact]
+        [TestMethod]
         public void IsTransientGdiError_ShouldReturnFalse_ForExternalExceptionWithWrongErrorCode()
         {
             // Arrange
@@ -51,10 +52,10 @@ namespace Tests.Service
             var result = (bool)method.Invoke(null, new object[] { exception });
 
             // Assert
-            Assert.False(result, "Should not identify ExternalException with wrong error code");
+            Assert.IsFalse(result, "Should not identify ExternalException with wrong error code");
         }
 
-        [Fact]
+        [TestMethod]
         public void IsTransientGdiError_ShouldReturnFalse_ForGdiErrorWithoutPaintStack()
         {
             // Arrange
@@ -66,10 +67,10 @@ namespace Tests.Service
             var result = (bool)method.Invoke(null, new object[] { exception });
 
             // Assert
-            Assert.False(result, "Should require paint-related stack trace to identify as transient");
+            Assert.IsFalse(result, "Should require paint-related stack trace to identify as transient");
         }
 
-        [Fact]
+        [TestMethod]
         public void IsTransientGdiError_ShouldReturnFalse_ForNullException()
         {
             // Arrange
@@ -80,10 +81,10 @@ namespace Tests.Service
             var result = (bool)method.Invoke(null, new object[] { nullException });
 
             // Assert
-            Assert.False(result, "Should handle null exception gracefully");
+            Assert.IsFalse(result, "Should handle null exception gracefully");
         }
 
-        [Fact]
+        [TestMethod]
         public void IsTransientGdiError_ShouldReturnTrue_ForGdiErrorWithWinFormsAdapterStack()
         {
             // Arrange
@@ -105,13 +106,13 @@ namespace Tests.Service
                 // Note: In a real scenario, the stack would contain actual WindowsFormsHost internals
                 if (ex.StackTrace?.Contains("WinFormsAdapter", StringComparison.Ordinal) == true)
                 {
-                    Assert.True(result, "Should identify GDI+ error with WinFormsAdapter in stack");
+                    Assert.IsTrue(result, "Should identify GDI+ error with WinFormsAdapter in stack");
                 }
                 else
                 {
                     // If the test framework doesn't preserve method names in stack traces,
                     // we can't verify this case, so we skip it
-                    Assert.False(result, "Stack trace doesn't contain expected method name");
+                    Assert.IsFalse(result, "Stack trace doesn't contain expected method name");
                 }
             }
         }

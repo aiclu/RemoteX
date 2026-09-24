@@ -171,6 +171,8 @@ namespace _1RM.View.Launcher
 
         public double ReCalcGridMainHeight()
         {
+            if (IoC.Get<ConfigurationService>().Theme.Fluent?.Enabled == true)
+                return IoC.Get<LauncherWindowViewModel>().FluentMetrics.HeightFor(ConnectHistory.Count);
             var tmp = LauncherWindowViewModel.LAUNCHER_SERVER_LIST_ITEM_HEIGHT * ConnectHistory.Count;
             var ret = LauncherWindowViewModel.LAUNCHER_GRID_KEYWORD_HEIGHT + tmp;
             return ret;

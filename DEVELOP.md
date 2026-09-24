@@ -6,11 +6,11 @@ It assumes no local tools and empty Windows 10 OS.
 
 ## Prerequisites
 
-1. `Windows 10` 1703 or later
+1. `Windows 10` 2004 or later
 2. `Microsoft Visual Studio 2022` or higher, with the following workloads:
     - .NET desktop development
-    - `.NET6 SDK` (may included in vs2022)
-    - Windows 10 SDK 10.0.17763.0
+    - `.NET 9 SDK`
+    - Windows 10 SDK 10.0.19041.0
 
 The build task `Deps` automates entire installation locally (except OS). More details on running tasks are given bellow.
 
@@ -24,7 +24,11 @@ The build task `Deps` automates entire installation locally (except OS). More de
 3. [Restore all NuGet packages](https://docs.microsoft.com/en-us/nuget/consume-packages/package-restore#restore-packages-manually-using-visual-studio)
 4. Build
 
-Now you can build solution.
+Use the Debug configuration for local development; other configurations require release secrets.
+
+Only .NET 9 is supported by the application and its dependency libraries. The legacy `DragablzModernUIDemo` is an archived upstream example and is not part of the supported build.
+
+Run the full suite with `dotnet test Tests/Tests.csproj -c Debug`. Tests use isolated temporary data, not user profiles.
 
 ### Command line
 

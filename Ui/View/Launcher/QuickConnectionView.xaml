@@ -41,9 +41,9 @@
 
 
             <DataTemplate DataType="{x:Type local:QuickConnectionItem}">
-                <Grid Height="{x:Static view:LauncherWindowViewModel.LAUNCHER_SERVER_LIST_ITEM_HEIGHT}">
+                <Grid Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.RowHeight)}">
                     <Grid VerticalAlignment="Center" 
-                      Width="{x:Static view:LauncherWindowViewModel.LAUNCHER_LIST_AREA_WIDTH}">
+                      >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -54,13 +54,18 @@
 
                         <TextBlock Grid.Column="0"
                                    Text="{Binding Host}"
+                                   ToolTip="{Binding Host}" TextTrimming="CharacterEllipsis"
                                    FontSize="{DynamicResource GlobalFontSizeSubtitle}"
                                    Margin="10 0"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
                                    VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                                     <Style.Triggers>
+                                        <MultiDataTrigger><MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentPage.Active)}" Value="True"/>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"/>
+                                        </MultiDataTrigger.Conditions><Setter Property="Foreground" Value="{DynamicResource FluentAccentText}"/></MultiDataTrigger>
                                         <DataTrigger Binding="{Binding Protocol}" Value="">
                                             <Setter Property="FontWeight" Value="Bold"></Setter>
                                             <Setter Property="HorizontalAlignment" Value="Center"></Setter>
@@ -76,9 +81,18 @@
                                    FontSize="{DynamicResource GlobalFontSizeSubtitle}" FontWeight="Bold"
                                    HorizontalAlignment="Right"
                                    Margin="5 0 0 0"
-                                   Opacity="0.3"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                   VerticalAlignment="Center"></TextBlock>
+                                   VerticalAlignment="Center">
+                            <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
+                                <Setter Property="Opacity" Value="0.3"/><Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Opacity" Value="1"/><Setter Property="Foreground" Value="{DynamicResource FluentMuted}"/></Trigger>
+                                    <MultiDataTrigger><MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentPage.Active)}" Value="True"/>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"/>
+                                    </MultiDataTrigger.Conditions><Setter Property="Foreground" Value="{DynamicResource FluentAccentText}"/></MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style></TextBlock.Style>
+                        </TextBlock>
 
 
                         <Button Grid.Column="2" Width="10" Height="10" 
@@ -124,6 +138,13 @@
                                 <ContentPresenter x:Name="ContentPresenter"/>
                             </Grid>
                             <ControlTemplate.Triggers>
+                                <Trigger Property="view:FluentPage.Active" Value="True">
+                                    <Setter TargetName="GridContainer" Property="CornerRadius" Value="6"/>
+                                    <Setter TargetName="GridContainer" Property="Margin" Value="4,1"/>
+                                </Trigger>
+                                <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsKeyboardFocusWithin" Value="True"/></MultiTrigger.Conditions>
+                                    <Setter TargetName="GridContainer" Property="BorderBrush" Value="{DynamicResource FluentText}"/><Setter TargetName="GridContainer" Property="BorderThickness" Value="1"/>
+                                </MultiTrigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Background" TargetName="GridContainer" Value="{DynamicResource PrimaryTextBrush}"></Setter>
                                     <Setter Property="Opacity" Value="0.2" TargetName="GridContainer" />
@@ -151,7 +172,7 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <Grid Name="GridKeyword" Height="{x:Static view:LauncherWindowViewModel.LAUNCHER_GRID_KEYWORD_HEIGHT}">
+        <Grid Name="GridKeyword" Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -166,7 +187,7 @@
                       ItemsSource="{Binding Protocols}">
             </ComboBox>
 
-            <TextBox Name="TbKeyWord"
+            <TextBox Name="TbKeyWord" Tag="{DynamicResource FluentQuickConnectHint}"
                      Foreground="{DynamicResource PrimaryTextBrush}"
                      PreviewKeyDown="TbKeyWord_OnPreviewKeyDown"
                      Margin="0 0 0 0"

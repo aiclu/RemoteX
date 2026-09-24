@@ -40,7 +40,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            6.0.x
             9.0.x
 
       # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
@@ -113,25 +112,6 @@ jobs:
       #     echo ${{env.BuildVersion}}
       #     echo ${{env.PreRelease}}
 
-      ## Publish the application Net4.8
-      #- name: Publish the application Net4.8
-      #  run: dotnet publish $env:Main_Project -p:PublishProfile=./Ui/Properties/PublishProfiles/x64-net48.pubxml
-      #  # run: msbuild $env:Main_Project -t:rebuild -verbosity:diag -property:Configuration=ReleaseNet48
-      ## artifact
-      #- uses: actions/upload-artifact@v4
-      #  with:
-      #    name: 1Remote-${{env.BuildVersion}}-net4.8(not recommended)
-      #    path: Ui/bin/Release/net4.8-windows/publish
-
-      # # Publish the application Net6.0
-      # - name: Publish the application net6
-      #   run: dotnet publish $env:Main_Project -p:PublishProfile=./Ui/Properties/PublishProfiles/x64-net60.pubxml
-      # # artifact
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: 1Remote-${{env.BuildVersion}}-net6-x64
-      #     path: Ui/bin/Release/net6.0-windows/publish/win-x64
-
       # Publish the application net9.0
       - name: Publish the application net9
         run: dotnet publish $env:Main_Project -p:PublishProfile=./Ui/Properties/PublishProfiles/x64-net90.pubxml
@@ -161,8 +141,6 @@ jobs:
     outputs:
       BuildVersion: ${{env.BuildVersion}}
       PreRelease: ${{env.PreRelease}}
-      # artifact_net48: 1Remote-${{env.BuildVersion}}-net4.8(not recommended)
-      # artifact_net6x: 1Remote-${{env.BuildVersion}}-net6-x64
       artifact_net9x: RemoteX-${{env.BuildVersion}}-net9-x64
       artifact_net9xsc: RemoteX-${{env.BuildVersion}}-net9-x64-self-contained
 
@@ -188,29 +166,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-
-      ## download artifact net4.8
-      #- uses: actions/download-artifact@v4.1.7
-      #  with:
-      #    name: ${{needs.JobBuild.outputs.artifact_net48}}
-      #    path: ${{needs.JobBuild.outputs.artifact_net48}}
-      ## zip
-      #- name: Easy Zip Files
-      #  uses: vimtor/action-zip@v1
-      #  with:
-      #    files: ${{needs.JobBuild.outputs.artifact_net48}}
-      #    dest: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-
-      # # download artifact net6.x & ZIP
-      # - uses: actions/download-artifact@v4.1.7
-      #   with:
-      #     name: ${{needs.JobBuild.outputs.artifact_net6x}}
-      #     path: ${{needs.JobBuild.outputs.artifact_net6x}}
-      # - name: Easy Zip Files
-      #   uses: vimtor/action-zip@v1
-      #   with:
-      #     files: ${{needs.JobBuild.outputs.artifact_net6x}}
-      #     dest: ${{needs.JobBuild.outputs.artifact_net6x}}.zip
 
       # download artifact net9.x & ZIP
       - uses: actions/download-artifact@v4.1.7
@@ -243,29 +198,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-
-      ## upload package net4.8
-      #- name: Upload Release Asset
-      #  uses: actions/upload-release-asset@v1
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #  with:
-      #    upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #    asset_path: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-      #    asset_name: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-      #    asset_content_type: application/zip
-
-      # # upload package net6.x
-      # - name: Upload Release Asset net6
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-      #     asset_path: ${{needs.JobBuild.outputs.artifact_net6x}}.zip
-      #     asset_name: ${{needs.JobBuild.outputs.artifact_net6x}}(obsolete).zip
-      #     asset_content_type: application/zip
-      #     prerelease: false
 
       # upload package net9.x
       - name: Upload Release Asset net9
@@ -319,28 +251,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      ## download artifact net4.8
-      #- uses: actions/download-artifact@v4.1.7
-      #  with:
-      #    name: ${{needs.JobBuild.outputs.artifact_net48}}
-      #    path: ${{needs.JobBuild.outputs.artifact_net48}}
-      ## zip
-      #- name: Easy Zip Files
-      #  uses: vimtor/action-zip@v1
-      #  with:
-      #    files: ${{needs.JobBuild.outputs.artifact_net48}}
-      #    dest: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-
-      # # download artifact net6.x & zip
-      # - uses: actions/download-artifact@v4.1.7
-      #   with:
-      #     name: ${{needs.JobBuild.outputs.artifact_net6x}}
-      #     path: ${{needs.JobBuild.outputs.artifact_net6x}}
-      # - uses: vimtor/action-zip@v1
-      #   with:
-      #     files: ${{needs.JobBuild.outputs.artifact_net6x}}
-      #     dest: ${{needs.JobBuild.outputs.artifact_net6x}}.zip
-
       # download artifact net9.x & zip
       - uses: actions/download-artifact@v4.1.7
         with:
@@ -371,27 +281,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: true
-
-      ## upload package net4.8
-      #- name: Upload Release Asset
-      #  uses: actions/upload-release-asset@v1
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #  with:
-      #    upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #    asset_path: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-      #    asset_name: ${{needs.JobBuild.outputs.artifact_net48}}.zip
-      #    asset_content_type: application/zip
-
-      # # upload package net6.x
-      # - uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-      #     asset_path: ${{needs.JobBuild.outputs.artifact_net6x}}.zip
-      #     asset_name: ${{needs.JobBuild.outputs.artifact_net6x}}(obsolete).zip
-      #     asset_content_type: application/zip
 
       # upload package net9.x
       - uses: actions/upload-release-asset@v1

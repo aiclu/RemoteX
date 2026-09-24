@@ -22,7 +22,7 @@ namespace _1RM.View.Editor.Forms
         {
             InitializeComponent();
             TextBoxRdpFileAdditionalSettings.TextArea.TextEntered += TextAreaOnTextEntered;
-            TextBoxRdpFileAdditionalSettings.GotFocus += (sender, args) =>
+            TextBoxRdpFileAdditionalSettings.PreviewMouseLeftButtonUp += (sender, args) =>
             {
                 if (TextBoxRdpFileAdditionalSettings.Text == "")
                 {
@@ -58,28 +58,10 @@ namespace _1RM.View.Editor.Forms
         private void ShowCompletionWindow(IEnumerable<string> completions)
         {
             _completionWindow?.Close();
-            var enumerable = completions as string[] ?? completions.ToArray();
-            if (enumerable?.Any() != true) return;
-            // ref: http://avalonedit.net/documentation/html/47c58b63-f30c-4290-a2f2-881d21227446.htm
-            _completionWindow = new CompletionWindow(TextBoxRdpFileAdditionalSettings.TextArea)
+            _completionWindow = RdpCompletionPopup.Show(completions, TextBoxRdpFileAdditionalSettings.TextArea, window =>
             {
-                CloseWhenCaretAtBeginning = true,
-                CloseAutomatically = true,
-                BorderThickness = new System.Windows.Thickness(0),
-                Background = (App.ResourceDictionary?["BackgroundBrush"] as Brush) ?? Brushes.White,
-                Foreground = (App.ResourceDictionary?["BackgroundTextBrush"] as Brush) ?? Brushes.Black,
-                ResizeMode = ResizeMode.NoResize,
-                WindowStyle = WindowStyle.None,
-            };
-            var completionData = _completionWindow.CompletionList.CompletionData;
-            foreach (var str in enumerable)
-            {
-                completionData.Add(new RdpFileSettingCompletionData(str));
-            }
-            _completionWindow.Show();
-            if (enumerable.Count() == 1)
-                _completionWindow.CompletionList.SelectItem(enumerable.First());
-            _completionWindow.Closed += (o, args) => _completionWindow = null;
+                if (ReferenceEquals(_completionWindow, window)) _completionWindow = null;
+            });
         }
 
 

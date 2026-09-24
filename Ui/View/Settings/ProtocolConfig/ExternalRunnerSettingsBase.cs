@@ -29,6 +29,28 @@ public abstract class ExternalRunnerSettingsBase : UserControl
             avalonEditor.SyntaxHighlighting = null;
             avalonEditor.SyntaxHighlighting = highlighting;
         }
+        // Existing syntax rules use classic colors. In the solid Fluent surface use
+        // its inherited text brush; keep completion and the original classic rules.
+        var classicHighlighting = avalonEditor.SyntaxHighlighting;
+        FluentAppearanceService? appearance = null;
+        void RefreshAppearance(object? sender, EventArgs args)
+        {
+            avalonEditor.SyntaxHighlighting = appearance?.Enabled == true ? null : classicHighlighting;
+            avalonEditor.SetResourceReference(Control.ForegroundProperty, "BackgroundTextBrush");
+        }
+        avalonEditor.Loaded += (_, _) =>
+        {
+            if (appearance != null) return;
+            appearance = IoC.Get<FluentAppearanceService>();
+            appearance.Changed += RefreshAppearance;
+            RefreshAppearance(null, EventArgs.Empty);
+        };
+        avalonEditor.Unloaded += (_, _) =>
+        {
+            if (appearance != null) appearance.Changed -= RefreshAppearance;
+            appearance = null;
+            _completionWindow?.Close();
+        };
         avalonEditor.GotFocus += (sender, args) =>
         {
             _completionWindow?.Close();

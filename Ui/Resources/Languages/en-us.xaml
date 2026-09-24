@@ -390,4 +390,18 @@
     <s:String x:Key="Administrator permission was not granted.">Administrator permission was not granted.</s:String>
     <s:String x:Key="Updater log">Updater log</s:String>
     <s:String x:Key="Update rollback failed. The old version may need manual recovery.">Update rollback failed. The old version may need manual recovery.</s:String>
+    <s:String x:Key="FluentPreview">Fluent preview</s:String>
+    <s:String x:Key="FluentAppearance">Appearance</s:String>
+    <s:String x:Key="FluentConnections">Connections</s:String>
+    <s:String x:Key="FluentAllConnections">All connections</s:String>
+    <s:String x:Key="FluentSystem">Follow system</s:String>
+    <s:String x:Key="FluentLight">Light</s:String>
+    <s:String x:Key="FluentDark">Dark</s:String>
+    <s:String x:Key="FluentClassic">Classic appearance</s:String>
+    <s:String x:Key="FluentSort">Sort</s:String>
+    <s:String x:Key="FluentMore">More</s:String>
+    <s:String x:Key="FluentTags">Manage tags</s:String>
+    <s:String x:Key="FluentClassicThemeHint">The theme and custom colors below affect classic appearance only. Font settings apply to both appearances.</s:String>
+    <s:String x:Key="FluentQuickConnectHint">Quick connect, e.g. 192.0.2.10:3389</s:String>
+    <s:String x:Key="FluentSearchConnections">Search connections</s:String>
 </ResourceDictionary>

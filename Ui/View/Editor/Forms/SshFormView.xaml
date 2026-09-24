@@ -10,20 +10,21 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance forms:SshFormViewModel}"
              d:DesignHeight="1450" d:DesignWidth="800">
+<UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
     <StackPanel>
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource 'Connection'}"></TextBlock>
             <ContentControl s:View.Model="{Binding HostViewModel}"></ContentControl>
 
-            <!--<Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <!--<Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Hostname}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.Address, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                  Tag="e.g. 192.168.0.101"></TextBox>
                     </Grid>
-                    <TextBlock Style="{StaticResource EditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitleFollowing}" Width="60" Text="{DynamicResource Port}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"
                                  MinWidth="50" HorizontalAlignment="Left"
                                  InputMethod.IsInputMethodEnabled="False"
@@ -33,10 +34,10 @@
                 </StackPanel>
             </Grid>-->
 
-            <!--<Grid Style="{StaticResource EditorRowGrid}" Name="GridUserName">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <!--<Grid Style="{StaticResource FluentEditorRowGrid}" Name="GridUserName">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource User}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.UserName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"></TextBox>
                     </Grid>
                 </StackPanel>
@@ -44,7 +45,7 @@
 
             <Grid Name="GridPwd">
                 <Grid.Style>
-                    <Style TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+                    <Style TargetType="Grid" BasedOn="{StaticResource FluentEditorRowGrid}">
                         <Setter Property="Margin" Value="0"></Setter>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=CbUsePrivateKey,Path= IsChecked}" Value="True">
@@ -55,8 +56,8 @@
                     </Style>
                 </Grid.Style>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource Password}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <controls:PasswordInput Height="28" Password="{Binding New.Password, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, ValidatesOnNotifyDataErrors=True}"/>
                     </Grid>
                     <CheckBox Name="CbUsePrivateKey"
@@ -70,7 +71,7 @@
 
             <Grid Name="GridPrivateKey">
                 <Grid.Style>
-                    <Style TargetType="Grid" BasedOn="{StaticResource EditorRowGrid}">
+                    <Style TargetType="Grid" BasedOn="{StaticResource FluentEditorRowGrid}">
                         <Setter Property="Margin" Value="0"></Setter>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=CbUsePrivateKey,Path= IsChecked}" Value="False">
@@ -82,8 +83,8 @@
                 </Grid.Style>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource 'Private key'}"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource 'Private key'}"></TextBlock>
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -92,7 +93,7 @@
                             <Button Grid.Column="1"
                                     Content="{DynamicResource Select}" 
                                     Click="ButtonOpenPrivateKey_OnClick" 
-                                    Style="{StaticResource ButtonPrimaryStyle}"
+                                    Style="{StaticResource FluentPageButton}"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Stretch">
                             </Button>
@@ -104,15 +105,15 @@
                                   Unchecked="CbUsePrivateKey_OnChecked"></CheckBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
                         <TextBlock Style="{StaticResource TextBlockBase}" Text="{DynamicResource 'Supports the Putty-key only'}" Opacity="0.7"></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
                     <CheckBox Content="{DynamicResource 'Ask for password when open connect'}" IsChecked="{Binding New.AskPasswordWhenConnect}"></CheckBox>
                 </StackPanel>
             </Grid>-->
@@ -126,11 +127,11 @@
 
 
         <StackPanel>
-            <TextBlock Style="{StaticResource EditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}"></TextBlock>
-            <Grid Style="{StaticResource EditorRowGrid}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_version}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <TextBlock Style="{StaticResource FluentEditorGroupTextBlockTitle}" Text="{DynamicResource server_editor_group_title_advantage}"></TextBlock>
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_version}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <Grid.Resources>
                             <forms:ConverterESshVersion x:Key="ConverterESshVersion" />
                         </Grid.Resources>
@@ -150,30 +151,30 @@
                     </Grid>
                 </StackPanel>
             </Grid>
-            <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_startup_auto_command}"></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="{DynamicResource server_editor_advantage_ssh_startup_auto_command}"></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBox Text="{Binding New.StartupAutoCommand, UpdateSourceTrigger=PropertyChanged}"
                                  Tag="e.g. cd /home/user/Desktop/;./build.sh;"></TextBox>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
-                    <Grid Style="{StaticResource EditorRowGridInput}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}" Visibility="{Binding New.SelectedRunnerIsInternalRunner, Converter={StaticResource ConverterBool2Visible}}">
+                <StackPanel Style="{StaticResource FluentFieldStack}">
+                    <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
+                    <Grid Style="{StaticResource FluentEditorRowGridInput}">
                         <TextBlock Opacity="0.8" Text="Tips: You can modify the color scheme in Settings -> Protocol -> SSH -> Built-in" TextWrapping="Wrap"></TextBlock>
                     </Grid>
                 </StackPanel>
             </Grid>
 
-            <Grid Style="{StaticResource EditorRowGrid}">
+            <Grid Style="{StaticResource FluentEditorRowGrid}">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text="SFTP"></TextBlock>
-                        <Grid Style="{StaticResource EditorRowGridInput}">
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text="SFTP"></TextBlock>
+                        <Grid Style="{StaticResource FluentEditorRowGridInput}">
                             <CheckBox Content="{DynamicResource 'Open SFTP when connected'}" IsChecked="{Binding New.OpenSftpOnConnected}"></CheckBox>
                         </Grid>
                     </StackPanel>
@@ -187,7 +188,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
                         <TextBlock Style="{StaticResource TextBlockBase}" Text="{DynamicResource 'Supports the OpenSSH format key only with the internal SFTP client.'}" Opacity="0.7"></TextBlock>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -200,7 +201,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Style="{StaticResource EditorRowGridTitle}" Text=""></TextBlock>
+                        <TextBlock Style="{StaticResource FluentEditorRowGridTitle}" Text=""></TextBlock>
                         <TextBlock Style="{StaticResource TextBlockBase}" Text="{DynamicResource 'Supports the OpenSSH format key and Putty-key with WinSCP.'}" Opacity="0.7"></TextBlock>
                     </StackPanel>
                 </StackPanel>

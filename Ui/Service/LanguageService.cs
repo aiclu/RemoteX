@@ -77,7 +77,8 @@ namespace _1RM.Service
             code = code.ToLower();
             if (code.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
                 code = code.Replace(".xaml", "");
-            var path = ResourceUriHelper.GetUriPathFromCurrentAssembly($"Resources/Languages/{code}.xaml");
+            // Resolve bundled resources from their owning assembly, including in isolated startup tests.
+            var path = ResourceUriHelper.GetUriPathFromAssembly(typeof(LanguageService).Assembly.GetName().Name!, $"Resources/Languages/{code}.xaml");
             if (LanguageCode2Name.ContainsKey(code)) return;
             var r = GetResourceDictionaryByXamlUri(path);
             Debug.Assert(r != null);

@@ -4,9 +4,11 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:local="clr-namespace:_1RM.View"
+                   xmlns:host="clr-namespace:_1RM.View.Host" host:FluentSessionAppearance.Enabled="True"
                    xmlns:styles="clr-namespace:Shawn.Utils.WpfResources.Theme.Styles;assembly=Shawn.Utils.WpfResources"
                    mc:Ignorable="d"
                    ResizeMode="NoResize"
                    WindowStartupLocation="CenterScreen"
-                   Title="FullScreenWindowView" Height="480" Width="600" Background="{DynamicResource PrimaryMidBrush}">
+                   Title="FullScreenWindowView" Height="480" Width="600">
+    <Window.Style><Style TargetType="{x:Type styles:WindowBase}"><Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/><Style.Triggers><Trigger Property="host:FluentSessionAppearance.Active" Value="True"><Setter Property="Background" Value="{DynamicResource FluentCanvas}"/></Trigger></Style.Triggers></Style></Window.Style>
 </styles:WindowBase>

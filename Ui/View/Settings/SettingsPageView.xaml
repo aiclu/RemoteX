@@ -7,18 +7,40 @@
              xmlns:settings="clr-namespace:_1RM.View.Settings"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:view="clr-namespace:_1RM.View"
+             view:FluentPage.Scope="True"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance settings:SettingsPageViewModel}"
-             Background="White"
+             Background="{DynamicResource BackgroundBrush}"
              d:DesignHeight="2450" d:DesignWidth="1000">
 
-    <Grid Background="{DynamicResource BackgroundBrush}" Grid.IsSharedSizeScope="True">
+    <UserControl.Resources>
+ <ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentForms.xaml"/></ResourceDictionary.MergedDictionaries>
+ <Style x:Key="NarrowOnly" TargetType="FrameworkElement"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><Trigger Property="view:FluentPage.Narrow" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers></Style>
+ <Style x:Key="FluentSettingsBack" TargetType="Button" BasedOn="{StaticResource ButtonBarAccentStyle}"><Setter Property="Width" Value="200"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Width" Value="176"/></Trigger><Trigger Property="view:FluentPage.Narrow" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers></Style>
+ </ResourceDictionary>
+ </UserControl.Resources>
+ <Grid>
+ <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+ <DockPanel Grid.Row="0" Margin="16,12" Style="{StaticResource NarrowOnly}">
+ <Button DockPanel.Dock="Right" Margin="12,0,0,0" Content="{DynamicResource Back}" Command="{Binding CmdSaveAndGoBack}" Style="{StaticResource FluentPageButton}"/>
+ <ComboBox x:Name="PageSelector" SelectedValuePath="Tag" SelectedValue="{Binding NavigationPage, Mode=TwoWay}">
+ <ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsGeneral}" Content="{DynamicResource system_options_general_title}"/>
+<ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsLauncher}" Content="{DynamicResource Launcher}"/>
+<ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsData}" Content="{DynamicResource system_options_data_security_database}"/>
+<ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsCredentialVault}" Content="{DynamicResource 'Credentials Vault'}"/>
+<ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsTheme}" Content="{DynamicResource Theme}"/>
+<ComboBoxItem Tag="{x:Static view:EnumMainWindowPage.SettingsRunners}" Content="{DynamicResource Protocol}"/>
+ </ComboBox>
+ </DockPanel>
+    <Grid Grid.Row="1" Grid.IsSharedSizeScope="True">
+<Grid.Style><Style TargetType="Grid"><Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Background" Value="{DynamicResource FluentCanvas}"/></Trigger></Style.Triggers></Style></Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
         <StackPanel Background="{DynamicResource PrimaryMidBrush}">
+ <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers><Trigger Property="view:FluentPage.Narrow" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers></Style></StackPanel.Style>
             <StackPanel.Resources>
                 <Style x:Key="TabButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonBarPrimaryStyle}">
                     <Setter Property="Cursor" Value="Hand"></Setter>
@@ -36,11 +58,11 @@
                     <Setter Property="attachProperty:VisionElement.BorderOpacity" Value="1"></Setter>
                     <Setter Property="attachProperty:VisionElement.BorderOpacityOnMouseDown" Value="1"></Setter>
                     <Setter Property="attachProperty:VisionElement.BorderOpacityOnMouseDown" Value="1"></Setter>
-                </Style>
+                <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Padding" Value="12,6"/><Setter Property="Template" Value="{StaticResource FluentPageButtonTemplate}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/><Setter Property="Width" Value="168"/><Setter Property="Height" Value="Auto"/><Setter Property="MinHeight" Value="36"/><Setter Property="HorizontalContentAlignment" Value="Left"/></Trigger></Style.Triggers></Style>
             </StackPanel.Resources>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsGeneral}"
                     Content="{DynamicResource system_options_general_title}">
@@ -65,7 +87,7 @@
             </Button>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsLauncher}"
                     Content="{DynamicResource Launcher}">
@@ -90,7 +112,7 @@
             </Button>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsData}"
                     Content="{DynamicResource system_options_data_security_database}">
@@ -115,7 +137,7 @@
             </Button>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsCredentialVault}"
                     Content="{DynamicResource 'Credentials Vault'}">
@@ -140,7 +162,7 @@
             </Button>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsTheme}"
                     Content="{DynamicResource Theme}">
@@ -165,7 +187,7 @@
             </Button>
 
 
-            <Button Width="200" Height="40"
+            <Button
                     Command="{Binding CmdShowPage}"
                     CommandParameter="{x:Static view:EnumMainWindowPage.SettingsRunners}"
                     Content="{DynamicResource Protocol}">
@@ -196,15 +218,23 @@
 
         <Button Grid.Column="0"
                 VerticalAlignment="Bottom"
-                Width="200" Height="40"
+                Height="40"
                 Foreground="{DynamicResource PrimaryTextBrush}"
                 Background="{DynamicResource PrimaryDarkBrush}"
-                Style="{StaticResource ButtonBarAccentStyle}"
+                Style="{StaticResource FluentSettingsBack}"
                 attachProperty:VisionElement.BackgroundAccent="{DynamicResource AccentMidBrush}"
                 Command="{Binding CmdSaveAndGoBack}"
                 Content="{DynamicResource Back}">
         </Button>
 
-        <ContentControl Grid.Column="1" s:View.Model="{Binding SelectedViewModel}"></ContentControl>
+        <Border Grid.Column="1">
+ <Border.Style><Style TargetType="Border"><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Background" Value="{DynamicResource FluentSurface}"/><Setter Property="Margin" Value="12"/><Setter Property="Padding" Value="16"/><Setter Property="CornerRadius" Value="8"/><Setter Property="BorderThickness" Value="1"/><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/></Trigger></Style.Triggers></Style></Border.Style>
+ <DockPanel>
+ <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedItem.Content, ElementName=PageSelector}" FontWeight="SemiBold" FontSize="{DynamicResource GlobalFontSizeTitle}" Margin="0,0,0,16">
+ <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Foreground" Value="{DynamicResource BackgroundTextBrush}"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers></Style></TextBlock.Style>
+ </TextBlock>
+ <ContentControl x:Name="SettingsContent" s:View.Model="{Binding SelectedViewModel}"/>
+ </DockPanel></Border>
     </Grid>
+ </Grid>
 </UserControl>
