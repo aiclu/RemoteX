@@ -2,10 +2,23 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:view="clr-namespace:_1RM.View">
     <!-- Only explicitly scoped connection views consume these templates. -->
+    <Style x:Key="FluentTreeLayout" TargetType="TreeView">
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+        <Style.Triggers>
+            <!-- Hierarchical virtualization can repeatedly invalidate layout on scrolling.
+                 Keep the stability fallback local to Fluent trees; list virtualization is unchanged. -->
+            <Trigger Property="view:FluentPage.Active" Value="True">
+                <Setter Property="VirtualizingPanel.IsVirtualizing" Value="False"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <ControlTemplate x:Key="FluentTreeItemTemplate" TargetType="TreeViewItem">
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <!-- WPF uses PART_Header.DesiredSize for hierarchical virtualization.
+                 It must include the whole row, not just the text inside its padded border. -->
             <Border x:Name="Row" Grid.ColumnSpan="2" CornerRadius="6" Background="Transparent" BorderBrush="Transparent" BorderThickness="1"/>
             <Border x:Name="SelectedMark" Width="3" Height="20" CornerRadius="2" Background="{DynamicResource FluentAccent}" HorizontalAlignment="Left" Visibility="Collapsed"/>
             <ToggleButton x:Name="Expander" Width="24" MinHeight="36" Focusable="False"
@@ -19,13 +32,13 @@
                     </ControlTemplate.Triggers>
                 </ControlTemplate></ToggleButton.Template>
             </ToggleButton>
-            <Border x:Name="HeaderRow" Grid.Column="1" MinHeight="40" Padding="4,2,8,2" Background="Transparent">
-                <ContentPresenter x:Name="PART_Header" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+            <Border x:Name="PART_Header" Grid.Column="1" MinHeight="40" Padding="4,2,8,2" Background="Transparent">
+                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
             </Border>
             <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Grid.Column="1"/>
         </Grid>
         <ControlTemplate.Triggers>
-            <Trigger SourceName="HeaderRow" Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+            <Trigger SourceName="PART_Header" Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
             <Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource FluentHover}"/><Setter TargetName="SelectedMark" Property="Visibility" Value="Visible"/></Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
             <Trigger Property="HasItems" Value="False"><Setter TargetName="Expander" Property="Visibility" Value="Hidden"/></Trigger>

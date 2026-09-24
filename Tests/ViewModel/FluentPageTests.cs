@@ -77,6 +77,32 @@ namespace Tests.ViewModel
             FluentFieldLayout.SetEnabled(stack, false);
             Assert.AreEqual(Orientation.Horizontal, stack.Orientation);
         });
+        [DataTestMethod]
+        [DataRow(12.0)]
+        [DataRow(24.0)]
+        public void TreeVirtualizationHeaderIncludesWholeRow(double fontSize) => Sta(() =>
+        {
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Application).TypeHandle);
+            var item = new TreeViewItem { Header = "Synthetic", FontSize = fontSize,
+                Template = (ControlTemplate)ServerViewResources()["FluentTreeItemTemplate"] };
+            item.Measure(new Size(400, double.PositiveInfinity));
+            item.Arrange(new Rect(0, 0, 400, item.DesiredSize.Height));
+            var header = (FrameworkElement)item.Template.FindName("PART_Header", item);
+            Assert.AreEqual(item.DesiredSize.Height, header.DesiredSize.Height, 0.01,
+                "Virtualization must measure the full row, including minimum height and padding, not only its text.");
+        });
+        [TestMethod]
+        public void TreeLayoutFallbackIsLimitedToFluentAndRestoresClassic() => Sta(() =>
+        {
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Application).TypeHandle);
+            var tree = new TreeView { Style = (Style)ServerViewResources()["FluentTreeLayout"] };
+            Assert.IsTrue(VirtualizingPanel.GetIsVirtualizing(tree));
+            FluentPage.SetActive(tree, true);
+            Assert.IsFalse(VirtualizingPanel.GetIsVirtualizing(tree));
+            FluentPage.SetActive(tree, false);
+            Assert.IsTrue(VirtualizingPanel.GetIsVirtualizing(tree));
+            Assert.AreEqual(VirtualizationMode.Recycling, VirtualizingPanel.GetVirtualizationMode(tree));
+        });
         private static ResourceDictionary ServerViewResources() => new ResourceDictionary {
             Source = new Uri("/RemoteX;component/Resources/Theme/FluentServerViews.xaml", UriKind.Relative)
         };

@@ -162,8 +162,7 @@
                           KeyboardNavigation.TabNavigation="Contained"
                           KeyboardNavigation.DirectionalNavigation="Contained"
                           Focusable="True"
-                          VirtualizingPanel.IsVirtualizing="True"
-                          VirtualizingPanel.VirtualizationMode="Recycling">
+                          Style="{StaticResource FluentTreeLayout}">
                     <TreeView.Resources>
                         <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="{DynamicResource PrimaryTextColor}"/>
                         <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="{DynamicResource AccentLightColor}"/>
