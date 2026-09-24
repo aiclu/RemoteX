@@ -19,7 +19,7 @@ RemoteX 是一款现代化的个人远程会话管理与启动器。它可以在
 
 启用方式：进入 **设置 → 主题**，选择 **Fluent 预览**，再选择浅色、深色或跟随系统。Fluent 模式下也可通过左侧 **外观** 菜单切换主题或返回经典模式。
 
-详见 [2.0.0 发布说明](docs/releases/2.0.0.md) 与 [开发指南](DEVELOP.md)。
+详见 [2.0.1 发布说明](docs/releases/2.0.1.md) 与 [开发指南](DEVELOP.md)。
 
 ## 功能特性
 
@@ -36,11 +36,11 @@ RemoteX 是一款现代化的个人远程会话管理与启动器。它可以在
 
 ## 🚩安装
 
-最新版本：2.0.0
+最新版本：2.0.1
 
 ### 🔻[下载](https://github.com/aiclu/RemoteX/releases)
 
-在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-2.0.0-net9-x64.zip`（框架依赖版）或 `RemoteX-2.0.0-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
+在 [Releases 页面](https://github.com/aiclu/RemoteX/releases) 下载 `RemoteX-2.0.1-net9-x64.zip`（框架依赖版）或 `RemoteX-2.0.1-net9-x64-self-contained.zip`（无需安装 .NET 运行时的自包含版）。
 
 ### 运行要求与升级
 

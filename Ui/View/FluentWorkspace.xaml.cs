@@ -25,6 +25,8 @@ namespace _1RM.View
         public static void SetIsCompact(DependencyObject target, bool value) => target.SetValue(IsCompactProperty, value);
 
         private MainWindowViewModel? _vm;
+        private ServerView.ServerPageViewModelBase? _tagPage;
+        private FluentTagView? _tagView;
         private readonly ResourceDictionary _listPalette = new ResourceDictionary();
         private bool _listening;
 
@@ -49,6 +51,7 @@ namespace _1RM.View
         }
         private void Detach()
         {
+            DetachTags();
             if (!_listening) return;
             if (_vm != null) _vm.PropertyChanged -= OnVmChanged;
             IoC.Get<FluentAppearanceService>().Changed -= OnAppearanceChanged;
@@ -60,6 +63,35 @@ namespace _1RM.View
             if (e.PropertyName is nameof(MainWindowViewModel.IsFluentPreview) or nameof(MainWindowViewModel.FluentTheme)
                 or nameof(MainWindowViewModel.CurrentView) or nameof(MainWindowViewModel.IsShownList))
                 Refresh();
+            if (e.PropertyName == nameof(MainWindowViewModel.ActiveServerViewModel)) RefreshTags();
+        }
+        private void DetachTags()
+        {
+            if (_tagPage != null) _tagPage.PropertyChanged -= OnTagPageChanged;
+            _tagPage = null;
+            Tags.ItemsSource = null;
+            _tagView?.Dispose();
+            _tagView = null;
+        }
+        private void RefreshTags()
+        {
+            var page = Enabled ? _vm?.ActiveServerViewModel : null;
+            if (ReferenceEquals(page, _tagPage) && _tagView != null &&
+                ReferenceEquals(_tagView.View.SourceCollection, page?.HeaderTags)) return;
+            DetachTags();
+            _tagPage = page;
+            if (page == null) return;
+            page.PropertyChanged += OnTagPageChanged;
+            _tagView = new FluentTagView(page.HeaderTags);
+            Tags.ItemsSource = _tagView.View;
+        }
+        private void OnTagPageChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ServerView.ServerPageViewModelBase.HeaderTags))
+            {
+                if (Dispatcher.CheckAccess()) RefreshTags();
+                else QueueRefresh();
+            }
         }
         private void OnAppearanceChanged(object? sender, EventArgs e) => QueueRefresh();
         private void QueueRefresh()
@@ -73,6 +105,7 @@ namespace _1RM.View
         {
             if (!Dispatcher.CheckAccess()) { QueueRefresh(); return; }
             IoC.Get<FluentAppearanceService>().ApplyPalette(Resources);
+            RefreshTags();
 
             ServerPresenter.Resources.MergedDictionaries.Remove(_listPalette);
             var listEnabled = Enabled && _vm?.CurrentView == EnumServerViewStatus.List;
@@ -127,6 +160,14 @@ namespace _1RM.View
                     menu.Resources[key] = Resources[key];
                 menu.IsOpen = true;
             }
+        }
+
+        private void TagMenuOpened(object sender, RoutedEventArgs e)
+        {
+            if (sender is not ContextMenu menu) return;
+            // Context menus live outside the sidebar's visual tree.
+            foreach (var key in new[] { "FluentSurface", "FluentText", "FluentAccent", "FluentMuted", "FluentHover", "FluentStroke" })
+                menu.Resources[key] = Resources[key];
         }
 
         private void SearchKeyUp(object sender, KeyEventArgs e)

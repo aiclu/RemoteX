@@ -159,6 +159,7 @@ class Program
             cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
             RenderAboutNavigation(dark, width < 720, type);
             RenderNavigationAlignment(dark, width < 720, type);
+            RenderSidebarTags(dark, width < 720 ? 140 : 176, type);
             RenderSessionHeader(width, dark, type);
             var cards = new WrapPanel();
             for (var i = 0; i < 8; i++) cards.Children.Add(new _1RM.Controls.ServerCardItem {
@@ -286,6 +287,26 @@ class Program
             if (labels.Any(label => Math.Abs(label.TranslatePoint(new Point(), samples).X - left) > 0.1))
                 throw new InvalidOperationException("Sidebar labels are not aligned.");
         }
+    }
+    static void RenderSidebarTags(bool dark, int width, Type service)
+    {
+        var workspace = new FluentWorkspace();
+        var tags = (ListBox)workspace.FindName("Tags");
+        ((Panel)tags.Parent).Children.Remove(tags);
+        tags.Visibility = Visibility.Visible;
+        tags.Resources.MergedDictionaries.Add(workspace.Resources);
+        var source = new ObservableCollection<_1RM.Model.Tag> {
+            new("ordinary", false, 0), new("pinned", true, 1), new("很长的固定标签名称·模拟数据", true, 2)
+        };
+        for (var i = 0; i < 400; i++) source.Add(new _1RM.Model.Tag("tag-" + i.ToString("D3"), false, i + 3));
+        var type = typeof(FluentWorkspace).Assembly.GetType("_1RM.View.FluentTagView")!;
+        using var sorted = (IDisposable)Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Instance,
+            null, new object[] { source }, null)!;
+        tags.ItemsSource = (System.Collections.IEnumerable)type.GetProperty("View", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(sorted)!;
+        Render(tags, "SidebarTags", width, dark, service, width == 140 ? 18 : 13);
+        if (tags.ItemContainerGenerator.ContainerFromIndex(300) != null)
+            throw new InvalidOperationException("Off-screen sidebar tags must remain virtualized.");
+        tags.ItemsSource = null;
     }
     static void RenderAboutNavigation(bool dark, bool compact, Type service)
     {

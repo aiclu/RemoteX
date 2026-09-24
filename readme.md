@@ -19,7 +19,7 @@ RemoteX is a modern personal remote session manager and launcher. It is a single
 
 To enable Fluent, open **Settings → Theme**, choose **Fluent preview**, then select light, dark, or system. In Fluent mode, the sidebar **Appearance** menu switches themes or returns to classic.
 
-See [2.0.0 release notes](docs/releases/2.0.0.md) and the [development guide](DEVELOP.md).
+See [2.0.1 release notes](docs/releases/2.0.1.md) and the [development guide](DEVELOP.md).
 
 ## Features
 
@@ -36,11 +36,11 @@ See [2.0.0 release notes](docs/releases/2.0.0.md) and the [development guide](DE
 
 ## 🚩Installation
 
-Latest Version: 2.0.0
+Latest Version: 2.0.1
 
 ### 🔻[Download](https://github.com/aiclu/RemoteX/releases)
 
-Grab the `RemoteX-2.0.0-net9-x64.zip` (framework-dependent) or `RemoteX-2.0.0-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
+Grab the `RemoteX-2.0.1-net9-x64.zip` (framework-dependent) or `RemoteX-2.0.1-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
 
 ### Requirements and upgrading
 

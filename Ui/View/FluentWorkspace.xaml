@@ -63,7 +63,7 @@
     <Button DockPanel.Dock="Top" Style="{StaticResource FluentNavButton}" Command="{Binding ActiveServerViewModel.CmdShowMainTab}" ToolTip="{DynamicResource FluentAllConnections}">
      <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8F1;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="ConnectionsLabel" Text="{DynamicResource FluentAllConnections}" Margin="12,0,0,0" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel>
     </Button>
-    <ListBox x:Name="Tags" ItemsSource="{Binding ActiveServerViewModel.HeaderTags}" Background="Transparent" BorderThickness="0"
+    <ListBox x:Name="Tags" Background="Transparent" BorderThickness="0"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
              VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
      <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/></Style></ListBox.ItemContainerStyle>
@@ -79,14 +79,30 @@
                        CommandParameter="{Binding}"/>
         </Button.InputBindings>
         <Button.ContextMenu>
-         <ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
+         <ContextMenu Style="{StaticResource FluentWorkspaceMenu}" Opened="TagMenuOpened">
           <MenuItem Header="{DynamicResource Rename}" Command="{Binding PlacementTarget.Tag.CmdTagRename, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-          <MenuItem Header="{DynamicResource Pin}" Command="{Binding PlacementTarget.Tag.CmdTagPin, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+          <MenuItem Command="{Binding PlacementTarget.Tag.CmdTagPin, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+           <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}">
+            <Setter Property="Header" Value="{DynamicResource Pin}"/>
+            <Style.Triggers><DataTrigger Binding="{Binding PlacementTarget.DataContext.IsPinned, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+             <Setter Property="Header" Value="{DynamicResource Unpin}"/>
+            </DataTrigger></Style.Triggers>
+           </Style></MenuItem.Style>
+          </MenuItem>
           <MenuItem Header="{DynamicResource Connect}" Command="{Binding PlacementTarget.Tag.CmdTagConnect, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
           <MenuItem Header="{DynamicResource Delete}" Command="{Binding PlacementTarget.Tag.CmdTagDelete, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
          </ContextMenu>
         </Button.ContextMenu>
-        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+        <Grid>
+         <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+         <TextBlock Text="&#xE718;" Foreground="{DynamicResource FluentMuted}" AutomationProperties.Name="{DynamicResource Pin}">
+          <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource FluentNavigationIcon}">
+           <Setter Property="Visibility" Value="Hidden"/>
+           <Style.Triggers><DataTrigger Binding="{Binding IsPinned}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+          </Style></TextBlock.Style>
+         </TextBlock>
+         <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+        </Grid>
        </Button>
       </DataTemplate>
      </ListBox.ItemTemplate>
