@@ -34,26 +34,32 @@
                           IsExpanded="{Binding Items[0].GroupedIsExpanded, Mode=TwoWay, FallbackValue=False}"
                           Template="{StaticResource FluentSourceExpanderTemplate}">
                     <Expander.Header>
-                        <StackPanel Tag="{Binding ActualHeight, ElementName=SourceTitleLine}">
-                        <Grid x:Name="SourceTitleLine">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/><ColumnDefinition Width="28"/><ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="HeaderCheckBox" Width="20" Height="20" VerticalAlignment="Center"
+                        <StackPanel>
+                        <view:FluentHomeRowGrid x:Name="SourceTitleLine" IsSourceHeader="True" MinHeight="36">
+                            <Path x:Name="SourceChevron" Data="M 0,0 L 5,5 L 0,10" Width="5" Height="10" Stretch="Fill" VerticalAlignment="Center"
+                                  Stroke="{DynamicResource FluentMuted}" StrokeThickness="1.5" RenderTransformOrigin="0.5,0.5">
+                                <Path.Style><Style TargetType="Path"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=Expander}}" Value="True">
+                                        <Setter Property="RenderTransform"><Setter.Value><RotateTransform Angle="90"/></Setter.Value></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers></Style></Path.Style>
+                            </Path>
+                            <CheckBox x:Name="HeaderCheckBox" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left"
                                       Click="ItemsCheckBox_OnClick" ToolTip="{DynamicResource Select}"
                                       AutomationProperties.Name="{DynamicResource Select}"/>
-                            <Grid Grid.Column="1" Background="Transparent" Cursor="SizeNS" Margin="4,0"
+                            <Grid Grid.Column="2" Background="Transparent" Cursor="SizeNS"
                                   ToolTip="{DynamicResource Sort by drag}"
                                   PreviewMouseDown="ServerListExpanderIcon_OnPreviewMouseDown"
                                   PreviewMouseMove="ServerList_PreviewMouseMoveEvent">
                                 <Path Width="8" Height="12" Stroke="{DynamicResource FluentMuted}" StrokeThickness="1.5" Stretch="Uniform"
                                       Data="M 1,1 L 1,2 M 6,1 L 6,2 M 1,5 L 1,6 M 6,5 L 6,6 M 1,9 L 1,10 M 6,9 L 6,10"/>
                             </Grid>
-                            <TextBlock x:Name="SourceName" Grid.Column="2" Style="{StaticResource TextBlockBase}" Text="{Binding Name.DataSourceName}" ToolTip="{Binding Name.DataSourceName}"
+                            <TextBlock x:Name="SourceName" Grid.Column="3" Style="{StaticResource TextBlockBase}" Text="{Binding Name.DataSourceName}" ToolTip="{Binding Name.DataSourceName}"
                                        FontSize="{DynamicResource GlobalFontSizeBody}" FontWeight="SemiBold" VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis" Margin="4,0,12,0" Foreground="{DynamicResource FluentText}"/>
-                            <Button x:Name="ButtonDbStatus" Grid.Column="3" Style="{StaticResource FluentSourceAction}"
+                                       TextTrimming="CharacterEllipsis" Margin="0,0,8,0" Foreground="{DynamicResource FluentText}"/>
+                            <Grid x:Name="SourceActions" Grid.Column="4" Grid.ColumnSpan="2" Width="124" HorizontalAlignment="Right">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="60"/><ColumnDefinition Width="64"/></Grid.ColumnDefinitions>
+                            <Button x:Name="ButtonDbStatus" Style="{StaticResource FluentSourceAction}"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType=serverView:ServerViewBase}, Path=DataContext.CmdRefreshDataSource}"
                                     CommandParameter="{Binding Name}" ToolTip="{Binding Name.StatusInfo}" AutomationProperties.Name="{Binding Name.StatusInfo}">
                                 <Path Width="18" Height="18" Stretch="Uniform" Fill="{DynamicResource FluentMuted}">
@@ -71,15 +77,16 @@
                                     </Style></Path.Style>
                                 </Path>
                             </Button>
-                            <Button x:Name="SourceAdd" Grid.Column="4" Style="{StaticResource FluentSourceAction}"
+                            <Button x:Name="SourceAdd" Grid.Column="1" Style="{StaticResource FluentSourceAction}"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType=serverView:ServerViewBase}, Path=DataContext.CmdAdd}"
                                     CommandParameter="{Binding Name}" IsEnabled="{Binding Name.IsWritable}"
                                     Visibility="{Binding Name.Status, Converter={StaticResource ConverterEqual2Visible}, ConverterParameter={x:Static dao:EnumDatabaseStatus.OK}}"
                                     ToolTip="{DynamicResource Add}" AutomationProperties.Name="{DynamicResource Add}">
                                 <Path Width="12" Height="12" Stretch="Uniform" Data="{StaticResource GeometryCross}" Fill="{DynamicResource FluentMuted}"/>
                             </Button>
-                        </Grid>
-                            <StackPanel x:Name="SourceError" Margin="52,4,4,4">
+                            </Grid>
+                        </view:FluentHomeRowGrid>
+                            <StackPanel x:Name="SourceError" Margin="84,4,4,4">
                                 <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers>
                                     <DataTrigger Binding="{Binding Name.Status}" Value="{x:Static dao:EnumDatabaseStatus.OK}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
                                 </Style.Triggers></Style></StackPanel.Style>
@@ -208,8 +215,12 @@
                             <VirtualizingStackPanel IsVirtualizing="True"
                                                     ScrollUnit="Pixel"
                                                     VirtualizationMode="Recycling"
-                                                    CacheLengthUnit="Item"
-                                                    Margin="0 0 0 30"/>
+                                                    CacheLengthUnit="Item">
+                                <VirtualizingStackPanel.Style><Style TargetType="VirtualizingStackPanel">
+                                    <Setter Property="Margin" Value="0,0,0,30"/>
+                                    <Style.Triggers><Trigger Property="view:FluentWorkspace.IsPreview" Value="True"><Setter Property="Margin" Value="0"/></Trigger></Style.Triggers>
+                                </Style></VirtualizingStackPanel.Style>
+                            </VirtualizingStackPanel>
                         </ItemsPanelTemplate>
                     </Setter.Value>
                 </Setter>
@@ -223,10 +234,14 @@
                 <Style.Triggers>
                     <MultiTrigger><MultiTrigger.Conditions>
                         <Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsGrouping" Value="True"/>
-                    </MultiTrigger.Conditions><Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/></MultiTrigger>
+                    </MultiTrigger.Conditions>
+                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                        <Setter Property="Padding" Value="0"/><Setter Property="Template" Value="{DynamicResource FluentHomeItemsTemplate}"/>
+                    </MultiTrigger>
                     <Trigger Property="view:FluentWorkspace.IsPreview" Value="True">
                         <Setter Property="ItemTemplate" Value="{StaticResource FluentListTemplate}"/>
                         <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Padding" Value="0"/><Setter Property="Template" Value="{DynamicResource FluentHomeItemsTemplate}"/>
                     </Trigger>
                     <DataTrigger Binding="{Binding CurrentViewInListPage}" Value="{x:Static view:EnumServerViewStatus.Card}">
                         <Setter Property="ItemsPanel">

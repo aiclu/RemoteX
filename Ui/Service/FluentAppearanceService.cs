@@ -55,6 +55,8 @@ namespace _1RM.Service
             resources["FluentHover"] = highContrast ? SystemColors.ControlBrush : ColorBrush(dark ? "#383838" : "#E9E9E9");
             resources["FluentAccent"] = highContrast ? SystemColors.HighlightBrush : ColorBrush(dark ? "#60CDFF" : "#005FB8");
             resources["FluentAccentText"] = highContrast ? SystemColors.HighlightTextBrush : ColorBrush(dark ? "#002238" : "#FFFFFF");
+            resources["FluentSelection"] = highContrast ? SystemColors.HighlightBrush : ColorBrush(dark ? "#293F49" : "#E7F0F8");
+            resources["FluentSelectionText"] = highContrast ? SystemColors.HighlightTextBrush : resources["FluentText"];
         }
         internal static void ApplyAliases(ResourceDictionary resources)
         {

@@ -39,7 +39,13 @@ public sealed class SourceGroupFixture : NotifyPropertyChangedBase
         public bool GroupedIsExpanded { get => _expanded; set => SetAndNotifyIfChanged(ref _expanded, value); }
         public Source DataSource { get; set; } = null!;
         public bool IsVisible { get; set; } = true;
-        public object Server => new { Id = IsVisible ? "synthetic" : "0" };
+        public string Protocol { get; set; } = "RDP";
+        public string Address { get; set; } = "server.example.invalid:3389 (demo)";
+        public ImageSource? Icon { get; set; }
+        private bool _isSelected;
+        public bool IsSelected { get => _isSelected; set => SetAndNotifyIfChanged(ref _isSelected, value); }
+        public Command CmdConnServer { get; } = new();
+        public object Server => new { Id = IsVisible ? "synthetic" : "0", ProtocolDisplayName = Protocol, SubTitle = Address, IconImg = Icon };
         public string DisplayName { get; set; } = "测试连接";
     }
     public sealed class Command : ICommand
@@ -56,6 +62,11 @@ public sealed class SourceGroupFixture : NotifyPropertyChangedBase
     public EnumServerViewStatus CurrentViewInListPage { get; set; } = EnumServerViewStatus.List;
     public bool IsTagFiltersShown => false;
     public bool IsAddToolTipShow => false;
+    private string _selectedTabName = "prime";
+    public string SelectedTabName { get => _selectedTabName; set => SetAndNotifyIfChanged(ref _selectedTabName, value); }
+    public Command CmdShowMainTab { get; } = new();
+    public Command CmdTagAddIncluded { get; } = new();
+    public Command CmdTagAddExcluded { get; } = new();
     public object? SelectedServerViewModel { get; set; }
     private object? _tagListViewModel;
     public object? TagListViewModel { get => _tagListViewModel; set => SetAndNotifyIfChanged(ref _tagListViewModel, value); }
@@ -107,7 +118,7 @@ public sealed class SourceGroupFixture : NotifyPropertyChangedBase
         Console.WriteLine("PASS: repeated tag management / connection switching, no legacy gap, expansion preserved.");
     }
 
-    public SourceGroupFixture(bool expanded = false, int rowsPerSource = 3, bool cards = false)
+    public SourceGroupFixture(bool expanded = false, int rowsPerSource = 3, bool cards = false, bool realRows = false)
     {
         CurrentViewInListPage = cards ? EnumServerViewStatus.Card : EnumServerViewStatus.List;
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Application).TypeHandle);
@@ -153,7 +164,7 @@ public sealed class SourceGroupFixture : NotifyPropertyChangedBase
             card.SetValue(Border.BorderThicknessProperty, new Thickness(1)); card.AppendChild(text);
             List.ItemTemplate = new DataTemplate { VisualTree = card };
         }
-        else List.ItemTemplate = new DataTemplate { VisualTree = text };
+        else if (!realRows) List.ItemTemplate = new DataTemplate { VisualTree = text };
     }
 
     private static void Require(bool condition, string message)

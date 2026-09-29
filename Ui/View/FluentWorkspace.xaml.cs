@@ -130,22 +130,26 @@ namespace _1RM.View
 
         private void RefreshLayout()
         {
-            var enabled = Enabled;
-            var compact = ActualWidth < 720;
+            ApplyHomeLayout(Enabled, ActualWidth);
+            if (Window.GetWindow(this) is MainWindowView main)
+                main.ApplyFluentChrome(_vm?.IsFluentPreview == true, (Brush)Resources["FluentCanvas"],
+                    (Brush)Resources["FluentText"], (Brush)Resources["FluentHover"]);
+        }
+
+        internal void ApplyHomeLayout(bool enabled, double width)
+        {
+            var compact = width < 720;
             SetIsCompact(Search, compact);
-            SetIsCompact(ServerPresenter, ActualWidth < 650);
+            SetIsCompact(ServerPresenter, width < 650);
             NavColumn.Width = new GridLength(enabled ? (compact ? 56 : 176) : 0);
             Sidebar.Visibility = Toolbar.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
             foreach (var label in new[] { ConnectionsLabel, SettingsLabel, AboutLabel, AppearanceLabel })
                 label.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
             Tags.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
             Shell.Background = enabled ? (Brush)Resources["FluentCanvas"] : Brushes.Transparent;
-            ListSurface.Margin = enabled ? new Thickness(0, 0, 16, 16) : new Thickness(0);
+            ListSurface.Margin = enabled ? new Thickness(16, 0, 16, 16) : new Thickness(0);
             ListSurface.CornerRadius = new CornerRadius(enabled ? 8 : 0);
             ListSurface.BorderBrush = (Brush)Resources["FluentStroke"];
-            if (Window.GetWindow(this) is MainWindowView main)
-                main.ApplyFluentChrome(_vm?.IsFluentPreview == true, (Brush)Resources["FluentCanvas"],
-                    (Brush)Resources["FluentText"], (Brush)Resources["FluentHover"]);
         }
 
         private void OpenMenu(object sender, RoutedEventArgs e)

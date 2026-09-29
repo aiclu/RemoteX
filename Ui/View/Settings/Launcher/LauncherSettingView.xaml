@@ -14,7 +14,8 @@
         <local:ConverterHotkeyModifierKeys x:Key="ConverterHotkeyModifierKeys"></local:ConverterHotkeyModifierKeys>
     </ResourceDictionary></UserControl.Resources>
     <Grid Background="{DynamicResource BackgroundBrush}">
-        <ScrollViewer>
+        <ScrollViewer x:Name="LauncherSettingsScroll"
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 
         <StackPanel>
 
@@ -106,45 +107,11 @@
                                     </Grid>
                                 </DataTemplate>
                             </Grid.Resources>
-                            <ListView Background="Transparent" BorderThickness="1"
-                                  ItemsSource="{Binding AvailableMatcherProviders}" 
-                                  ItemTemplate="{StaticResource DataTemplateForMatcher}">
-                                <ListView.Style>
-                                    <Style TargetType="ListView">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListView}">
-                                                    <ScrollViewer x:Name="ScrollViewer" BorderThickness="0">
-                                                        <ItemsPresenter/>
-                                                    </ScrollViewer>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListView.Style>
-                                <ListView.Resources>
-                                    <Style TargetType="{x:Type ListViewItem}">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{x:Null}" />
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="true">
-                                                <Setter Property="Background" Value="{x:Null}" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListView.Resources>
-                            </ListView>
+                            <!-- These checkboxes share the page's scroll viewer. An inner ListView
+                                 consumes the wheel even when its entire content is already visible. -->
+                            <ItemsControl x:Name="MatcherOptions" Background="Transparent" Focusable="False"
+                                          ItemsSource="{Binding AvailableMatcherProviders}"
+                                          ItemTemplate="{StaticResource DataTemplateForMatcher}"/>
                         </Grid>
                     </StackPanel>
                 </Grid>

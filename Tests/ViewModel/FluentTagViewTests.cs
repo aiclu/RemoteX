@@ -84,7 +84,7 @@ public class FluentTagViewTests
             {
                 Assert.AreEqual(pair.Item2 == selected ? FontWeights.SemiBold : FontWeights.Normal, pair.Item1.FontWeight);
                 var color = ((SolidColorBrush)pair.Item1.Background).Color;
-                Assert.AreEqual(pair.Item2 == selected ? ((SolidColorBrush)tags.FindResource("FluentHover")).Color : Colors.Transparent, color);
+                Assert.AreEqual(pair.Item2 == selected ? ((SolidColorBrush)tags.FindResource("FluentSelection")).Color : Colors.Transparent, color);
                 Assert.IsNotNull(pair.Item1.FocusVisualStyle, "Keyboard focus feedback must remain available.");
             }
             Assert.IsInstanceOfType(VisualTreeHelper.GetChild(oldContainer, 0), typeof(ContentPresenter),

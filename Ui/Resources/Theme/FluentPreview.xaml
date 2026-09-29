@@ -10,6 +10,8 @@
     <SolidColorBrush x:Key="FluentHover" Color="#E9E9E9"/>
     <SolidColorBrush x:Key="FluentAccent" Color="#005FB8"/>
     <SolidColorBrush x:Key="FluentAccentText" Color="White"/>
+    <SolidColorBrush x:Key="FluentSelection" Color="#E7F0F8"/>
+    <SolidColorBrush x:Key="FluentSelectionText" Color="#1B1B1B"/>
     <Style x:Key="FluentFocus" TargetType="Control">
         <Setter Property="Template">
             <Setter.Value><ControlTemplate><Border BorderBrush="{DynamicResource FluentAccent}" BorderThickness="2" CornerRadius="6" Margin="1"/></ControlTemplate></Setter.Value>
@@ -40,6 +42,59 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <!-- Home-only variants: do not change buttons in editors, settings or dialogs. -->
+    <Style x:Key="FluentHomeActionButton" TargetType="Button" BasedOn="{StaticResource FluentButton}">
+        <Setter Property="BorderThickness" Value="0"/><Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="8,4"/><Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="ToolTip" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="Chrome" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                <TextBlock Text="{TemplateBinding Content}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" TextAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Opacity" Value="0.7"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="FluentHomeMenuButton" TargetType="Button" BasedOn="{StaticResource FluentHomeActionButton}">
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="ToolTip" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="Chrome" Background="Transparent" CornerRadius="6" Padding="10,4">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="{TemplateBinding Content}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                    <Path Grid.Column="1" Data="M 0,0 L 4,4 L 8,0" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.2"
+                          Width="8" Height="4" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Opacity" Value="0.7"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="FluentHomePrimaryButton" TargetType="Button" BasedOn="{StaticResource FluentButton}">
+        <Setter Property="MinHeight" Value="36"/><Setter Property="Padding" Value="16,4"/>
+        <Setter Property="ToolTip" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="Foreground" Value="{DynamicResource FluentAccentText}"/>
+        <Setter Property="Background" Value="{DynamicResource FluentAccent}"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Grid>
+                <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                    <TextBlock Text="{TemplateBinding Content}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <Border x:Name="Hover" Background="{TemplateBinding Foreground}" Opacity="0" CornerRadius="6" IsHitTestVisible="False"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Hover" Property="Opacity" Value="0.08"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Hover" Property="Opacity" Value="0.18"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
     </Style>
     <!-- Explicit styles: only the Fluent workspace menus opt in. -->
     <Style x:Key="FluentWorkspaceMenuItem" TargetType="MenuItem">
@@ -102,9 +157,48 @@
     </Style>
     <Style x:Key="FluentNavButton" TargetType="Button" BasedOn="{StaticResource FluentButton}">
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="MinHeight" Value="36"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Margin" Value="0,2"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Grid>
+                <Border x:Name="Chrome" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"/>
+                </Border>
+                <Border x:Name="Hover" Background="{DynamicResource FluentText}" Opacity="0" CornerRadius="6" IsHitTestVisible="False"/>
+                <Border x:Name="SelectedMark" Background="{TemplateBinding BorderBrush}" Width="3" Margin="0,8" CornerRadius="1.5" HorizontalAlignment="Left" IsHitTestVisible="False"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Hover" Property="Opacity" Value="0.05"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Hover" Property="Opacity" Value="0.09"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
     </Style>
+    <Style x:Key="FluentAllConnectionsButton" TargetType="Button" BasedOn="{StaticResource FluentNavButton}">
+        <Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions>
+            <Condition Binding="{Binding ActiveServerViewModel.SelectedTabName}" Value=""/>
+            <Condition Binding="{Binding ActiveServerViewModel.TagListViewModel}" Value="{x:Null}"/>
+        </MultiDataTrigger.Conditions>
+            <Setter Property="Background" Value="{DynamicResource FluentSelection}"/>
+            <Setter Property="Foreground" Value="{DynamicResource FluentSelectionText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FluentAccent}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </MultiDataTrigger></Style.Triggers>
+    </Style>
+    <!-- The system ListBox template has an additional inset even with a zero border.
+         Home surfaces own their padding; retain one ScrollViewer and the virtualizing ItemsPresenter. -->
+    <ControlTemplate x:Key="FluentHomeItemsTemplate" TargetType="ListBox">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+            <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False" Padding="{TemplateBinding Padding}" CanContentScroll="True"
+                          HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                          VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+            </ScrollViewer>
+        </Border>
+    </ControlTemplate>
     <!-- Tag activation is driven by the filter, not ListBox selection/current item. -->
     <converters:ConverterIsEqual x:Key="FluentTagNameEquals"/>
     <Style x:Key="FluentTagContainer" TargetType="ListBoxItem">
@@ -116,15 +210,14 @@
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="FluentTagButton" TargetType="Button" BasedOn="{StaticResource FluentNavButton}">
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
         <Style.Triggers>
             <DataTrigger Value="True">
                 <DataTrigger.Binding><MultiBinding Converter="{StaticResource FluentTagNameEquals}">
                     <Binding Path="Name"/>
                     <Binding Path="DataContext.ActiveServerViewModel.SelectedTabName" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
                 </MultiBinding></DataTrigger.Binding>
-                <Setter Property="Background" Value="{DynamicResource FluentHover}"/>
+                <Setter Property="Background" Value="{DynamicResource FluentSelection}"/>
+                <Setter Property="Foreground" Value="{DynamicResource FluentSelectionText}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource FluentAccent}"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
             </DataTrigger>

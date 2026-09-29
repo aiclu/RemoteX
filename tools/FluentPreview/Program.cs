@@ -153,6 +153,65 @@ class Program
         var type = typeof(FluentPage).Assembly.GetType("_1RM.Service.FluentAppearanceService")!;
         var appearance = Activator.CreateInstance(type, config)!;
         IoC.GetByType = (t, key) => t == type ? appearance : t == typeof(ConfigurationService) ? config : null;
+        if (Environment.GetCommandLineArgs().Contains("--home"))
+        {
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 60000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var width in new[] { 1120, 800, 600, 300 })
+            {
+                cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
+                var fixture = new RemoteX.UiTesting.HomeFixture();
+                Render(fixture.View, "Home", width, dark, type, width == 600 ? 20 : 13, () =>
+                {
+                    fixture.Prepare(width, dark, type); fixture.CheckGeometry(width);
+                    if (width == 1120) { fixture.CheckSelectionAndCommands(); fixture.CheckFullResize(width, dark, type); fixture.Prepare(width, dark, type); }
+                }, 610);
+                if (width != 800) continue;
+                var states = new RemoteX.UiTesting.HomeFixture();
+                states.ActiveServerViewModel.VmServerList[0].DataSource.IsWritable = false;
+                states.ActiveServerViewModel.VmServerList[0].DataSource.DataSourceName = "只读数据源 · 很长的名称用于检查省略和提示";
+                states.ActiveServerViewModel.VmServerList[5].DataSource.Status = _1RM.Service.DataSource.DAO.EnumDatabaseStatus.LostConnection;
+                states.ActiveServerViewModel.VmServerList[5].DataSource.ReconnectInfo = "模拟错误：无法访问数据源，请检查网络连接。长文本自动换行。";
+                states.ActiveServerViewModel.VmServerList.Add(new() { DataSource = new() { DataSourceName = "空数据源" }, IsVisible = false });
+                Render(states.View, "Home-States", width, dark, type, 20, () => states.Prepare(width, dark, type), 610);
+                var single = new RemoteX.UiTesting.HomeFixture(); single.ActiveServerViewModel.Collection.GroupDescriptions.Clear();
+                Render(single.View, "Home-Ungrouped", width, dark, type, 13, () => single.Prepare(width, dark, type), 610);
+                var collapsed = new RemoteX.UiTesting.HomeFixture();
+                foreach (var row in collapsed.ActiveServerViewModel.VmServerList) row.GroupedIsExpanded = false;
+                Render(collapsed.View, "Home-Collapsed", width, dark, type, 13, () => { collapsed.Prepare(width, dark, type); collapsed.CheckGeometry(width); }, 610);
+                foreach (var longWidth in new[] { 1000, 300 })
+                {
+                    var longLabels = new RemoteX.UiTesting.HomeFixture(); longLabels.UseLongLabels();
+                    Render(longLabels.View, "Home-LongLabels", longWidth, dark, type, 24, () => { longLabels.Prepare(longWidth, dark, type); longLabels.CheckGeometry(longWidth); }, 720);
+                }
+            }
+            var interactions = new RemoteX.UiTesting.SourceGroupFixture(realRows: true);
+            FluentPage.SetActive(interactions.Page, true); FluentWorkspace.SetIsPreview(interactions.Page, true);
+            interactions.CheckInteractions();
+            var large = new RemoteX.UiTesting.SourceGroupFixture(true, 600, realRows: true);
+            FluentPage.SetActive(large.Page, true); FluentWorkspace.SetIsPreview(large.Page, true);
+            large.CheckVirtualization();
+            return;
+        }
+        if (Environment.GetCommandLineArgs().Contains("--launcher-settings"))
+        {
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 30000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var width in new[] { 1000, 600 })
+            {
+                cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
+                var fixture = new RemoteX.UiTesting.LauncherSettingsFixture();
+                var settings = new _1RM.View.Settings.SettingsPageView();
+                var presenter = (ContentControl)settings.FindName("SettingsContent");
+                BindingOperations.ClearBinding(presenter, Stylet.Xaml.View.ModelProperty);
+                settings.DataContext = new SettingsFixture { NavigationPage = EnumMainWindowPage.SettingsLauncher };
+                presenter.Content = fixture.Page;
+                foreach (var bottom in new[] { false, true })
+                    Render(settings, bottom ? "Settings-Launcher-Bottom" : "Settings-Launcher-Top", width, dark, type,
+                        width == 600 ? 20 : 13, () => fixture.CheckScrolling(bottom), 480);
+            }
+            return;
+        }
         if (Environment.GetCommandLineArgs().Contains("--tag-management"))
         {
             using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 30000, System.Threading.Timeout.Infinite);
@@ -422,9 +481,11 @@ class Program
         buttons.Resources.MergedDictionaries.Add(dictionary);
         Render(buttons, "SessionWindowButtons", width, dark, service, width == 600 ? 18 : 13);
     }
-    static void Render(FrameworkElement view, string name, int width, bool dark, Type service, double fontSize = 13)
+    static void Render(FrameworkElement view, string name, int width, bool dark, Type service, double fontSize = 13,
+        Action? beforeCapture = null, int? heightOverride = null)
     {
         var height = name.StartsWith("Search-") ? 80 : name.StartsWith("Navigation") ? 140 : name.StartsWith("Session") || name.StartsWith("MenuAbout") ? 60 : name == "About" ? 460 : name.StartsWith("Dialog-") ? 500 : name == "Launcher-Empty" ? (int)Math.Ceiling(Math.Max(46, fontSize * 1.6 + 20)) : name == "Launcher-Results" ? (int)Math.Ceiling(Math.Max(46, fontSize * 1.6 + 20) + 8 * Math.Max(40, fontSize * 2.4 + 10)) : 680;
+        height = heightOverride ?? height;
         view.Resources["FluentDialogBodyMaxHeight"] = (double)height - 144;
         view.Resources["FluentDialogFieldMaxWidth"] = (double)width - 64;
         FluentLauncher.SetSearchHeight(view, Math.Max(46, fontSize * 1.6 + 20));
@@ -448,6 +509,8 @@ class Program
         stage.Measure(new Size(width,height)); stage.Arrange(new Rect(0,0,width,height)); stage.UpdateLayout();
         LoadChildren(view);
         stage.Measure(new Size(width,height)); stage.Arrange(new Rect(0,0,width,height)); stage.UpdateLayout();
+        beforeCapture?.Invoke();
+        stage.UpdateLayout();
         foreach(var scale in new[] {1.0,1.5,2.0})
         {
             var bitmap = new RenderTargetBitmap((int)(width*scale),(int)(height*scale),96*scale,96*scale,PixelFormats.Pbgra32);

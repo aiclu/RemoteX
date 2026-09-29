@@ -38,28 +38,22 @@
         <Border x:Name="SourceCard" Background="{DynamicResource FluentSurface}" BorderBrush="{DynamicResource FluentStroke}"
                 BorderThickness="1" CornerRadius="8" SnapsToDevicePixels="True">
             <DockPanel LastChildFill="True">
-                <ToggleButton x:Name="HeaderSite" DockPanel.Dock="Top" MinHeight="44" Padding="8,4" Style="{x:Null}"
+                <ToggleButton x:Name="HeaderSite" DockPanel.Dock="Top" MinHeight="44" Padding="12,4" Style="{x:Null}"
                               HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Foreground="{DynamicResource FluentText}"
                               IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                               Content="{TemplateBinding Header}" AutomationProperties.Name="{Binding Name.DataSourceName}">
                     <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
-                        <Border x:Name="HeaderChrome" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <!-- Align with the title row, not the center of a multiline error message. -->
-                                <Grid VerticalAlignment="Top" Height="{Binding Content.Tag, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=32, TargetNullValue=32}">
-                                    <Path x:Name="Chevron" Data="M 0,0 L 5,5 L 0,10" Width="5" Height="10" Stretch="Fill"
-                                          Stroke="{DynamicResource FluentMuted}" StrokeThickness="1.5" RenderTransformOrigin="0.5,0.5"/>
-                                </Grid>
-                                <ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                        <Grid>
+                            <Border x:Name="HeaderChrome" Background="Transparent" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                                                   HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
+                            </Border>
+                            <Border x:Name="HeaderFocus" BorderBrush="{DynamicResource FluentAccent}" BorderThickness="1" CornerRadius="7" Visibility="Collapsed" IsHitTestVisible="False"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True"><Setter TargetName="Chevron" Property="RenderTransform"><Setter.Value><RotateTransform Angle="90"/></Setter.Value></Setter></Trigger>
                             <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="HeaderChrome" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
                             <Trigger Property="IsPressed" Value="True"><Setter TargetName="HeaderChrome" Property="Opacity" Value="0.7"/></Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="HeaderChrome" Property="BorderBrush" Value="{DynamicResource FluentAccent}"/></Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="HeaderFocus" Property="Visibility" Value="Visible"/></Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate></ToggleButton.Template>
                 </ToggleButton>
@@ -68,6 +62,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsExpanded" Value="True"><Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/></Trigger>
+            <Trigger Property="view:FluentWorkspace.IsPreview" Value="True"><Setter TargetName="ExpandSite" Property="Margin" Value="0,0,0,8"/></Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
     <Style x:Key="FluentTreeLayout" TargetType="TreeView">

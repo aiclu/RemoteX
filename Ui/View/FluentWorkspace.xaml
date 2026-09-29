@@ -60,10 +60,10 @@
       <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE790;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="AppearanceLabel" Text="{DynamicResource FluentAppearance}" Margin="12,0,0,0" VerticalAlignment="Center"/></StackPanel>
      </Button>
     </StackPanel>
-    <Button DockPanel.Dock="Top" Style="{StaticResource FluentNavButton}" Command="{Binding ActiveServerViewModel.CmdShowMainTab}" ToolTip="{DynamicResource FluentAllConnections}">
-     <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8F1;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="ConnectionsLabel" Text="{DynamicResource FluentAllConnections}" Margin="12,0,0,0" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel>
+    <Button x:Name="AllConnectionsNavigation" DockPanel.Dock="Top" Style="{StaticResource FluentAllConnectionsButton}" Command="{Binding ActiveServerViewModel.CmdShowMainTab}" ToolTip="{DynamicResource FluentAllConnections}">
+     <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8F1;" Style="{StaticResource FluentNavigationIcon}"/><TextBlock x:Name="ConnectionsLabel" Text="{DynamicResource FluentAllConnections}" Margin="12,0,0,0" VerticalAlignment="Center"/></StackPanel>
     </Button>
-    <ListBox x:Name="Tags" Background="Transparent" BorderThickness="0"
+    <ListBox x:Name="Tags" Background="Transparent" BorderThickness="0" Padding="0" Template="{StaticResource FluentHomeItemsTemplate}"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
              VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True"
              IsSynchronizedWithCurrentItem="False" ItemContainerStyle="{StaticResource FluentTagContainer}">
@@ -111,17 +111,12 @@
   </Border>
   <Grid Grid.Column="1">
    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-   <StackPanel x:Name="Toolbar" Margin="12,4,16,8" Visibility="Collapsed">
-    <Grid>
-     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-     <TextBox x:Name="Search" Style="{StaticResource FluentSearch}" Margin="0,0,8,0"
+   <local:FluentHomeToolbarPanel x:Name="Toolbar" Margin="16,12,16,12" Visibility="Collapsed">
+     <TextBox x:Name="Search" Style="{StaticResource FluentSearch}" MinHeight="36" KeyboardNavigation.TabIndex="0"
               Text="{Binding MainFilterString, UpdateSourceTrigger=PropertyChanged}" Tag="{DynamicResource FluentSearchConnections}" ToolTip="{DynamicResource 'Search (Ctrl+F)'}"
               attach:FocusExtension.IsFocused="{Binding MainFilterIsFocused}"
               attach:TextBoxAttachProperty.CaretIndex="{Binding MainFilterCaretIndex, UpdateSourceTrigger=PropertyChanged}" KeyUp="SearchKeyUp"/>
-     <Button Grid.Column="1" Style="{StaticResource FluentButton}" Content="{DynamicResource Add}" Command="{Binding ActiveServerViewModel.CmdAdd}"/>
-    </Grid>
-    <WrapPanel Margin="0,4,0,0">
-     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource ListViewMode}" Click="OpenMenu" Margin="0,0,8,4">
+     <Button x:Name="ViewMenuButton" Style="{StaticResource FluentHomeMenuButton}" Content="{DynamicResource ListViewMode}" Click="OpenMenu">
       <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
        <MenuItem Header="{DynamicResource ListViewMode_List}" Command="{Binding CmdToggleListView}">
         <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
@@ -140,7 +135,7 @@
        </MenuItem>
       </ContextMenu></Button.ContextMenu>
      </Button>
-     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource FluentSort}" Click="OpenMenu" Margin="0,0,8,4">
+     <Button x:Name="SortMenuButton" Style="{StaticResource FluentHomeMenuButton}" Content="{DynamicResource FluentSort}" Click="OpenMenu">
       <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
        <MenuItem Header="ID" Command="{Binding CmdReOrder}" CommandParameter="{x:Static locality:EnumServerOrderBy.IdAsc}">
         <MenuItem.Style><Style TargetType="MenuItem" BasedOn="{StaticResource FluentWorkspaceMenuItem}"><Style.Triggers>
@@ -172,7 +167,7 @@
        </MenuItem>
       </ContextMenu></Button.ContextMenu>
      </Button>
-     <Button Style="{StaticResource FluentButton}" Content="{DynamicResource FluentMore}" Click="OpenMenu" Margin="0,0,0,4">
+     <Button x:Name="MoreMenuButton" Style="{StaticResource FluentHomeMenuButton}" Content="{DynamicResource FluentMore}" Click="OpenMenu">
       <Button.ContextMenu><ContextMenu Style="{StaticResource FluentWorkspaceMenu}">
        <MenuItem Header="{DynamicResource import_from_json}" Command="{Binding ActiveServerViewModel.CmdImportFromJson}"/>
        <MenuItem Header="{DynamicResource import_from_rdp_file}" Command="{Binding ActiveServerViewModel.CmdImportFromRdp}"/>
@@ -184,8 +179,8 @@
        <MenuItem Header="{DynamicResource Exit}" Command="{Binding CmdExit}"/>
       </ContextMenu></Button.ContextMenu>
      </Button>
-    </WrapPanel>
-   </StackPanel>
+     <Button x:Name="AddConnectionButton" Style="{StaticResource FluentHomePrimaryButton}" Content="{DynamicResource Add}" Command="{Binding ActiveServerViewModel.CmdAdd}"/>
+   </local:FluentHomeToolbarPanel>
    <Border x:Name="ListSurface" Grid.Row="1" ClipToBounds="True">
     <Border.Style><Style TargetType="Border">
      <Setter Property="Background" Value="Transparent"/>
