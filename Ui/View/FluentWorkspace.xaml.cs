@@ -23,6 +23,11 @@ namespace _1RM.View
             new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
         public static bool GetIsCompact(DependencyObject target) => (bool)target.GetValue(IsCompactProperty);
         public static void SetIsCompact(DependencyObject target, bool value) => target.SetValue(IsCompactProperty, value);
+        // Set by the actual grouped view, not by the number of configured sources (filters can remove groups).
+        public static readonly DependencyProperty HasSourceGroupsProperty = DependencyProperty.RegisterAttached(
+            "HasSourceGroups", typeof(bool), typeof(FluentWorkspace), new PropertyMetadata(false));
+        public static bool GetHasSourceGroups(DependencyObject target) => (bool)target.GetValue(HasSourceGroupsProperty);
+        public static void SetHasSourceGroups(DependencyObject target, bool value) => target.SetValue(HasSourceGroupsProperty, value);
 
         private MainWindowViewModel? _vm;
         private ServerView.ServerPageViewModelBase? _tagPage;
@@ -137,10 +142,7 @@ namespace _1RM.View
             Shell.Background = enabled ? (Brush)Resources["FluentCanvas"] : Brushes.Transparent;
             ListSurface.Margin = enabled ? new Thickness(0, 0, 16, 16) : new Thickness(0);
             ListSurface.CornerRadius = new CornerRadius(enabled ? 8 : 0);
-            ListSurface.Padding = new Thickness(enabled ? 8 : 0);
-            ListSurface.BorderThickness = new Thickness(enabled ? 1 : 0);
             ListSurface.BorderBrush = (Brush)Resources["FluentStroke"];
-            ListSurface.Background = enabled ? (Brush)Resources["FluentSurface"] : Brushes.Transparent;
             if (Window.GetWindow(this) is MainWindowView main)
                 main.ApplyFluentChrome(_vm?.IsFluentPreview == true, (Brush)Resources["FluentCanvas"],
                     (Brush)Resources["FluentText"], (Brush)Resources["FluentHover"]);

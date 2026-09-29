@@ -25,6 +25,8 @@ namespace _1RM.View.ServerView
         public ServerListPageView()
         {
             InitializeComponent();
+            SetBinding(FluentWorkspace.HasSourceGroupsProperty,
+                new Binding(nameof(ItemsControl.IsGrouping)) { Source = LvServerCards });
             // hide GridBottom when hover.
             MouseMove += (sender, args) =>
             {

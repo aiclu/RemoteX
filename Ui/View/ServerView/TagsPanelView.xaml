@@ -10,16 +10,21 @@
              d:DataContext="{d:DesignInstance local:TagsPanelViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+      <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/RemoteX;component/Resources/Theme/FluentServerViews.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
         <CollectionViewSource x:Key="TagItemSource" 
                               Source="{Binding GlobalData.TagList}"
                               Filter="TagItemSource_OnFilter">
         </CollectionViewSource>
         <local:ConverterTagNameCount x:Key="ConverterTagNameCount" />
+      </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Margin="0 21 0 0" Background="{DynamicResource BackgroundBrush}">
+    <Grid x:Name="TagManagementBody" Style="{StaticResource TagManagementBody}" Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition x:Name="LegacyTopSpacer" Style="{StaticResource TagManagementLegacySpacer}"/>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>

@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:view="clr-namespace:_1RM.View">
+                    xmlns:view="clr-namespace:_1RM.View"
+                    xmlns:converters="clr-namespace:Shawn.Utils.WpfResources.Converter;assembly=Shawn.Utils.WpfResources">
     <SolidColorBrush x:Key="FluentCanvas" Color="#F3F3F3"/>
     <SolidColorBrush x:Key="FluentSurface" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="FluentText" Color="#1B1B1B"/>
@@ -103,6 +104,31 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="Margin" Value="0,2"/>
+    </Style>
+    <!-- Tag activation is driven by the filter, not ListBox selection/current item. -->
+    <converters:ConverterIsEqual x:Key="FluentTagNameEquals"/>
+    <Style x:Key="FluentTagContainer" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="FluentTagButton" TargetType="Button" BasedOn="{StaticResource FluentNavButton}">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Style.Triggers>
+            <DataTrigger Value="True">
+                <DataTrigger.Binding><MultiBinding Converter="{StaticResource FluentTagNameEquals}">
+                    <Binding Path="Name"/>
+                    <Binding Path="DataContext.ActiveServerViewModel.SelectedTabName" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                </MultiBinding></DataTrigger.Binding>
+                <Setter Property="Background" Value="{DynamicResource FluentHover}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource FluentAccent}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="FluentSearch" TargetType="TextBox">
         <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>

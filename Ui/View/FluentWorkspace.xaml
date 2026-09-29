@@ -65,11 +65,11 @@
     </Button>
     <ListBox x:Name="Tags" Background="Transparent" BorderThickness="0"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True"
-             VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
-     <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/></Style></ListBox.ItemContainerStyle>
+             VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True"
+             IsSynchronizedWithCurrentItem="False" ItemContainerStyle="{StaticResource FluentTagContainer}">
      <ListBox.ItemTemplate>
       <DataTemplate>
-       <Button Style="{StaticResource FluentNavButton}" HorizontalContentAlignment="Stretch"
+       <Button Style="{StaticResource FluentTagButton}" HorizontalContentAlignment="Stretch"
                Command="{Binding DataContext.ActiveServerViewModel.CmdTagAddIncluded, RelativeSource={RelativeSource AncestorType=local:FluentWorkspace}}"
                CommandParameter="{Binding}" ToolTip="{Binding Name}"
                Tag="{Binding DataContext.ActiveServerViewModel.TagsPanelViewModel, RelativeSource={RelativeSource AncestorType=local:FluentWorkspace}}">
@@ -187,9 +187,30 @@
     </WrapPanel>
    </StackPanel>
    <Border x:Name="ListSurface" Grid.Row="1" ClipToBounds="True">
+    <Border.Style><Style TargetType="Border">
+     <Setter Property="Background" Value="Transparent"/>
+     <Style.Triggers>
+      <MultiDataTrigger><MultiDataTrigger.Conditions>
+       <Condition Binding="{Binding IsFluentPreview}" Value="True"/>
+       <Condition Binding="{Binding IsShownList}" Value="True"/>
+      </MultiDataTrigger.Conditions>
+       <Setter Property="Background" Value="{DynamicResource FluentSurface}"/>
+       <Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="8"/>
+      </MultiDataTrigger>
+      <MultiDataTrigger><MultiDataTrigger.Conditions>
+       <Condition Binding="{Binding IsFluentPreview}" Value="True"/>
+       <Condition Binding="{Binding IsShownList}" Value="True"/>
+       <Condition Binding="{Binding Content.(local:FluentWorkspace.HasSourceGroups), ElementName=ServerPresenter, FallbackValue=False}" Value="True"/>
+       <Condition Binding="{Binding ActiveServerViewModel.TagListViewModel, FallbackValue={x:Null}}" Value="{x:Null}"/>
+      </MultiDataTrigger.Conditions>
+       <Setter Property="Background" Value="Transparent"/>
+       <Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="0"/>
+      </MultiDataTrigger>
+     </Style.Triggers>
+    </Style></Border.Style>
     <Grid>
      <ContentControl x:Name="ServerPresenter" s:View.Model="{Binding ActiveServerViewModel}"/>
-     <Button Content="{DynamicResource Add}"
+     <Button x:Name="EmptyConnectionsAdd" Content="{DynamicResource Add}"
              Command="{Binding ActiveServerViewModel.CmdAdd}" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Button.Style>
        <Style TargetType="Button" BasedOn="{StaticResource FluentButton}">
@@ -199,6 +220,7 @@
           <MultiDataTrigger.Conditions>
            <Condition Binding="{Binding IsFluentPreview}" Value="True"/>
            <Condition Binding="{Binding ActiveServerViewModel.IsAddToolTipShow}" Value="True"/>
+           <Condition Binding="{Binding ActiveServerViewModel.TagListViewModel, FallbackValue={x:Null}}" Value="{x:Null}"/>
           </MultiDataTrigger.Conditions>
           <Setter Property="Visibility" Value="Visible"/>
          </MultiDataTrigger>

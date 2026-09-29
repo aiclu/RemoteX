@@ -153,6 +153,59 @@ class Program
         var type = typeof(FluentPage).Assembly.GetType("_1RM.Service.FluentAppearanceService")!;
         var appearance = Activator.CreateInstance(type, config)!;
         IoC.GetByType = (t, key) => t == type ? appearance : t == typeof(ConfigurationService) ? config : null;
+        if (Environment.GetCommandLineArgs().Contains("--tag-management"))
+        {
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 30000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var width in new[] { 800, 420 })
+            {
+                cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
+                var fixture = new RemoteX.UiTesting.SourceGroupFixture(true);
+                FluentWorkspace.SetIsPreview(fixture.Page, true);
+                fixture.ShowTagManagement();
+                Render(fixture.Page, "TagManagement", width, dark, type);
+                fixture.CheckTagManagementTransitions();
+            }
+            return;
+        }
+        if (Environment.GetCommandLineArgs().Contains("--source-groups"))
+        {
+            // Independent watchdog also bounds any accidental virtualization/layout loop.
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 45000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var width in new[] { 800, 420 })
+            {
+                cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
+                foreach (var expanded in new[] { false, true })
+                {
+                    var fixture = new RemoteX.UiTesting.SourceGroupFixture(expanded);
+                    FluentWorkspace.SetIsPreview(fixture.Page, true);
+                    Render(fixture.Page, expanded ? "Sources-Expanded" : "Sources-Collapsed", width, dark, type, width == 420 ? 20 : 13);
+                    foreach (var expander in RemoteX.UiTesting.SourceGroupFixture.Descendants(fixture.Page).OfType<Expander>())
+                        Console.WriteLine($"Source={expander.DataContext} expanded={expander.IsExpanded} validation={Validation.GetHasError(expander)} size={expander.ActualWidth}x{expander.ActualHeight}");
+                }
+                var states = new RemoteX.UiTesting.SourceGroupFixture();
+                states.VmServerList[0].DataSource.IsWritable = false;
+                states.VmServerList[0].DataSource.DataSourceName = "只读数据源 · 很长的名称用于检查截断与完整提示";
+                states.VmServerList[3].DataSource.Status = _1RM.Service.DataSource.DAO.EnumDatabaseStatus.LostConnection;
+                states.VmServerList[3].DataSource.ReconnectInfo = "模拟重连信息：暂时无法访问数据源，请检查网络连接。较长说明应当换行，不挤占其他操作按钮。";
+                states.VmServerList.Add(new RemoteX.UiTesting.SourceGroupFixture.Row { DataSource = new() { DataSourceName = "空数据源（模拟占位）" }, IsVisible = false, GroupedIsExpanded = true });
+                FluentWorkspace.SetIsPreview(states.Page, true);
+                Render(states.Page, "Sources-States", width, dark, type, width == 420 ? 24 : 13);
+                var cardGroups = new RemoteX.UiTesting.SourceGroupFixture(true, 4, true);
+                Render(cardGroups.Page, "Sources-CardView", width, dark, type);
+            }
+            var interactions = new RemoteX.UiTesting.SourceGroupFixture();
+            FluentPage.SetActive(interactions.Page, true); FluentWorkspace.SetIsPreview(interactions.Page, true);
+            interactions.CheckInteractions();
+            var large = new RemoteX.UiTesting.SourceGroupFixture(true, 600);
+            FluentPage.SetActive(large.Page, true); FluentWorkspace.SetIsPreview(large.Page, true);
+            large.CheckVirtualization();
+            var largeCards = new RemoteX.UiTesting.SourceGroupFixture(true, 600, true);
+            FluentPage.SetActive(largeCards.Page, true);
+            largeCards.CheckVirtualization();
+            return;
+        }
         foreach (var dark in new[] { false, true })
         foreach (var width in new[] { 1000, 600 })
         {
@@ -303,6 +356,9 @@ class Program
         using var sorted = (IDisposable)Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Instance,
             null, new object[] { source }, null)!;
         tags.ItemsSource = (System.Collections.IEnumerable)type.GetProperty("View", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(sorted)!;
+        // Keep a stale ListBox selection while the actual filter activates another row.
+        tags.SelectedItem = source[0];
+        tags.DataContext = new { ActiveServerViewModel = new { SelectedTabName = source[1].Name } };
         Render(tags, "SidebarTags", width, dark, service, width == 140 ? 18 : 13);
         if (tags.ItemContainerGenerator.ContainerFromIndex(300) != null)
             throw new InvalidOperationException("Off-screen sidebar tags must remain virtualized.");

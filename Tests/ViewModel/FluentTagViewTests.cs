@@ -7,6 +7,8 @@ using System.Threading;
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.ComponentModel;
+using System.Windows.Media;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using _1RM.Model;
@@ -23,10 +25,73 @@ public class FluentTagViewTests
         Exception? failure = null;
         var thread = new Thread(() => { try { action(); } catch (Exception e) { failure = e; } });
         thread.SetApartmentState(ApartmentState.STA); thread.Start(); thread.Join();
-        if (failure != null) throw failure;
+        if (failure != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failure).Throw();
     }
     private static string[] Names(FluentTagView view) => view.View.Cast<Tag>().Select(t => t.Name).ToArray();
     private static void Drain() => Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+
+    public sealed class FilterFixture : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private string _selectedTabName = "";
+        public string SelectedTabName
+        {
+            get => _selectedTabName;
+            set { _selectedTabName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedTabName))); }
+        }
+    }
+    private static T? FindChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T result) return result;
+            if (FindChild<T>(child) is T nested) return nested;
+        }
+        return null;
+    }
+
+    [TestMethod]
+    public void SidebarHighlightFollowsFilterNotStaleListSelection() => Sta(() =>
+    {
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Application).TypeHandle);
+        var workspace = new FluentWorkspace();
+        var tags = (ListBox)workspace.FindName("Tags");
+        ((Panel)tags.Parent).Children.Remove(tags);
+        tags.Resources.MergedDictionaries.Add(workspace.Resources);
+        tags.Visibility = Visibility.Visible;
+        var model = new FilterFixture();
+        tags.DataContext = new { ActiveServerViewModel = model };
+        var source = new ObservableCollection<Tag> { new("hp", false, 0), new("personal", false, 1) };
+        using var view = new FluentTagView(source);
+        tags.ItemsSource = view.View;
+        tags.ApplyTemplate(); Drain();
+        var stage = new Grid { Width = 176, Height = 300 };
+        stage.Children.Add(tags);
+        stage.Measure(new Size(176, 300)); stage.Arrange(new Rect(0, 0, 176, 300)); stage.UpdateLayout(); Drain();
+        var oldContainer = (ListBoxItem)tags.ItemContainerGenerator.ContainerFromIndex(0);
+        Assert.IsNotNull(oldContainer, $"First tag container should be realized. items={tags.Items.Count}, visible={tags.Visibility}, size={tags.ActualWidth}x{tags.ActualHeight}, children={VisualTreeHelper.GetChildrenCount(tags)}, status={tags.ItemContainerGenerator.Status}");
+        var hp = FindChild<Button>(oldContainer)!;
+        var personal = FindChild<Button>((ListBoxItem)tags.ItemContainerGenerator.ContainerFromIndex(1))!;
+        Assert.IsNotNull(hp); Assert.IsNotNull(personal);
+        Assert.AreEqual(false, tags.IsSynchronizedWithCurrentItem);
+        // Reproduce the independent, previously stale selection/current-item state.
+        tags.SelectedItem = source[0]; view.View.MoveCurrentTo(source[0]);
+        foreach (var selected in new[] { "hp", "personal", "", _1RM.View.ServerView.ServerPageViewModelBase.TAB_NONE_SELECTED, "hp" })
+        {
+            model.SelectedTabName = selected; Drain();
+            foreach (var pair in new[] { (hp, "hp"), (personal, "personal") })
+            {
+                Assert.AreEqual(pair.Item2 == selected ? FontWeights.SemiBold : FontWeights.Normal, pair.Item1.FontWeight);
+                var color = ((SolidColorBrush)pair.Item1.Background).Color;
+                Assert.AreEqual(pair.Item2 == selected ? ((SolidColorBrush)tags.FindResource("FluentHover")).Color : Colors.Transparent, color);
+                Assert.IsNotNull(pair.Item1.FocusVisualStyle, "Keyboard focus feedback must remain available.");
+            }
+            Assert.IsInstanceOfType(VisualTreeHelper.GetChild(oldContainer, 0), typeof(ContentPresenter),
+                "Container must not paint a second selection background.");
+        }
+        tags.ItemsSource = null;
+    });
 
     [TestMethod]
     public void ActualSidebarTemplateShowsPinAndToggleMenuWithoutExecutingCommands() => Sta(() =>
