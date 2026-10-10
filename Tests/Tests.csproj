@@ -18,6 +18,8 @@
     <ProjectReference Include="..\Ui\Ui.csproj" />
     <Compile Include="..\tools\FluentPreview\SessionHeaderFixture.cs" Link="Fixtures\SessionHeaderFixture.cs" />
     <Compile Include="..\tools\FluentPreview\LauncherFixture.cs" Link="Fixtures\LauncherFixture.cs" />
+    <Compile Include="..\tools\FluentPreview\CredentialFixture.cs" Link="Fixtures\CredentialFixture.cs" />
+    <Compile Include="..\tools\FluentPreview\CredentialDialogFixture.cs" Link="Fixtures\CredentialDialogFixture.cs" />
   </ItemGroup>
 
 </Project>

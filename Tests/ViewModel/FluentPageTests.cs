@@ -175,9 +175,8 @@ namespace Tests.ViewModel
             Assert.IsNotNull(input.GetBindingExpression(TextBox.TextProperty));
         });
         [TestMethod]
-        public void ScopeSynchronizesAndUnsubscribesWithoutChangingClassicResources() => Sta(() =>
+        public void ScopeSynchronizesAndUnsubscribesWithoutChangingClassicResources() => WpfTestHost.Run(() =>
         {
-            var app = new Application();
 #pragma warning disable SYSLIB0050
             var cfg = (_1RM.Service.Configuration)FormatterServices.GetUninitializedObject(typeof(_1RM.Service.Configuration));
             cfg.Theme = new ThemeConfig(); cfg.Theme.Fluent.Enabled = true;
@@ -229,7 +228,7 @@ namespace Tests.ViewModel
                 _1RM.View.Host.FluentSessionAppearance.SetEnabled(session, false);
                 session.Close();
             }
-            finally { ((IDisposable)service).Dispose(); IoC.GetByType = previous; app.Shutdown(); }
+            finally { ((IDisposable)service).Dispose(); IoC.GetByType = previous; }
         });
     }
 }

@@ -361,6 +361,7 @@
         <Page Update="Resources\Theme\FluentPreview.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>
+        <Page Update="View\Editor\Forms\AlternativeCredential\AlternativeCredentialStyles.xaml"><Generator>MSBuild:Compile</Generator><SubType>Designer</SubType></Page>
         <Page Update="Resources\Theme\FluentForms.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>

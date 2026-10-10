@@ -51,6 +51,7 @@ namespace _1RM.Service
             resources["FluentSurface"] = highContrast ? SystemColors.WindowBrush : ColorBrush(dark ? "#292929" : "#FFFFFF");
             resources["FluentText"] = highContrast ? SystemColors.WindowTextBrush : ColorBrush(dark ? "#F5F5F5" : "#1B1B1B");
             resources["FluentMuted"] = highContrast ? SystemColors.WindowTextBrush : ColorBrush(dark ? "#C0C0C0" : "#606060");
+            resources["FluentError"] = highContrast ? SystemColors.WindowTextBrush : ColorBrush(dark ? "#FF99A4" : "#C42B1C");
             resources["FluentStroke"] = highContrast ? SystemColors.WindowTextBrush : ColorBrush(dark ? "#484848" : "#DDDDDD");
             resources["FluentHover"] = highContrast ? SystemColors.ControlBrush : ColorBrush(dark ? "#383838" : "#E9E9E9");
             resources["FluentAccent"] = highContrast ? SystemColors.HighlightBrush : ColorBrush(dark ? "#60CDFF" : "#005FB8");

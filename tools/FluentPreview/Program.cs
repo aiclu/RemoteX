@@ -125,7 +125,7 @@ class Program
     }
     [MethodImpl(MethodImplOptions.NoInlining)] static void Run()
     {
-        var app = new Application();
+        var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         // Exercise the same all-language loading path as startup, not just the rendered language.
         var languages = new LanguageService(app.Resources);
         if (languages.Resources.Count != LanguagesResources.Files.Length)
@@ -153,6 +153,61 @@ class Program
         var type = typeof(FluentPage).Assembly.GetType("_1RM.Service.FluentAppearanceService")!;
         var appearance = Activator.CreateInstance(type, config)!;
         IoC.GetByType = (t, key) => t == type ? appearance : t == typeof(ConfigurationService) ? config : null;
+        if (Environment.GetCommandLineArgs().Contains("--credential-dialog"))
+        {
+            // Validation uses the same language resources as the fields, without a real vault.
+            IoC.GetByType = (t, key) => t == type ? appearance : t == typeof(ConfigurationService) ? config
+                : t == typeof(Shawn.Utils.Interface.ILanguageService) ? languages : null;
+            languages.SetLanguage("zh-cn");
+            foreach (var dark in new[] { false, true })
+            foreach (var scenario in new[] { "Password", "Required", "PrivateKey", "Alternative", "Narrow", "LargeFont" })
+            {
+                using var fixture = new RemoteX.UiTesting.CredentialDialogFixture(showHost: scenario == "Alternative");
+                if (scenario == "Required") fixture.Data.Name = fixture.Data.UserName = fixture.Data.Password = "";
+                if (scenario == "PrivateKey") { fixture.Data.IsUsePrivateKey = true; fixture.Data.PrivateKeyPath = @"C:\synthetic\demo-key.ppk"; }
+                var width = scenario == "Narrow" ? 300 : 560;
+                fixture.Prepare(width, scenario == "LargeFont" || scenario == "Narrow" ? 20 : 13,
+                    dark, bodyMaxHeight: scenario == "Narrow" ? 300 : 800);
+                foreach (var scale in new[] { 1.0, 1.5, 2.0 })
+                {
+                    var bitmap = new RenderTargetBitmap((int)Math.Ceiling(fixture.View.ActualWidth * scale), (int)Math.Ceiling(fixture.View.ActualHeight * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);
+                    bitmap.Render(fixture.View);
+                    var directory = Path.Combine(AppDir, "screenshots"); Directory.CreateDirectory(directory);
+                    using var file = File.Create(Path.Combine(directory, $"CredentialDialog-{scenario}-{(dark ? "Dark" : "Light")}-{scale * 100:0}.png"));
+                    var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); encoder.Save(file);
+                }
+                Console.WriteLine($"Rendered compiled credential dialog {scenario}, dark={dark}, {fixture.View.ActualWidth}x{fixture.View.ActualHeight}");
+            }
+            ((IDisposable)appearance).Dispose(); return;
+        }
+        if (Environment.GetCommandLineArgs().Contains("--credentials"))
+        {
+            foreach (var dark in new[] { false, true })
+            foreach (var scenario in new[] { "Password", "Vault", "PrivateKey", "Narrow", "LargeFont", "LongLabels" })
+            {
+                using var fixture = new RemoteX.UiTesting.CredentialFixture();
+                fixture.Data.ShowPrivateKeyInput = scenario == "PrivateKey" || scenario == "Narrow";
+                fixture.Data.IsUsePrivateKey = fixture.Data.ShowPrivateKeyInput;
+                if (scenario == "Vault") fixture.Data.SelectedCredential = fixture.Data.Credentials[0];
+                if (scenario == "LongLabels") fixture.Data.StrBtnUseCredentialsVault = "Credentials vault with a long translated label";
+                var width = scenario == "Narrow" || scenario == "LongLabels" ? 300 : 800;
+                var font = scenario == "LargeFont" || scenario == "Narrow" ? 20 : 13;
+                fixture.Prepare(width, font, dark);
+                Render(fixture.View, "Credentials-" + scenario, width, dark, type, font,
+                    heightOverride: (int)Math.Ceiling(fixture.View.DesiredSize.Height));
+            }
+            foreach (var dark in new[] { false, true })
+            {
+                var compiled = (UserControl)Application.LoadComponent(new Uri("/RemoteX;component/View/Editor/Forms/Utils/CredentialView.xaml", UriKind.Relative));
+                compiled.DataContext = new RemoteX.UiTesting.CredentialFixture.Model();
+                Render(compiled, "Credentials-Compiled", 800, dark, type, beforeCapture: () => {
+                    var panel = (Border)compiled.FindName("CredentialPanel");
+                    if (!double.IsNaN(panel.Width) || panel.BorderThickness != new Thickness(1))
+                        throw new InvalidOperationException("Compiled credential panel did not apply Fluent styling.");
+                }, heightOverride: 280);
+            }
+            ((IDisposable)appearance).Dispose(); return;
+        }
         if (Environment.GetCommandLineArgs().Contains("--launcher"))
         {
             using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 60000, System.Threading.Timeout.Infinite);

@@ -3,6 +3,7 @@
   <PreviewAppDir Condition="'$(PreviewAppDir)' == ''">../../Ui/bin/FluentDialogsTest</PreviewAppDir>
  </PropertyGroup>
  <ItemGroup>
+  <None Include="$(PreviewAppDir)/ssh_rust.dll" Link="ssh_rust.dll" CopyToOutputDirectory="PreserveNewest" />
   <Reference Include="RemoteX"><HintPath>$(PreviewAppDir)/RemoteX.dll</HintPath></Reference>
   <Reference Include="Dragablz"><HintPath>$(PreviewAppDir)/Dragablz.dll</HintPath></Reference>
   <Reference Include="Stylet"><HintPath>$(PreviewAppDir)/Stylet.dll</HintPath></Reference>
