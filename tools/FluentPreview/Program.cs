@@ -108,7 +108,7 @@ class Program
         public double UpdateProgress { get; set; }
     }
     static readonly string Root = FindRoot();
-    static readonly string AppDir = Path.Combine(Root, "Ui", "bin", "FluentDialogsTest");
+    static readonly string AppDir = Environment.GetEnvironmentVariable("REMOTEX_PREVIEW_APP_DIR") ?? Path.Combine(Root, "Ui", "bin", "FluentDialogsTest");
     static string FindRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
@@ -153,6 +153,77 @@ class Program
         var type = typeof(FluentPage).Assembly.GetType("_1RM.Service.FluentAppearanceService")!;
         var appearance = Activator.CreateInstance(type, config)!;
         IoC.GetByType = (t, key) => t == type ? appearance : t == typeof(ConfigurationService) ? config : null;
+        if (Environment.GetCommandLineArgs().Contains("--launcher"))
+        {
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 60000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var scenario in new[] { "Results", "Actions", "Quick", "Note", "NoteEdit", "Filters", "Narrow", "Empty", "HiddenAccounts", "LargeFont", "SmallFont", "Highlight" })
+            {
+                using var fixture = new RemoteX.UiTesting.LauncherFixture(scenario == "Empty" ? 0 : 16);
+                if (scenario == "Filters")
+                {
+                    fixture.Model.TagFilters.Add(_1RM.Model.TagFilter.Create("研发环境 · very-long-tag", _1RM.Model.TagFilter.FilterType.Included));
+                    fixture.Model.TagFilters.Add(_1RM.Model.TagFilter.Create("排除生产", _1RM.Model.TagFilter.FilterType.Excluded));
+                    fixture.Model.Filter = "#研发环境 #-生产";
+                }
+                fixture.Model.ShowCredentials = scenario != "HiddenAccounts";
+                if (scenario == "Highlight") foreach (var row in fixture.Model.VmServerList)
+                    row.LauncherMainTitleViewModel.HighLight(row.DisplayName.Select((_, i) => i < 2).ToList());
+                fixture.Appearance(dark);
+                fixture.Prepare(scenario == "LargeFont" ? 20 : scenario == "SmallFont" ? 10 : 13,
+                    scenario == "Narrow" ? 320 : 1920, scenario == "Narrow" ? 400 : 1080,
+                    scenario.ToLowerInvariant(), scenario.StartsWith("Note"));
+                if (scenario == "NoteEdit")
+                {
+                    ((FrameworkElement)fixture.Note.FindName("MarkdownViewer")).Visibility = Visibility.Collapsed;
+                    ((Grid)fixture.Note.FindName("GridEditor")).Visibility = Visibility.Visible;
+                    ((TextBox)fixture.Note.FindName("TbMarkdown")).Text = "# 模拟编辑\n\n仅展示编辑样式，不保存备注。";
+                    fixture.Layout();
+                }
+                foreach (var scale in new[] { 1.0, 1.5, 2.0 })
+                {
+                    var bitmap = new RenderTargetBitmap((int)Math.Ceiling(fixture.View.ActualWidth * scale), (int)Math.Ceiling(fixture.View.ActualHeight * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);
+                    bitmap.Render(fixture.View);
+                    var directory = Path.Combine(AppDir, "screenshots"); Directory.CreateDirectory(directory);
+                    using var file = File.Create(Path.Combine(directory, $"Launcher-{scenario}-{(dark ? "Dark" : "Light")}-{scale * 100:0}.png"));
+                    var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); encoder.Save(file);
+                }
+                Console.WriteLine($"Rendered actual launcher {scenario}, dark={dark}, {fixture.View.ActualWidth}x{fixture.View.ActualHeight}");
+            }
+            // Also load compiled controls with their real namespace/ancestor bindings. The loose
+            // fixture deliberately removes event hookups, so this catches BAML-only regressions.
+            foreach (var dark in new[] { false, true })
+            {
+                using var fixture = new RemoteX.UiTesting.LauncherFixture();
+                var results = new _1RM.View.Launcher.ServerSelectionsView();
+                FluentPage.SetActive(results, true);
+                ((ListBox)results.FindName("ListBoxSelections")).ItemTemplate = (DataTemplate)results.Resources[new DataTemplateKey(typeof(ProtocolBaseViewModel))];
+                results.DataContext = fixture.Model;
+                Render(results, "Launcher-CompiledResults", 400, dark, type, 13, () => {
+                    var title = RemoteX.UiTesting.LauncherFixture.Descendants<_1RM.View.Launcher.LauncherHighlightedText>(results).First(x => x.Name == "ResultTitle");
+                    if (title.FontSize != 13 || title.FontWeight != FontWeights.SemiBold) throw new InvalidOperationException("Compiled launcher title style did not apply.");
+                    fixture.Model.ShowCredentials = false; fixture.Model.Refresh(); RemoteX.UiTesting.LauncherFixture.Drain();
+                    foreach (var subtitle in RemoteX.UiTesting.LauncherFixture.Descendants<_1RM.View.Launcher.LauncherHighlightedText>(results).Where(x => x.Name == "ResultSubtitle"))
+                        if (subtitle.Title != null || subtitle.ToolTip != null) throw new InvalidOperationException("Hidden account exposed by compiled bindings.");
+                    fixture.Model.ShowCredentials = true; fixture.Model.Refresh();
+                }, 414);
+                var quick = new _1RM.View.Launcher.QuickConnectionView();
+                FluentPage.SetActive(quick, true); quick.DataContext = fixture.QuickData;
+                Render(quick, "Launcher-CompiledQuick", 400, dark, type, 13, heightOverride: 414);
+            }
+            return;
+        }
+        if (Environment.GetCommandLineArgs().Contains("--session-tabs"))
+        {
+            using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 30000, System.Threading.Timeout.Infinite);
+            foreach (var dark in new[] { false, true })
+            foreach (var width in new[] { 1000, 600 })
+            {
+                cfg.Theme.Fluent.Theme = dark ? "Dark" : "Light";
+                RenderSessionHeader(width, dark, type);
+            }
+            return;
+        }
         if (Environment.GetCommandLineArgs().Contains("--home"))
         {
             using var watchdog = new System.Threading.Timer(_ => Environment.Exit(2), null, 60000, System.Threading.Timeout.Infinite);
@@ -444,42 +515,12 @@ class Program
     }
     static void RenderSessionHeader(int width, bool dark, Type service)
     {
-        // Extract the actual header style; never construct TabWindowView or a protocol host.
-        var source = XDocument.Load(Path.Combine(Root, "Ui/View/Host/TabWindowView.xaml"));
-        XNamespace presentation = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
-        XNamespace x = "http://schemas.microsoft.com/winfx/2006/xaml";
-        var resources = new XElement(presentation + "ResourceDictionary");
-        foreach (var attribute in source.Root!.Attributes().Where(a => a.IsNamespaceDeclaration))
-            resources.SetAttributeValue(attribute.Name, attribute.Value.StartsWith("clr-namespace:_1RM") ? attribute.Value + ";assembly=RemoteX" : attribute.Value);
-        resources.SetAttributeValue(XNamespace.Xmlns + "dragablz", "clr-namespace:Dragablz;assembly=Dragablz");
-        resources.Add(new XElement(presentation + "ResourceDictionary.MergedDictionaries",
-            new XElement(presentation + "ResourceDictionary", new XAttribute("Source", "/RemoteX;component/Resources/Theme/FluentSessions.xaml"))));
-        resources.Add(new XElement(source.Descendants(presentation + "Style").First(e => (string?)e.Attribute(x + "Key") == "DragableTabHeaderItemStyle")));
-        var resourceXaml = System.Text.RegularExpressions.Regex.Replace(resources.ToString(), "(clr-namespace:_1RM[^\";]+)\"", "$1;assembly=RemoteX\"");
-        var dictionary = (ResourceDictionary)XamlReader.Parse(resourceXaml);
-        var stack = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top };
-        stack.Resources.MergedDictionaries.Add(dictionary);
-        var itemType = Assembly.Load("Dragablz").GetType("Dragablz.DragablzItem")!;
-        for (var i = 0; i < 3; i++)
-        {
-            var item = (ContentControl)Activator.CreateInstance(itemType)!;
-            item.Style = (Style)dictionary["DragableTabHeaderItemStyle"];
-            item.Width = width == 600 ? 170 : 220;
-            item.DataContext = new { DisplayName = i == 0 ? "研发服务器 · 模拟" : "SSH · demo.example.invalid", ColorHex = "#0078D4",
-                Content = new { ConnectionId = "synthetic", SettingsPage = new { TabHeaderShowIconButton = false, TabHeaderShowReConnectButton = true, TabHeaderShowCloseButton = true } } };
-            itemType.GetProperty("IsSelected")!.SetValue(item, i == 0);
-            stack.Children.Add(item);
-        }
-        Render(stack, "SessionHeaders", width, dark, service, width == 600 ? 18 : 13);
-        var buttonsXml = new XElement(source.Descendants(presentation + "StackPanel").First(e => (string?)e.Attribute(x + "Name") == "SessionWindowButtons"));
-        foreach (var attribute in resources.Attributes().Where(a => a.IsNamespaceDeclaration)) buttonsXml.SetAttributeValue(attribute.Name, attribute.Value);
-        var buttonsXaml = System.Text.RegularExpressions.Regex.Replace(buttonsXml.ToString(), "(clr-namespace:_1RM[^\";]+)\"", "$1;assembly=RemoteX\"");
-        FrameworkElement buttons;
-        Application.Current.Resources.MergedDictionaries.Add(dictionary);
-        try { buttons = (FrameworkElement)XamlReader.Parse(buttonsXaml); }
-        finally { Application.Current.Resources.MergedDictionaries.Remove(dictionary); }
-        buttons.Resources.MergedDictionaries.Add(dictionary);
-        Render(buttons, "SessionWindowButtons", width, dark, service, width == 600 ? 18 : 13);
+        using var fixture = new RemoteX.UiTesting.SessionHeaderFixture(width < 800 ? 12 : 3, longTitle: true);
+        Render(fixture.View, "SessionHeaders", width, dark, service, width == 600 ? 20 : 13, () => {
+            fixture.SetFluent(true);
+            fixture.Layout(width, 60);
+            fixture.CheckActionBounds();
+        });
     }
     static void Render(FrameworkElement view, string name, int width, bool dark, Type service, double fontSize = 13,
         Action? beforeCapture = null, int? heightOverride = null)

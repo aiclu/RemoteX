@@ -16,6 +16,20 @@ namespace _1RM.Model;
 
 public static class ProtocolActionHelper
 {
+    internal static List<ProtocolAction> GetAlternateConnectionActions(this ProtocolBase server, string fromView)
+    {
+        var actions = new List<ProtocolAction>();
+        if (server is not ProtocolBaseWithAddressPortUserPwd protocol) return actions;
+
+        foreach (var credential in protocol.AlternateCredentials)
+        {
+            actions.Add(new ProtocolAction(
+                actionName: IoC.Translate("Connect") + $" ({IoC.Translate("with alternative")} `{credential.Name}`)",
+                action: () => GlobalEventHelper.OnRequestServerConnect?.Invoke(server, fromView: fromView, assignCredentialName: credential.Name)));
+        }
+        return actions;
+    }
+
     public static List<ProtocolAction> GetActions(this ProtocolBase server, bool forTabHeader = false)
     {
         bool writable = server.DataSource?.IsWritable != false;
@@ -32,16 +46,7 @@ public static class ProtocolActionHelper
                     ));
                 }
 
-                if (server is ProtocolBaseWithAddressPortUserPwd { AlternateCredentials.Count: > 0 } protocol)
-                {
-                    foreach (var credential in protocol.AlternateCredentials)
-                    {
-                        actions.Add(new ProtocolAction(
-                            actionName: IoC.Translate("Connect") + $" ({IoC.Translate("with alternative")} `{credential.Name}`)",
-                            action: () => { GlobalEventHelper.OnRequestServerConnect?.Invoke(server, fromView: $"{nameof(LauncherWindowView)} - Action - AlternateCredentials", assignCredentialName: credential.Name); }
-                        ));
-                    }
-                }
+                actions.AddRange(server.GetAlternateConnectionActions($"{nameof(LauncherWindowView)} - Action - AlternateCredentials"));
 
                 // external runners
                 var protocolConfigurationService = IoC.Get<ProtocolConfigurationService>();

@@ -19,9 +19,9 @@ namespace Tests.ViewModel
         [DataTestMethod]
         [DataRow(-1, 46.0)]
         [DataRow(0, 46.0)]
-        [DataRow(1, 86.0)]
-        [DataRow(8, 366.0)]
-        [DataRow(10000, 366.0)]
+        [DataRow(1, 98.0)]
+        [DataRow(8, 406.0)]
+        [DataRow(10000, 406.0)]
         public void FluentShowsAtMostEightRows(int count, double height)
         {
             Assert.AreEqual(height, new FluentLauncherMetrics(true, 12, 1920, 1080).HeightFor(count));
@@ -33,7 +33,7 @@ namespace Tests.ViewModel
             Assert.IsTrue(metrics.RowHeight > 40);
             Assert.IsTrue(metrics.ActionHeight > 34);
             Assert.IsTrue(metrics.SearchHeight > 46);
-            Assert.AreEqual(metrics.SearchHeight + metrics.ActionHeight * 3, metrics.HeightFor(3, true));
+            Assert.AreEqual(metrics.SearchHeight + metrics.ListPadding + metrics.ActionHeight * 3, metrics.HeightFor(3, true));
         }
         [TestMethod]
         public void SmallWorkAreaBoundsLauncher()
@@ -45,7 +45,25 @@ namespace Tests.ViewModel
         [TestMethod]
         public void InvalidFontFallsBackToDefault()
         {
-            Assert.AreEqual(40, new FluentLauncherMetrics(true, double.NaN, 1920, 1080).RowHeight);
+            Assert.AreEqual(44, new FluentLauncherMetrics(true, double.NaN, 1920, 1080).RowHeight);
+        }
+        [TestMethod]
+        public void FiltersUseOneLineOnlyAndNeverChangeActionOrClassicHeight()
+        {
+            var metrics = new FluentLauncherMetrics(true, 13, 1920, 1080);
+            Assert.AreEqual(metrics.HeightFor(8) + metrics.FilterHeight, metrics.HeightFor(8, hasFilters: true));
+            Assert.AreEqual(metrics.HeightFor(6, true), metrics.HeightFor(6, true, true));
+            var classic = new FluentLauncherMetrics(false, 20, 1920, 1080);
+            Assert.AreEqual(classic.HeightFor(8), classic.HeightFor(8, hasFilters: true));
+            Assert.AreEqual(366.0, classic.HeightFor(8));
+        }
+        [TestMethod]
+        public void MetricsRespectFontLineSpacingAndWorkingAreaWithFilters()
+        {
+            var tall = new FluentLauncherMetrics(true, 20, 340, 340, 1.8);
+            Assert.AreEqual(300.0, tall.Width);
+            Assert.IsTrue(tall.RowHeight >= 36 + 33 + 12);
+            Assert.AreEqual(240.0, tall.HeightFor(5000, hasFilters: true));
         }
         [TestMethod]
         public void DialogKeepsWorkAreaMarginAndSpaceForActions()

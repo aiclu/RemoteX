@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Shawn.Utils;
 using System.Windows.Media;
+using System;
 
 namespace _1RM.View.Launcher
 {
@@ -39,9 +40,17 @@ namespace _1RM.View.Launcher
             set => SetAndNotifyIfChanged(ref _displayNameControl, value);
         }
 
+        private IReadOnlyList<bool> _highlightFlags = Array.Empty<bool>();
+        public IReadOnlyList<bool> HighlightFlags
+        {
+            get => _highlightFlags;
+            private set => SetAndNotifyIfChanged(ref _highlightFlags, value);
+        }
+
 
         public void UnHighLightAll()
         {
+            HighlightFlags = Array.Empty<bool>();
             TextVisibility = Visibility.Visible;
             HighlightVisibility = Visibility.Collapsed;
         }
@@ -49,6 +58,7 @@ namespace _1RM.View.Launcher
         {
             if (flags.Count == Text.Length && flags.Any(x => x))
             {
+                HighlightFlags = flags.ToArray();
                 var sp = new StackPanel() { Orientation = System.Windows.Controls.Orientation.Horizontal };
                 for (int i = 0; i < flags.Count; i++)
                 {

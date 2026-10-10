@@ -56,7 +56,8 @@ namespace _1RM.View
         }
         internal FluentLauncherMetrics FluentMetrics => new FluentLauncherMetrics(
             _configurationService.Theme.Fluent?.Enabled == true, _configurationService.Theme.FontSize,
-            _fluentWorkArea.Width, _fluentWorkArea.Height);
+            _fluentWorkArea.Width, _fluentWorkArea.Height,
+            (Application.Current?.TryFindResource("GlobalFontFamily") as FontFamily)?.LineSpacing ?? 1.2);
         public double GridMainHeight
         {
             get => _gridMainHeight;
@@ -146,6 +147,8 @@ namespace _1RM.View
                     FluentLauncher.SetRowHeight(window, metrics.RowHeight);
                     FluentLauncher.SetSearchHeight(window, metrics.SearchHeight);
                     FluentLauncher.SetActionHeight(window, metrics.ActionHeight);
+                    FluentLauncher.SetFilterHeight(window, metrics.FilterHeight);
+                    FluentLauncher.SetCompact(window, metrics.Width < 380 || _configurationService.Theme.FontSize > 16);
                 }
                 var height = ServerSelectionsViewVisibility == Visibility.Visible ? ServerSelectionsViewModel.ReCalcGridMainHeight() : QuickConnectionViewModel.ReCalcGridMainHeight();
                 GridMainHeight = height;

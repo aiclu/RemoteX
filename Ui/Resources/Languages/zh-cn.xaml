@@ -404,4 +404,6 @@
     <s:String x:Key="FluentClassicThemeHint">下方主题与自定义颜色仅影响经典外观；字体设置对两种外观均生效。</s:String>
     <s:String x:Key="FluentQuickConnectHint">快速连接，例如 192.0.2.10:3389</s:String>
     <s:String x:Key="FluentSearchConnections">搜索连接</s:String>
+    <s:String x:Key="FluentLauncherSearchHint">搜索连接或 #标签</s:String>
+    <s:String x:Key="FluentLauncherQuickHint">Tab 快速连接</s:String>
 </ResourceDictionary>

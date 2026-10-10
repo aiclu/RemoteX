@@ -1,10 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
- <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0-windows</TargetFramework><UseWPF>true</UseWPF><Nullable>enable</Nullable><NuGetAudit>false</NuGetAudit></PropertyGroup>
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0-windows</TargetFramework><UseWPF>true</UseWPF><Nullable>enable</Nullable><NuGetAudit>false</NuGetAudit>
+  <PreviewAppDir Condition="'$(PreviewAppDir)' == ''">../../Ui/bin/FluentDialogsTest</PreviewAppDir>
+ </PropertyGroup>
  <ItemGroup>
-  <Reference Include="RemoteX"><HintPath>../../Ui/bin/FluentDialogsTest/RemoteX.dll</HintPath></Reference>
-  <Reference Include="Stylet"><HintPath>../../Ui/bin/FluentDialogsTest/Stylet.dll</HintPath></Reference>
-  <Reference Include="Shawn.Utils"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.dll</HintPath></Reference>
-  <Reference Include="Shawn.Utils.Wpf"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.Wpf.dll</HintPath></Reference>
-  <Reference Include="Shawn.Utils.WpfResources"><HintPath>../../Ui/bin/FluentDialogsTest/Shawn.Utils.WpfResources.dll</HintPath></Reference>
+  <Reference Include="RemoteX"><HintPath>$(PreviewAppDir)/RemoteX.dll</HintPath></Reference>
+  <Reference Include="Dragablz"><HintPath>$(PreviewAppDir)/Dragablz.dll</HintPath></Reference>
+  <Reference Include="Stylet"><HintPath>$(PreviewAppDir)/Stylet.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils"><HintPath>$(PreviewAppDir)/Shawn.Utils.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils.Wpf"><HintPath>$(PreviewAppDir)/Shawn.Utils.Wpf.dll</HintPath></Reference>
+  <Reference Include="Shawn.Utils.WpfResources"><HintPath>$(PreviewAppDir)/Shawn.Utils.WpfResources.dll</HintPath></Reference>
  </ItemGroup>
 </Project>

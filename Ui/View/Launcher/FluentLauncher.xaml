@@ -1,0 +1,83 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:view="clr-namespace:_1RM.View">
+    <!-- Explicit, launcher-local styles. Classic templates never use these keys. -->
+    <Style x:Key="LauncherText" TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}">
+        <Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeBody}"/>
+        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Style.Triggers>
+            <Trigger Property="view:FluentLauncher.RowSelected" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource FluentSelectionText}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="LauncherSecondaryText" TargetType="TextBlock" BasedOn="{StaticResource LauncherText}">
+        <Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeSmall}"/>
+        <Setter Property="Foreground" Value="{DynamicResource FluentMuted}"/>
+    </Style>
+    <Style x:Key="LauncherTitleText" TargetType="TextBlock" BasedOn="{StaticResource LauncherText}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <ControlTemplate x:Key="LauncherButtonTemplate" TargetType="Button">
+            <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="4" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource FluentHover}"/><Setter Property="Foreground" Value="{DynamicResource FluentText}"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource FluentSelection}"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource FluentText}"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger>
+                <Trigger Property="view:FluentLauncher.RowSelected" Value="True"><Setter Property="Foreground" Value="{DynamicResource FluentSelectionText}"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    <Style x:Key="LauncherIconButton" TargetType="Button">
+        <Setter Property="Width" Value="28"/><Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="6"/><Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource FluentMuted}"/>
+        <Setter Property="BorderThickness" Value="0"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template" Value="{StaticResource LauncherButtonTemplate}"/>
+    </Style>
+    <ControlTemplate x:Key="LauncherItemTemplate" TargetType="ListBoxItem">
+        <Grid Background="Transparent" SnapsToDevicePixels="True" view:FluentLauncher.RowSelected="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}}">
+            <Border x:Name="Surface" Margin="4,1" CornerRadius="6" Background="Transparent" BorderThickness="1" BorderBrush="Transparent"/>
+            <Border x:Name="SelectionIndicator" Width="3" Margin="4,9,0,9" CornerRadius="1.5" HorizontalAlignment="Left" Background="{DynamicResource FluentAccent}" Visibility="Collapsed"/>
+            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource FluentHover}"/></Trigger>
+            <Trigger Property="IsSelected" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource FluentSelection}"/><Setter TargetName="SelectionIndicator" Property="Visibility" Value="Visible"/></Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource FluentText}"/></Trigger>
+            <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="LauncherSearchTemplate" TargetType="TextBox">
+        <Grid Margin="0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Path x:Name="SearchIcon" Margin="12,0,10,0" Width="16" Height="16" Stretch="Uniform" Data="M7,0.75 A6.25,6.25 0 1 1 6.99,0.75 M11.5,11.5 L16,16" StrokeThickness="1.5" Stroke="{DynamicResource FluentMuted}" VerticalAlignment="Center"/>
+            <Grid Grid.Column="1" Margin="0,0,8,0">
+                <TextBlock x:Name="Hint" Text="{TemplateBinding Tag}" Foreground="{DynamicResource FluentMuted}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Visibility="Collapsed" IsHitTestVisible="False"/>
+                <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+            </Grid>
+            <TextBlock x:Name="Shortcut" Grid.Column="2" Margin="0,0,12,0" Text="{DynamicResource FluentLauncherQuickHint}" Style="{StaticResource LauncherSecondaryText}" IsHitTestVisible="False"/>
+            <Border x:Name="FocusLine" Grid.ColumnSpan="3" Height="1" VerticalAlignment="Bottom" Background="{DynamicResource FluentAccent}" Visibility="Collapsed"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="Text" Value=""><Setter TargetName="Hint" Property="Visibility" Value="Visible"/></Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="FocusLine" Property="Visibility" Value="Visible"/></Trigger>
+            <Trigger Property="view:FluentLauncher.QuickMode" Value="True"><Setter TargetName="SearchIcon" Property="Visibility" Value="Collapsed"/><Setter TargetName="Shortcut" Property="Visibility" Value="Collapsed"/></Trigger>
+            <Trigger Property="view:FluentLauncher.Compact" Value="True"><Setter TargetName="Shortcut" Property="Visibility" Value="Collapsed"/></Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="LauncherShell" TargetType="Border">
+        <Setter Property="CornerRadius" Value="8"/><Setter Property="Background" Value="{DynamicResource PrimaryMidBrush}"/>
+        <Setter Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="10"/></Setter.Value></Setter>
+        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
+            <Setter Property="Background" Value="{DynamicResource FluentSurface}"/>
+            <Setter Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.16"/></Setter.Value></Setter>
+        </Trigger></Style.Triggers>
+    </Style>
+</ResourceDictionary>

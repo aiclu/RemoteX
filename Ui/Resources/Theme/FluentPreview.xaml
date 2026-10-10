@@ -59,6 +59,16 @@
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
     </Style>
+    <Style x:Key="FluentAlternateConnectionButton" TargetType="Button" BasedOn="{StaticResource FluentButton}">
+        <Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="4"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Style.Triggers>
+            <!-- Reserve the arrow slot to align actions on rows with and without alternatives. -->
+            <DataTrigger Binding="{Binding AlternateConnectionSource.AlternateCredentials.Count, FallbackValue=0, TargetNullValue=0}" Value="0">
+                <Setter Property="Visibility" Value="Hidden"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="FluentHomeMenuButton" TargetType="Button" BasedOn="{StaticResource FluentHomeActionButton}">
         <Setter Property="MinHeight" Value="36"/>
         <Setter Property="ToolTip" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>

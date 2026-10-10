@@ -99,7 +99,7 @@ public sealed class HomeFixture
             var check = elements.Single(e => e.Name == "HeaderCheckBox"); var name = elements.Single(e => e.Name == "SourceName");
             Equal(Bounds(check).Left, Bounds((FrameworkElement)row.FindName("RowSelection")).Left, "Header / row checkbox");
             Equal(Bounds(name).Left, Bounds((FrameworkElement)row.FindName("RowName")).Left, "Header / row name");
-            Equal(Bounds(elements.Single(e => e.Name == "SourceAdd")).Right, Bounds((FrameworkElement)row.FindName("RowConnect")).Right, "Header / row actions");
+            Equal(Bounds(elements.Single(e => e.Name == "SourceAdd")).Right, Bounds((FrameworkElement)row.FindName("RowConnectionActions")).Right, "Header / row actions");
             Require(row.ActualHeight >= 44, "Connection row minimum height.");
             if (width == 1000)
             {

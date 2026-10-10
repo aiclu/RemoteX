@@ -387,3 +387,5 @@ FluentTags;Manage tags
 FluentClassicThemeHint;The theme and custom colors below affect classic appearance only. Font settings apply to both appearances.
 FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
 FluentSearchConnections;Szukaj połączeń
+FluentLauncherSearchHint;Szukaj połączeń lub #tagów
+FluentLauncherQuickHint;Tab  Szybkie połączenie

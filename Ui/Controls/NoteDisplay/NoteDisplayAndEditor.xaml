@@ -5,17 +5,45 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wpf="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:view="clr-namespace:_1RM.View"
              xmlns:attachProperty="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="../../View/Launcher/FluentLauncher.xaml"/></ResourceDictionary.MergedDictionaries>
+        <Style x:Key="LauncherNoteIcon" TargetType="Button" BasedOn="{StaticResource ButtonBarPrimaryStyle}">
+            <Setter Property="Width" Value="20"/><Setter Property="Height" Value="20"/>
+            <Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                <Setter Property="Width" Value="28"/><Setter Property="Height" Value="28"/><Setter Property="Padding" Value="6"/>
+                <Setter Property="Template" Value="{StaticResource LauncherButtonTemplate}"/><Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+            </MultiTrigger></Style.Triggers>
+        </Style>
+        <Style x:Key="LauncherNoteSave" TargetType="Button" BasedOn="{StaticResource ButtonAccentStyle}">
+            <Setter Property="Padding" Value="0,1,0,0"/><Setter Property="MinHeight" Value="25"/>
+            <Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                <Setter Property="Template" Value="{StaticResource LauncherButtonTemplate}"/><Setter Property="Padding" Value="12,4"/><Setter Property="MinHeight" Value="32"/>
+                <Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="Background" Value="{DynamicResource FluentSelection}"/>
+            </MultiTrigger></Style.Triggers>
+        </Style>
+        <Style x:Key="LauncherNoteCancel" TargetType="Button" BasedOn="{StaticResource ButtonPrimaryStyle}">
+            <Setter Property="Padding" Value="0,1,0,0"/><Setter Property="MinHeight" Value="25"/>
+            <Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                <Setter Property="Template" Value="{StaticResource LauncherButtonTemplate}"/><Setter Property="Padding" Value="12,4"/><Setter Property="MinHeight" Value="32"/>
+                <Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="Background" Value="{DynamicResource FluentHover}"/>
+            </MultiTrigger></Style.Triggers>
+        </Style>
         <system:Double x:Key="LauncherGridKeywordHeight">46</system:Double>
         <system:Double x:Key="LauncherOutlineCornerRadius">8</system:Double>
         <CornerRadius x:Key="LauncherOutlineCornerRadiusObj" TopLeft="{StaticResource LauncherOutlineCornerRadius}" TopRight="{StaticResource LauncherOutlineCornerRadius}" BottomLeft="{StaticResource LauncherOutlineCornerRadius}" BottomRight="{StaticResource LauncherOutlineCornerRadius}"></CornerRadius>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Border Padding="0 " Margin="0" Background="Transparent">
         <Border CornerRadius="{StaticResource LauncherOutlineCornerRadiusObj}" Background="{DynamicResource PrimaryMidBrush}">
+            <Border.Style><Style TargetType="Border"><Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                <Setter Property="BorderThickness" Value="1"/><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+            </MultiTrigger></Style.Triggers></Style></Border.Style>
             <Grid Name="Main">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -24,23 +52,27 @@
 
                 <Grid RowSpan="2" PreviewMouseDown="Ignore_OnPreviewMouseDown" PreviewMouseMove="Ignore_OnPreviewMouseMove" Background="Transparent"></Grid>
 
-                <Border Grid.Row="0" Background="{DynamicResource PrimaryMidBrush}" Height="{StaticResource LauncherGridKeywordHeight}"
+                <Border Grid.Row="0" Background="{DynamicResource PrimaryMidBrush}"
                         BorderThickness="0 0 0 1">
-                    <Border.BorderBrush>
-                        <SolidColorBrush Color="{DynamicResource PrimaryTextColor}" Opacity="0.5"></SolidColorBrush>
-                    </Border.BorderBrush>
+                    <Border.Style><Style TargetType="Border"><Setter Property="Height" Value="46"/><Setter Property="BorderBrush"><Setter.Value><SolidColorBrush Color="{DynamicResource PrimaryTextColor}" Opacity="0.5"/></Setter.Value></Setter>
+                        <Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                            <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}"/><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+                        </MultiTrigger></Style.Triggers></Style></Border.Style>
                     <Border.CornerRadius>
                         <CornerRadius TopLeft="{StaticResource LauncherOutlineCornerRadius}" TopRight="{StaticResource LauncherOutlineCornerRadius}"></CornerRadius>
                     </Border.CornerRadius>
                     <Grid>
                         <TextBlock Text="{DynamicResource Note}" 
-                                   Style="{StaticResource TextBlockBase}"
-                                   FontSize="{DynamicResource GlobalFontSizeTitle}" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"></TextBlock>
+                                   VerticalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}">
+                            <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}"><Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeTitle}"/><Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Style.Triggers><MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                                    <Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeBody}"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="HorizontalAlignment" Value="Left"/><Setter Property="Margin" Value="12,0,80,0"/>
+                                </MultiTrigger></Style.Triggers></Style></TextBlock.Style>
+                        </TextBlock>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Name="ButtonEdit" Width="20" Height="20"
-                                    Style="{StaticResource ButtonBarPrimaryStyle}"
+                            <Button Name="ButtonEdit"
+                                    Style="{StaticResource LauncherNoteIcon}"
                                     Background="Transparent"
                                     attachProperty:VisionElement.BackgroundAccent="Transparent"
                                     attachProperty:VisionElement.BackgroundOnMouseDown="Transparent"
@@ -57,8 +89,8 @@
                             </Button>
 
 
-                            <Button Name="ButtonClose" Width="20" Height="20" 
-                                    Style="{StaticResource ButtonBarPrimaryStyle}"
+                            <Button Name="ButtonClose"
+                                    Style="{StaticResource LauncherNoteIcon}"
                                     IsEnabled="False"
                                     Background="Transparent"
                                     attachProperty:VisionElement.BackgroundAccent="Transparent"
@@ -112,24 +144,30 @@
                                      AcceptsReturn="True"
                                      AcceptsTab="True"
                                      Tag="&#13;# Markdown support&#13;&#13;- write your note here&#13;- foo&#13;&#13;![pic](http://x/structure.png)&#13;&#13;[link](http://x/readme.md)" xml:space="preserve">
+                                <TextBox.Style><Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"><Style.Triggers>
+                                    <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="view:FluentLauncher.IsNotePane" Value="True"/></MultiTrigger.Conditions>
+                                        <Setter Property="Padding" Value="8"/><Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="Background" Value="{DynamicResource FluentSurface}"/><Setter Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+                                        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+                                    </MultiTrigger>
+                                </Style.Triggers></Style></TextBox.Style>
                             </TextBox>
 
 
                             <StackPanel Name="GridButtons"  Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                                 <Button Name="ButtonSave"
                                         Margin="0 0 15 0"
-                                        Padding="0 1 0 0" MinWidth="80" MinHeight="25"
+                                        MinWidth="80"
                                         HorizontalAlignment="Left"
                                         Click="ButtonSave_OnClick"
-                                        Style="{StaticResource ButtonAccentStyle}"
+                                        Style="{StaticResource LauncherNoteSave}"
                                         Content="{DynamicResource Save}">
                                 </Button>
 
-                                <Button Padding="0 1 0 0" MinWidth="80" MinHeight="25"
+                                <Button MinWidth="80"
                                         Margin="15 0 0 0"
                                         HorizontalAlignment="Right"
                                         Click="ButtonCancelEdit_OnClick"
-                                        Style="{StaticResource ButtonPrimaryStyle}"
+                                        Style="{StaticResource LauncherNoteCancel}"
                                         Content="{DynamicResource Cancel}">
                                 </Button>
                             </StackPanel>

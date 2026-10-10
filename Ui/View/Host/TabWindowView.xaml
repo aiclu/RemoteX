@@ -119,7 +119,9 @@
                                     </ContextMenu>
                                 </Grid.ContextMenu>
                                 <Border Name="DragablzHeaderItemBorder"></Border>
-                                <Border x:Name="FluentSelectedMark" Height="3" Margin="8,0" VerticalAlignment="Bottom" Background="{DynamicResource FluentAccent}" CornerRadius="2" Visibility="Collapsed"/>
+                                <Border x:Name="FluentSelectedMark" Width="24" Height="2" Margin="0,0,0,1"
+                                        HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="{DynamicResource FluentAccent}"
+                                        CornerRadius="1" Visibility="Collapsed" IsHitTestVisible="False"/>
                                 <Grid Name="Trapezoid" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" 
                                       ToolTip="{Binding DisplayName, Mode=OneWay}"
                                       VerticalAlignment="Center">
@@ -133,17 +135,17 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!--header item icon-->
-                                    <Border Grid.Column="1" Padding="4 0 0 0"
+                                    <Border x:Name="TabIconBorder" Grid.Column="1" Padding="4 0 0 0"
                                             Visibility="{Binding Content.SettingsPage.TabHeaderShowIconButton, Converter={StaticResource ConverterBool2Visible}}"
                                             >
-                                        <Grid Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Grid x:Name="TabIcon" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center">
                                             <Image Source="{Binding IconImg}" Stretch="Uniform"></Image>
                                         </Grid>
                                     </Border>
 
                                     <!--header item content-->
-                                    <Border Grid.Column="2" Padding="0" Margin="4 0 4 0">
-                                        <TextBlock HorizontalAlignment="Center"
+                                    <Border x:Name="TabTitleBorder" Grid.Column="2" Padding="0" Margin="4 0 4 0">
+                                        <TextBlock x:Name="TabTitle" HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
                                                    TextTrimming="CharacterEllipsis"
                                                    MaxWidth="250"
@@ -167,7 +169,7 @@
                                         </Thumb.Style>
                                     </Thumb>
 
-                                    <Button Grid.Column="4"
+                                    <Button x:Name="TabReconnect" Grid.Column="4"
                                             Visibility="{Binding Content.SettingsPage.TabHeaderShowReConnectButton, Converter={StaticResource ConverterBool2Visible}}"
                                             Style="{StaticResource SessionTabButton}"
                                             Background="Transparent"
@@ -181,11 +183,12 @@
                                             <Path Data="M684.032 403.456q-17.408-8.192-15.872-22.016t11.776-22.016q3.072-2.048 19.968-15.872t41.472-33.28q-43.008-49.152-102.4-77.312t-129.024-28.16q-64.512 0-120.832 24.064t-98.304 66.048-66.048 98.304-24.064 120.832q0 63.488 24.064 119.808t66.048 98.304 98.304 66.048 120.832 24.064q53.248 0 100.864-16.896t87.04-47.616 67.584-72.192 41.472-90.624q7.168-23.552 26.624-38.912t46.08-15.36q31.744 0 53.76 22.528t22.016 53.248q0 14.336-5.12 27.648-21.504 71.68-63.488 132.096t-99.84 103.936-128.512 68.096-148.48 24.576q-95.232 0-179.2-35.84t-145.92-98.304-98.304-145.92-36.352-178.688 36.352-179.2 98.304-145.92 145.92-98.304 179.2-36.352q105.472 0 195.584 43.52t153.6 118.272q23.552-17.408 39.424-30.208t19.968-15.872q6.144-5.12 13.312-7.68t13.312 0 10.752 10.752 6.656 24.576q1.024 9.216 2.048 31.232t2.048 51.2 1.024 60.416-1.024 58.88q-1.024 34.816-16.384 50.176-8.192 8.192-24.576 9.216t-34.816-3.072q-27.648-6.144-60.928-13.312t-63.488-14.848-53.248-14.336-29.184-9.728z"
                                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                   Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
-                                                  StrokeThickness="0" Stretch="Uniform" />
+                                                  StrokeThickness="0" Stretch="Uniform" Style="{StaticResource SessionClassicGlyph}"/>
+                                            <Path Style="{StaticResource SessionFluentGlyph}" Data="M 10.5,4 A 4.5,4.5 0 1 0 10.5,8 M 10.5,1 L 10.5,4 L 7.5,4"/>
                                         </Grid>
                                     </Button>
 
-                                    <Button Tag="SessionDanger" Grid.Column="5"
+                                    <Button x:Name="TabClose" Tag="SessionDanger" Grid.Column="5"
                                             Visibility="{Binding Content.SettingsPage.TabHeaderShowCloseButton, Converter={StaticResource ConverterBool2Visible}}"
                                             Style="{StaticResource SessionTabButton}"
                                             Background="Transparent"
@@ -200,7 +203,8 @@
                                             <Path Data="F1 M 47.910156 -44.000000 L 87.183594 -4.683594 L 83.316406 -0.816406 L 44.000000 -40.089844 L 4.683594 -0.816406 L 0.816406 -4.683594 L 40.089844 -44.000000 L 0.816406 -83.316406 L 4.683594 -87.183594 L 44.000000 -47.910156 L 83.316406 -87.183594 L 87.183594 -83.316406 Z "
                                                       Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                       Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
-                                                      StrokeThickness="2" Stretch="Uniform" />
+                                                      StrokeThickness="2" Stretch="Uniform" Style="{StaticResource SessionClassicGlyph}"/>
+                                            <Path Style="{StaticResource SessionFluentGlyph}" Data="M 1,1 L 9,9 M 9,1 L 1,9"/>
                                         </Grid>
                                     </Button>
                                 </Grid>
@@ -235,15 +239,32 @@
                                 </Trigger>
                                 <Trigger Property="view:FluentPage.Active" Value="True">
                                     <Setter TargetName="DragablzHeaderItemContent" Property="Background" Value="{DynamicResource FluentCanvas}"/>
-                                    <Setter TargetName="DragablzHeaderItemBorder" Property="CornerRadius" Value="6,6,0,0"/>
+                                    <!-- Inner margins give a 4 DIP visual gap without changing the drag organiser's item bounds. -->
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="CornerRadius" Value="6"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="Margin" Value="2,1"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="BorderBrush" Value="Transparent"/>
                                     <Setter TargetName="DragablzHeaderItemBorder" Property="BorderThickness" Value="0"/>
+                                    <Setter TargetName="Trapezoid" Property="Margin" Value="8,0"/>
+                                    <Setter TargetName="TabIconBorder" Property="Padding" Value="0"/>
+                                    <Setter TargetName="TabIcon" Property="Width" Value="16"/><Setter TargetName="TabIcon" Property="Height" Value="16"/>
+                                    <Setter TargetName="TabTitleBorder" Property="Margin" Value="8,0,4,0"/>
+                                    <Setter TargetName="TabReconnect" Property="Margin" Value="0"/>
+                                    <Setter TargetName="TabClose" Property="Margin" Value="0"/>
                                     <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
                                 </Trigger>
+                                <MultiDataTrigger><MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentPage.Active)}" Value="True"/>
+                                    <Condition Binding="{Binding ColorHex, Converter={StaticResource ConverterColorIsTransparent}}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="FluentSelectedMark" Property="Background" Value="{Binding ColorHex, Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"/>
+                                </MultiDataTrigger>
                                 <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsMouseOver" Value="True"/></MultiTrigger.Conditions>
                                     <Setter TargetName="DragablzHeaderItemBorder" Property="Background" Value="{DynamicResource FluentHover}"/>
                                 </MultiTrigger>
                                 <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsSelected" Value="True"/></MultiTrigger.Conditions>
                                     <Setter TargetName="DragablzHeaderItemBorder" Property="Background" Value="{DynamicResource FluentSurface}"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="BorderBrush" Value="{DynamicResource FluentStroke}"/>
+                                    <Setter TargetName="DragablzHeaderItemBorder" Property="BorderThickness" Value="1"/>
                                     <Setter TargetName="FluentSelectedMark" Property="Visibility" Value="Visible"/>
                                 </MultiTrigger>
                                 <MultiTrigger><MultiTrigger.Conditions><Condition Property="view:FluentPage.Active" Value="True"/><Condition Property="IsKeyboardFocusWithin" Value="True"/></MultiTrigger.Conditions>
@@ -271,7 +292,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type dragablz:DragablzItemsControl}">
-                            <Grid Background="{DynamicResource PrimaryMidBrush}"
+                            <Grid Style="{StaticResource SessionHeaderSurface}"
                                   Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}">
                                 <Grid Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Bottom">
                                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
@@ -298,23 +319,24 @@
             </Style>
 
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <host:SessionHeaderReserveConverter x:Key="SessionHeaderReserveConverter" />
             <Style TargetType="{x:Type dragablz:TabablzControl}">
                 <!--Add button to left of header items-->
                 <Setter Property="HeaderPrefixContent">
                     <Setter.Value>
-                        <StackPanel Margin="5 0" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" 
+                        <StackPanel Style="{StaticResource SessionHeaderPrefix}" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}"
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center">
                             <StackPanel Visibility="{Binding SettingsPage.GeneralSettingViewModel.TabWindowCloseButtonOnLeft, Converter={StaticResource ConverterBool2Visible}}"
                                         Orientation="Horizontal"
-                                        Background="{DynamicResource PrimaryMidBrush}">
+                                        Style="{StaticResource SessionHeaderSurface}">
                                 <!--IT ONLY A PLACEHOLDER FOR 6 BUTTONS, 4 * 45 + 5 + 45 * 2(depends on this.SelectedItem.Content?.CanFullScreen & BtnCloseAllVisibility)-->
                                 <Grid Width="185"></Grid>
                                 <Grid Width="45" Visibility="{Binding SelectedItem.Content.CanFullScreen, Converter={StaticResource BooleanToVisibilityConverter}}"></Grid>
                                 <Grid Width="45" Visibility="{Binding BtnCloseAllVisibility}"></Grid>
                             </StackPanel>
 
-                            <Grid Width="20" Height="20" VerticalAlignment="Center">
+                            <Grid x:Name="SessionLogo" Width="20" Height="20" VerticalAlignment="Center">
                                 <Image Source="/RemoteX;component/Resources/Image/Logo/logo32.png"></Image>
                             </Grid>
                         </StackPanel>
@@ -324,26 +346,27 @@
                 <!--Add button to right of header items-->
                 <Setter Property="HeaderSuffixContent">
                     <Setter.Value>
-                        <Grid Background="{DynamicResource PrimaryMidBrush}">
+                        <Grid Style="{StaticResource SessionHeaderSurface}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <Grid Grid.Column="0" Background="{DynamicResource PrimaryMidBrush}">
+                            <Grid Grid.Column="0" Style="{StaticResource SessionHeaderSurface}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
 
-                                <Grid Grid.Column="1" 
+                                <Grid Grid.Column="1"
                                       MouseDown="WinTitleBar_OnPreviewMouseDown" 
                                       PreviewMouseMove="WinTitleBar_OnPreviewMouseMove" 
-                                      Background="{DynamicResource PrimaryMidBrush}"></Grid>
+                                      Style="{StaticResource SessionHeaderSurface}"></Grid>
 
-                                <Button Grid.Column="0" Width="25" Height="{x:Static host:TabWindowView.TITLE_BAR_HEIGHT}" VerticalAlignment="Center"
+                                <Button x:Name="SessionAdd" Grid.Column="0" VerticalAlignment="Center"
                                         Visibility="{Binding SettingsPage.LauncherSettingViewModel.LauncherEnabled, Converter={StaticResource ConverterBool2Visible}}"
-                                        Style="{StaticResource SessionChromeButton}"
+                                        Style="{StaticResource SessionLauncherButton}"
+                                        ToolTip="{DynamicResource Launcher}" AutomationProperties.Name="{DynamicResource Launcher}"
                                         attachProperty:VisionElement.Opacity="0.5"
                                         attachProperty:VisionElement.OpacityAccent="0.9"
                                         HorizontalAlignment="Left" Command="{Binding CmdInvokeLauncher}">
@@ -351,16 +374,17 @@
                                         <Path Data="M 41.888 18.304 L 41.888 23.584 L 23.584 23.584 L 23.584 41.888 L 18.304 41.888 L 18.304 23.584 L 0 23.584 L 0 18.304 L 18.304 18.304 L 18.304 0 L 23.584 0 L 23.584 18.304 Z"
                                               Stroke="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                               Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
-                                              StrokeThickness="1" Stretch="Uniform">
+                                              StrokeThickness="1" Stretch="Uniform" Style="{StaticResource SessionClassicGlyph}">
                                         </Path>
+                                        <Path Width="12" Height="12" Style="{StaticResource SessionFluentGlyph}" Data="M 6,1 L 6,11 M 1,6 L 11,6"/>
                                     </Grid>
                                 </Button>
                             </Grid>
 
-                            <StackPanel Grid.Column="1" 
+                            <StackPanel Grid.Column="1"
                                         Visibility="{Binding SettingsPage.GeneralSettingViewModel.TabWindowCloseButtonOnLeft, Converter={StaticResource ConverterBool2VisibleInv}}"
                                         Orientation="Horizontal" HorizontalAlignment="Right"
-                                        Background="{DynamicResource PrimaryMidBrush}">
+                                        Style="{StaticResource SessionHeaderSurface}">
                                 <!--IT ONLY A PLACEHOLDER FOR 5 BUTTONS, 4 * 45 + 5 + 45 * 2(depends on this.SelectedItem.Content?.CanFullScreen & BtnCloseAllVisibility)-->
                                 <Grid Width="185"></Grid>
                                 <Grid Width="45" Visibility="{Binding SelectedItem.Content.CanFullScreen, Converter={StaticResource BooleanToVisibilityConverter}}"></Grid>
@@ -397,12 +421,22 @@
                                         <Grid x:Name="PART_ItemsHolder" Margin="0" />
                                     </Grid>
                                 </Border>
-                                <Grid Grid.Column="0" Grid.Row="0" Margin="0" view:FluentPage.Scope="True" x:Name="HeaderContainerGrid" Visibility="{TemplateBinding IsHeaderPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Grid Grid.Column="0" Grid.Row="0" Margin="0" view:FluentPage.Scope="True" Style="{StaticResource SessionHeaderSurface}" x:Name="HeaderContainerGrid" Visibility="{TemplateBinding IsHeaderPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*">
+                                            <ColumnDefinition.MinWidth>
+                                                <MultiBinding Converter="{StaticResource SessionHeaderReserveConverter}">
+                                                    <Binding ElementName="HeaderContainerGrid" Path="(view:FluentPage.Active)"/>
+                                                    <Binding Path="SettingsPage.GeneralSettingViewModel.TabWindowCloseButtonOnLeft"/>
+                                                    <Binding Path="SettingsPage.LauncherSettingViewModel.LauncherEnabled"/>
+                                                    <Binding Path="SelectedItem.Content.CanFullScreen"/>
+                                                    <Binding Path="BtnCloseAllVisibility"/>
+                                                </MultiBinding>
+                                            </ColumnDefinition.MinWidth>
+                                        </ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <ContentControl Grid.Column="0" x:Name="PrefixContentControl"
                                                     Content="{TemplateBinding HeaderPrefixContent}"
@@ -446,7 +480,7 @@
 
 
                                     <!--MarkColor border top-->
-                                    <Border BorderThickness="0 0 0 5"
+                                    <Border x:Name="HeaderLegacyColorBorder" Style="{StaticResource SessionHeaderLegacyColorBorder}"
                                             Grid.Column="0" Grid.ColumnSpan="4"
                                             BorderBrush="{Binding SelectedItem.ColorHex, Converter={StaticResource ConverterColorHexString2Brush}, Mode=OneWay}"
                                             SnapsToDevicePixels="True">

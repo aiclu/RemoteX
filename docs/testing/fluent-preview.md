@@ -222,3 +222,118 @@ in compact/expanded sidebars and both palettes at 100%, 150%, 200% bitmap scales
 opening the classic popup again after switching still require interactive checks.
 The full legacy-suite NETSDK1005 blocker is unchanged. Output is still
 `Ui/bin/FluentDialogsTest/RemoteX.exe`; version stays 1.0.16, with no commit or release.
+
+## Compact session tab bar — 2026-10-10
+
+This local iteration stays at **2.0.3** and preserves the uncommitted alternate-
+connection changes. Fluent headers now share the canvas background across the logo,
+tabs, gaps and launcher area. Tabs have 6-DIP corners, 4-DIP visual gaps and a
+centered 24-by-2-DIP selected marker (connection color, otherwise Fluent accent).
+The logo stays 20 DIP, protocol icons are 16 DIP, and the three tab actions use
+24-by-24-DIP hit targets with lightweight vector strokes. Classic visuals and
+commands, content color borders, the 30-DIP header and remote sizing code remain
+unchanged. No protocol host or fullscreen toolbar is modified.
+
+Whole-header rendering found that the star-sized suffix could under-report its
+desired width while tabs overflowed, clipping the launcher against the window
+buttons. `SessionHeaderReserveConverter` supplies a Fluent-only minimum for the
+existing suffix column, reserving the current launcher/window-button slots. It
+returns zero in classic mode and respects launcher visibility and left/right
+window-button placement; no settings or protocol interfaces are added.
+
+Validation:
+
+- Debug app build: 120 warnings, zero errors. Complete C# suite: **129 passed,
+  zero failed, zero skipped**, including eight session-header tests. The historical
+  net6 test blocker described above no longer applies; see `net9-migration.md`.
+- Real production templates check 10–20 DIP fonts, center deviation no greater
+  than 1 DIP, 4-DIP gaps, selection and marker colors, simulated hover/focus,
+  disabled/hidden buttons, long-title trimming/tooltips, horizontal scrolling,
+  repeated resizing and window-button sides. Content remains 90 DIP below a
+  30-DIP header in the 120-DIP fixture; Fluent does not inherit into its presenter.
+- The shared `SessionHeaderFixture` loads the entire actual content grid with
+  prefix, tabs, suffix and window actions, not independent placeholder tabs. Only
+  code-behind events and the inter-window drag controller are omitted; models and
+  commands are synthetic, and no `TabWindowView` or protocol host is constructed.
+- `ssh_rust.dll` in the independent output is 5,443,072 bytes; `NativeLibrary.Load`
+  and `sr_set_log_callback` export lookup succeed, followed by immediate unload.
+- Executable: `Ui/bin/FluentSessionTabsTest/RemoteX.exe`. Normal/large-font overflow
+  screenshots: `screenshots/SessionHeaders-{Light|Dark}-{1000|600}-{100|150|200}.png`
+  under that directory. Full test results and additional marked/hidden-button/
+  high-contrast render cases are under `Tests/TestResults/SessionTabs/full.trx`
+  and its PNG attachments.
+
+Reproduce (Debug only):
+
+```powershell
+dotnet test Tests/Tests.csproj -c Debug --no-restore --logger "trx;LogFileName=full.trx" --results-directory Tests/TestResults/SessionTabs
+dotnet build Ui/Ui.csproj -c Debug --no-restore -p:OutDir=D:/Projects/RemoteX/Ui/bin/FluentSessionTabsTest/
+dotnet build tools/FluentPreview/Render.csproj -c Debug --no-restore -p:PreviewAppDir=D:/Projects/RemoteX/Ui/bin/FluentSessionTabsTest
+$env:REMOTEX_PREVIEW_APP_DIR = 'D:\Projects\RemoteX\Ui\bin\FluentSessionTabsTest'
+dotnet tools/FluentPreview/bin/Debug/net9.0-windows/Render.dll --session-tabs
+```
+
+100%/150%/200% are bitmap output scales, not real monitor-DPI certification.
+Hover/focus injection and system-color palette checks are not desktop interaction
+tests. Still manual: actual drag/reorder/tear-out, cross-monitor DPI, keyboard
+routing, real session switching/reconnect/close and system theme/high-contrast
+changes. No real connections, user database writes, upgrade, version bump, commit,
+push, tag or release were performed.
+
+## Launcher compact Fluent refresh (local, 2.0.3)
+
+The launcher keeps a 400-DIP content width and at most eight complete result
+rows on a sufficiently tall work area. Fluent uses a 24-DIP icon, a two-line
+title/subtitle, restrained metadata, a pale selection with a separate 3-DIP
+indicator, and an independent connection-color dot. Search and quick-connect
+keep their existing input instances. Active tag filters now occupy a separate
+single line; the height/clip calculations include it, and clearing filters
+recalculates without a stale empty strip. Classic templates remain available.
+
+`LauncherHighlightedText` renders the existing match flags as runs inside one
+ellipsized text block. It releases its weak property subscription on unload or
+model replacement. Hidden account information has neither a subtitle view-model
+binding nor a tooltip in the Fluent result and action header. Notes are styled
+only when the launcher-specific opt-in is inherited; Markdown/edit/save logic is
+unchanged. Note/delete buttons own their gestures, so a double click on them is
+not interpreted as a connection gesture.
+
+Validation and artifacts:
+
+- Debug build: 120 existing warnings, zero errors. Full C# tests: **139 passed,
+  zero failed, zero skipped** (129 prior tests plus 10 launcher tests/cases).
+- Covers classic dimensions, work-area bounds, font line spacing, filter-strip
+  height, 10–20 DIP two-line bounds, hidden-account bindings, caret retention,
+  matching ranges, highlight subscription release, simulated hover/focus,
+  light/dark/system-color selection, and 1,200-item virtualized scrolling.
+- `LauncherFixture` uses the actual launcher shell, server/action/quick templates
+  and note XAML with inert models. It removes code-behind events and Stylet
+  activation; no real host, hotkey registration or database is constructed.
+  The renderer additionally loads compiled result/quick controls to validate the
+  original ancestor bindings and hidden-account behavior.
+- `Ui/bin/FluentLauncherTest/RemoteX.exe` is the independent Debug executable.
+  Its `ssh_rust.dll` is present (5,443,072 bytes); native load and lookup of
+  `sr_set_log_callback` succeed, followed by immediate unload.
+- 84 PNGs under that directory's `screenshots/`: `Launcher-{scenario}-{Light|Dark}-{100|150|200}.png`.
+  Scenarios include results, actions, quick connect, note display/edit, filters,
+  narrow work area, empty results, hidden accounts, small/large fonts and search
+  highlighting, plus compiled-control checks. All 14 language dictionaries load;
+  the new search/hotkey hints are synchronized with the language CSV sources.
+- Full report: `Tests/TestResults/FluentLauncherFull/full.trx`.
+
+Reproduce (Debug only):
+
+```powershell
+dotnet test Tests/Tests.csproj -c Debug --no-restore --logger "trx;LogFileName=full.trx" --results-directory Tests/TestResults/FluentLauncherFull
+dotnet build Ui/Ui.csproj -c Debug --no-restore -p:OutDir=D:/Projects/RemoteX/Ui/bin/FluentLauncherTest/
+dotnet build tools/FluentPreview/Render.csproj -c Debug --no-restore -p:PreviewAppDir=D:/Projects/RemoteX/Ui/bin/FluentLauncherTest
+$env:REMOTEX_PREVIEW_APP_DIR = 'D:\Projects\RemoteX\Ui\bin\FluentLauncherTest'
+dotnet tools/FluentPreview/bin/Debug/net9.0-windows/Render.dll --launcher
+```
+
+Bitmap scales are not monitor-DPI certification. Still manual: Chinese IME
+composition, actual global hotkey/Enter/Escape/Tab/arrow routing, focus loss and
+hide, real monitor changes/system theme changes, and the actual note/connection
+actions. The automated fixtures do not connect, save notes, delete persisted
+history, modify credentials or upgrade. Version stays 2.0.3; prior alternate
+connection and session-tab work is preserved. No commit, push, tag or release.

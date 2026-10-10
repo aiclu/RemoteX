@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ui\Ui.csproj" />
+    <Compile Include="..\tools\FluentPreview\SessionHeaderFixture.cs" Link="Fixtures\SessionHeaderFixture.cs" />
+    <Compile Include="..\tools\FluentPreview\LauncherFixture.cs" Link="Fixtures\LauncherFixture.cs" />
   </ItemGroup>
 
 </Project>

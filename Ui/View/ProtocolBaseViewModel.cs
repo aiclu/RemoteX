@@ -80,6 +80,9 @@ namespace _1RM.View
         public string SubTitle => Server.SubTitle;
         public string ProtocolDisplayNameInShort => Server.ProtocolDisplayName;
 
+        // A typed binding source also observes changes to the alternate collection/count.
+        public ProtocolBaseWithAddressPortUserPwd? AlternateConnectionSource => Server as ProtocolBaseWithAddressPortUserPwd;
+
         /// <summary>
         /// like: "#work #asd", display in launcher page.
         /// </summary>
@@ -112,6 +115,7 @@ namespace _1RM.View
                     RaisePropertyChanged(nameof(DisplayName));
                     RaisePropertyChanged(nameof(SubTitle));
                     RaisePropertyChanged(nameof(ProtocolDisplayNameInShort));
+                    RaisePropertyChanged(nameof(AlternateConnectionSource));
                     IsViewable = IsEditable = _server.DataSource?.IsWritable == true;
                     RaisePropertyChanged(nameof(DataSource));
                     RaisePropertyChanged(nameof(IsViewable));

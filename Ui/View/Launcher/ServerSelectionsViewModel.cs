@@ -220,7 +220,7 @@ namespace _1RM.View.Launcher
             if (IoC.Get<ConfigurationService>().Theme.Fluent?.Enabled == true)
                 return IoC.Get<LauncherWindowViewModel>().FluentMetrics.HeightFor(
                     view.GridActionsList.Visibility == Visibility.Visible ? Actions.Count : VmServerList.Count,
-                    view.GridActionsList.Visibility == Visibility.Visible);
+                    view.GridActionsList.Visibility == Visibility.Visible, TagFilters.Count > 0);
             // show server list
             if (view.GridActionsList.Visibility != Visibility.Visible)
             {
@@ -255,8 +255,8 @@ namespace _1RM.View.Launcher
             if (string.IsNullOrEmpty(keyword))
             {
                 SelectedIndex = -1;
-                RebuildVmServerList();
                 TagFilters = new List<TagFilter>();
+                RebuildVmServerList();
                 return;
             }
 

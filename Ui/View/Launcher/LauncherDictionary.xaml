@@ -4,6 +4,7 @@
                     xmlns:view="clr-namespace:_1RM.View"
                     xmlns:attachProperty="clr-namespace:Shawn.Utils.WpfResources.Theme.AttachProperty;assembly=Shawn.Utils.WpfResources"
                     xmlns:converter="clr-namespace:Shawn.Utils.WpfResources.Converter;assembly=Shawn.Utils.WpfResources">
+    <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="FluentLauncher.xaml"/></ResourceDictionary.MergedDictionaries>
 
     <converter:ConverterColorHexString2Brush x:Key="ConverterColorHexString2Brush"></converter:ConverterColorHexString2Brush>
 
@@ -36,17 +37,15 @@
         </Setter>
         <Setter Property="Background" Value="Transparent" />
     <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
-<Setter Property="Height" Value="Auto"/><Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeTitle}"/>
-<Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
-<Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource FluentStroke}" Padding="12,4" Background="{DynamicResource FluentSurface}">
-<Grid><TextBlock x:Name="FluentHint" Text="{TemplateBinding Tag}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="{DynamicResource FluentMuted}" Visibility="Collapsed" IsHitTestVisible="False"/><ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/></Grid>
-</Border><ControlTemplate.Triggers><Trigger Property="Text" Value=""><Setter TargetName="FluentHint" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers>
-</ControlTemplate></Setter.Value></Setter></Trigger></Style.Triggers></Style>
+<Setter Property="Height" Value="Auto"/><Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeBody}"/>
+<Setter Property="Margin" Value="0"/><Setter Property="Tag" Value="{DynamicResource FluentLauncherSearchHint}"/>
+<Setter Property="Template" Value="{StaticResource LauncherSearchTemplate}"/></Trigger></Style.Triggers></Style>
 
 
 
 
     <Style x:Key="ListBoxItemStyleForServer" TargetType="ListBoxItem">
+        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Template" Value="{StaticResource LauncherItemTemplate}"/></Trigger></Style.Triggers>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -111,6 +110,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
+            <Setter Property="Padding" Value="0,4"/>
             <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -131,6 +131,14 @@
                 <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"></Setter>
                 <Setter Property="Opacity" Value="1"></Setter>
             </DataTrigger>
+            <Trigger Property="view:FluentPage.Active" Value="True">
+                <Setter Property="Opacity" Value="1"/><Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeBody}"/>
+                <Setter Property="Foreground" Value="{DynamicResource FluentText}"/>
+            </Trigger>
+            <MultiDataTrigger><MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentPage.Active)}" Value="True"/>
+                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True"/>
+            </MultiDataTrigger.Conditions><Setter Property="Foreground" Value="{DynamicResource FluentSelectionText}"/></MultiDataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -155,6 +163,7 @@
 
 
     <Style x:Key="ListBoxItemStyleForAction" TargetType="ListBoxItem">
+        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Template" Value="{StaticResource LauncherItemTemplate}"/></Trigger></Style.Triggers>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>

@@ -27,7 +27,10 @@
             </VisualBrush>
 
             <Style x:Key="SearchBoxTbKeyWordStyle" TargetType="TextBox" BasedOn="{StaticResource SearchBoxTbKeyWordStyleBase}">
+                <Setter Property="Margin" Value="10,0,0,0"/>
+                <Setter Property="Tag" Value="{DynamicResource filter_mainwindow}"/>
                 <Style.Triggers>
+                    <Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Margin" Value="0"/><Setter Property="Tag" Value="{DynamicResource FluentLauncherSearchHint}"/></Trigger>
                     <Trigger Property="Text" Value="{x:Null}">
                         <Setter Property="Background" Value="{StaticResource HintText}" />
                     </Trigger>
@@ -70,7 +73,7 @@
                 </Style.Triggers>
             </Style>
 
-            <DataTemplate DataType="{x:Type view:ProtocolBaseViewModel}">
+            <DataTemplate x:Key="ClassicServerResult">
                 <Grid Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.RowHeight)}"
                       >
                     <Grid.ColumnDefinitions>
@@ -200,6 +203,48 @@
                 </Grid>
             </DataTemplate>
 
+            <DataTemplate x:Key="FluentServerResult">
+                <Grid x:Name="FluentResultRow" Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.RowHeight)}" Margin="12,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="32"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid VerticalAlignment="Center" Width="24" HorizontalAlignment="Left">
+                        <Image Width="24" Height="24" Source="{Binding Server.IconImg}"/>
+                        <Border Width="6" Height="6" CornerRadius="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="{Binding Server.ColorHex, Converter={StaticResource ConverterColorHexString2Brush}}"/>
+                    </Grid>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
+                        <local:LauncherHighlightedText x:Name="ResultTitle" Title="{Binding LauncherMainTitleViewModel}" ToolTip="{Binding DisplayName}" Style="{StaticResource LauncherTitleText}"/>
+                        <local:LauncherHighlightedText x:Name="ResultSubtitle">
+                            <local:LauncherHighlightedText.Style><Style TargetType="local:LauncherHighlightedText" BasedOn="{StaticResource LauncherSecondaryText}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <!-- No credential content or tooltip exists while account display is disabled. -->
+                                <Style.Triggers><DataTrigger Binding="{Binding DataContext.ShowCredentials, RelativeSource={RelativeSource AncestorType=local:ServerSelectionsView}}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/><Setter Property="Title" Value="{Binding LauncherSubTitleViewModel}"/><Setter Property="ToolTip" Value="{Binding SubTitle}"/>
+                                </DataTrigger></Style.Triggers>
+                            </Style></local:LauncherHighlightedText.Style>
+                        </local:LauncherHighlightedText>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" MaxWidth="92" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding Server.ProtocolDisplayName}" Style="{StaticResource LauncherSecondaryText}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                        <TextBlock ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Style="{StaticResource LauncherSecondaryText}" HorizontalAlignment="Stretch" TextAlignment="Right">
+                            <TextBlock.Text><MultiBinding StringFormat="{}{0} {1}"><Binding Path="TagString"/><Binding Path="DataSourceNameForLauncher"/></MultiBinding></TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="3" Margin="4,0,0,0" Style="{StaticResource LauncherIconButton}" VerticalAlignment="Center" ToolTip="{DynamicResource Note}" AutomationProperties.Name="{DynamicResource Note}"
+                            Visibility="{Binding Server.Note, Converter={StaticResource ConverterNoteToVisibility}}" Tag="{Binding Server.Id}" Click="ButtonShowNote_OnClick"
+                            IsEnabled="{Binding DataContext.IsShowNoteFieldEnabled, RelativeSource={RelativeSource AncestorType=local:ServerSelectionsView}}">
+                        <Path Width="14" Height="14" Data="{StaticResource NoteGeometry}" Stretch="Uniform" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type view:ProtocolBaseViewModel}">
+                <ContentControl Content="{Binding}" IsTabStop="False" HorizontalContentAlignment="Stretch">
+                    <ContentControl.Style><Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource ClassicServerResult}"/>
+                        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="ContentTemplate" Value="{StaticResource FluentServerResult}"/></Trigger></Style.Triggers>
+                    </Style></ContentControl.Style>
+                </ContentControl>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="{DynamicResource PrimaryMidBrush}">
@@ -208,21 +253,24 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
 
             <Grid Name="GridKeyword"
 
                   Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
-                <TextBox Name="TbKeyWord" Tag="{DynamicResource filter_mainwindow}"
+                <TextBox Name="TbKeyWord"
                          Foreground="{DynamicResource PrimaryTextBrush}"
                          PreviewKeyDown="TbKeyWord_OnPreviewKeyDown"
-                         Margin="10 0 0 0"
                          Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource SearchBoxTbKeyWordStyle}"></TextBox>
 
                 <!-- show tags -->
-                <Grid Height="40" HorizontalAlignment="Right" Visibility="{Binding TagFilters.Count, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter='0'}">
+                <Grid Height="40" HorizontalAlignment="Right">
+                    <Grid.Style><Style TargetType="Grid"><Setter Property="Visibility" Value="{Binding TagFilters.Count, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter='0'}"/>
+                        <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers>
+                    </Style></Grid.Style>
                     <ItemsControl VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding TagFilters}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -263,11 +311,27 @@
                     </ItemsControl>
                 </Grid>
             </Grid>
-
-
+            <Border x:Name="FluentFilterStrip" Grid.Row="1" Padding="12,0,12,8" Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.FilterHeight)}">
+                <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger>
+                        <DataTrigger Binding="{Binding TagFilters.Count}" Value="0"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+                    </Style.Triggers></Style></Border.Style>
+                <ItemsControl ItemsSource="{Binding TagFilters}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate><DataTemplate>
+                        <Border Margin="0,0,4,0" Padding="6,2" CornerRadius="4" Background="{DynamicResource FluentSelection}" ToolTip="{Binding TagName}">
+                            <TextBlock Text="{Binding TagName}" Foreground="{DynamicResource FluentSelectionText}" TextTrimming="CharacterEllipsis" FontSize="{DynamicResource GlobalFontSizeSmall}" VerticalAlignment="Center">
+                                <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBase}"><Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsExcluded}" Value="True"><Setter Property="TextDecorations" Value="Strikethrough"/></DataTrigger>
+                                </Style.Triggers></Style></TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+                    </DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
             <!--servers list body-->
             <ListBox x:Name="ListBoxSelections"
-                     Grid.Row="1"
+                     Grid.Row="2"
                      Grid.IsSharedSizeScope="True"
                      BorderThickness="0"
                      PreviewMouseRightButtonDown="ListBoxSelections_OnMouseRightButtonDown"
@@ -289,6 +353,7 @@
             <Grid
                   Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
                 <Grid VerticalAlignment="Center">
+                    <Grid.Style><Style TargetType="Grid"><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers></Style></Grid.Style>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"></ColumnDefinition>
                         <ColumnDefinition Width="30"></ColumnDefinition>
@@ -352,6 +417,23 @@
                 </Grid>
             </Grid>
 
+            <Grid Grid.Row="0" Margin="12,0" Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
+                <Grid.Style><Style TargetType="Grid"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers></Style></Grid.Style>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Button Style="{StaticResource LauncherIconButton}" VerticalAlignment="Center" ToolTip="{DynamicResource Back}" AutomationProperties.Name="{DynamicResource Back}" Click="ButtonActionBack_OnClick">
+                    <Path Data="M9,1 L3,7 L9,13" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5"/>
+                </Button>
+                <Image Grid.Column="1" Width="24" Height="24" HorizontalAlignment="Left" Source="{Binding SelectedItem.Server.IconImg}"/>
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <TextBlock Text="{Binding SelectedItem.DisplayName}" ToolTip="{Binding SelectedItem.DisplayName}" Style="{StaticResource LauncherTitleText}"/>
+                    <TextBlock x:Name="ActionSubtitle">
+                        <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource LauncherSecondaryText}"><Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers><DataTrigger Binding="{Binding ShowCredentials}" Value="True"><Setter Property="Visibility" Value="Visible"/><Setter Property="Text" Value="{Binding SelectedItem.SubTitle}"/><Setter Property="ToolTip" Value="{Binding SelectedItem.SubTitle}"/></DataTrigger></Style.Triggers>
+                        </Style></TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                <TextBlock Grid.Column="3" MaxWidth="70" Text="{Binding SelectedItem.Server.ProtocolDisplayName}" Style="{StaticResource LauncherSecondaryText}"/>
+            </Grid>
             <ListBox x:Name="ListBoxActions"
                      Grid.Row="1"
                      PreviewMouseRightButtonDown="ListBoxActions_OnMouseRightButtonDown"

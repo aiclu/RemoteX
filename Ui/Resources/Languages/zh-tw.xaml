@@ -384,4 +384,6 @@
     <s:String x:Key="FluentClassicThemeHint">下方主題與自訂色彩僅影響經典外觀；字型設定對兩種外觀均生效。</s:String>
     <s:String x:Key="FluentQuickConnectHint">快速連線，例如 192.0.2.10:3389</s:String>
     <s:String x:Key="FluentSearchConnections">搜尋連線</s:String>
+    <s:String x:Key="FluentLauncherSearchHint">搜尋連線或 #標籤</s:String>
+    <s:String x:Key="FluentLauncherQuickHint">Tab 快速連線</s:String>
 </ResourceDictionary>

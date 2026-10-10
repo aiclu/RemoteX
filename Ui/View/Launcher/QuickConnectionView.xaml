@@ -40,7 +40,7 @@
 
 
 
-            <DataTemplate DataType="{x:Type local:QuickConnectionItem}">
+            <DataTemplate x:Key="ClassicQuickResult">
                 <Grid Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.RowHeight)}">
                     <Grid VerticalAlignment="Center" 
                       >
@@ -125,7 +125,25 @@
 
 
 
+            <DataTemplate x:Key="FluentQuickResult">
+                <Grid Height="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.RowHeight)}" Margin="12,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Host}" ToolTip="{Binding Host}" Style="{StaticResource LauncherTitleText}" Margin="0,0,8,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Protocol}" Style="{StaticResource LauncherSecondaryText}" Margin="0,0,4,0" MaxWidth="70"/>
+                    <Button Grid.Column="2" Tag="{Binding}" VerticalAlignment="Center" ToolTip="{DynamicResource Delete}" AutomationProperties.Name="{DynamicResource Delete}" Click="ButtonDeleteItem_OnClick">
+                        <Button.Style><Style TargetType="Button" BasedOn="{StaticResource LauncherIconButton}"><Style.Triggers><DataTrigger Binding="{Binding Protocol}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Button.Style>
+                        <Path Width="10" Height="10" Data="M0,0 L10,10 M10,0 L0,10" StrokeThickness="1.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:QuickConnectionItem}">
+                <ContentControl Content="{Binding}" IsTabStop="False" HorizontalContentAlignment="Stretch"><ContentControl.Style><Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ClassicQuickResult}"/>
+                    <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="ContentTemplate" Value="{StaticResource FluentQuickResult}"/></Trigger></Style.Triggers>
+                </Style></ContentControl.Style></ContentControl>
+            </DataTemplate>
             <Style x:Key="ListBoxItemStyleForQuickConnect" TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemStyleForServer}">
+                <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Template" Value="{StaticResource LauncherItemTemplate}"/></Trigger></Style.Triggers>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBoxItem">
@@ -166,7 +184,7 @@
 
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="{DynamicResource PrimaryMidBrush}">
+    <Grid Background="{DynamicResource PrimaryMidBrush}" view:FluentLauncher.QuickMode="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -179,12 +197,19 @@
             </Grid.ColumnDefinitions>
 
             <ComboBox TabIndex="1"
-                      Margin="3 8"
                       IsTabStop="False"
                       Grid.Column="0"
                       DisplayMemberPath="Protocol"
                       SelectedItem="{Binding SelectedProtocol}"
                       ItemsSource="{Binding Protocols}">
+                <ComboBox.Style><Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                    <Setter Property="Margin" Value="3,8"/>
+                    <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True">
+                        <Setter Property="Margin" Value="8,6"/><Setter Property="MinWidth" Value="68"/><Setter Property="MaxWidth" Value="112"/>
+                        <Setter Property="FontSize" Value="{DynamicResource GlobalFontSizeBody}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource FluentText}"/><Setter Property="Background" Value="{DynamicResource FluentSurface}"/>
+                    </Trigger></Style.Triggers>
+                </Style></ComboBox.Style>
             </ComboBox>
 
             <TextBox Name="TbKeyWord" Tag="{DynamicResource FluentQuickConnectHint}"

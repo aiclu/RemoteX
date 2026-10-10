@@ -23,9 +23,12 @@
         <WindowChrome GlassFrameThickness="-1" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
+        <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Launcher/FluentLauncher.xaml"/></ResourceDictionary.MergedDictionaries>
         <Style TargetType="FlowDocument">
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -37,10 +40,7 @@
 
         <Border Name="BorderMainContent" Padding="10 40">
             <StackPanel MinHeight="{Binding RelativeSource={RelativeSource Self}, Path=(view:FluentLauncher.SearchHeight)}">
-                <Border CornerRadius="{x:Static view:LauncherWindowViewModel.LauncherOutlineCornerRadiusObj}" Background="{DynamicResource PrimaryMidBrush}">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" />
-                    </Border.Effect>
+                <Border Style="{StaticResource LauncherShell}">
 
                     <Grid Clip="{Binding GridMainClip}"
                           Width="{Binding GridMainWidth}"
@@ -56,6 +56,11 @@
                                         PreviewMouseMove="WinTitleBar_OnPreviewMouseMove"
                                         Visibility="{Binding ElementName=ServerSelectionsView, Path=Visibility, Converter={StaticResource ConverterEqual2Collapsed}, ConverterParameter={x:Static Visibility.Visible}}">
                         </ContentControl>
+                        <Border CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource FluentStroke}" IsHitTestVisible="False">
+                            <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers><Trigger Property="view:FluentPage.Active" Value="True"><Setter Property="Visibility" Value="Visible"/></Trigger></Style.Triggers>
+                            </Style></Border.Style>
+                        </Border>
                     </Grid>
                 </Border>
             </StackPanel>
@@ -74,6 +79,7 @@
                 </Style>
             </Border.Style>
             <noteDisplay:NoteDisplayAndEditor Width="{Binding NoteWidth}"
+                                              view:FluentLauncher.IsNotePane="True"
                                               Height="{Binding GridNoteHeight}"
                                               Server="{Binding ServerSelectionsViewModel.SelectedItem.Server, Mode=OneWay}"
                                               EditEnable="True"

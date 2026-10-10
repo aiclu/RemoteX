@@ -384,4 +384,6 @@
     <s:String x:Key="FluentClassicThemeHint">The theme and custom colors below affect classic appearance only. Font settings apply to both appearances.</s:String>
     <s:String x:Key="FluentQuickConnectHint">Quick connect, e.g. 192.0.2.10:3389</s:String>
     <s:String x:Key="FluentSearchConnections">Rechercher des connexions</s:String>
+    <s:String x:Key="FluentLauncherSearchHint">Rechercher connexions ou #tags</s:String>
+    <s:String x:Key="FluentLauncherQuickHint">Tab  Connexion rapide</s:String>
 </ResourceDictionary>

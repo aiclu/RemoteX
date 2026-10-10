@@ -191,6 +191,8 @@ namespace _1RM.View.Launcher
             HideActionsList();
         }
 
+        private void ButtonActionBack_OnClick(object sender, RoutedEventArgs e) => HideActionsList();
+
 
 
         public void ShowActionsList(ProtocolBaseViewModel protocol)
@@ -272,6 +274,8 @@ namespace _1RM.View.Launcher
 
         private void ListBoxSelections_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // A note button owns its click, including a double click; it is not a connect gesture.
+            if (FluentPage.GetActive(this) && MyVisualTreeHelper.VisualUpwardSearch<Button>(e.OriginalSource as DependencyObject) != null) return;
             if (IoC.Get<LauncherWindowViewModel>().View is LauncherWindowView { IsClosing: true }) return;
             if (this.DataContext is not ServerSelectionsViewModel vm) return;
 

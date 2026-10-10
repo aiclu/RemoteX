@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using _1RM.Model;
 using _1RM.Service;
+using Shawn.Utils.Wpf;
 using _1RM.Service.Locality;
 using _1RM.View.Editor;
 using Stylet;
@@ -98,6 +99,7 @@ namespace _1RM.View.Launcher
 
         private void ListBoxHistory_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (FluentPage.GetActive(this) && MyVisualTreeHelper.VisualUpwardSearch<Button>(e.OriginalSource as DependencyObject) != null) return;
             if (IoC.TryGet<LauncherWindowView>()?.IsClosing != false) return;
             if (this.DataContext is not QuickConnectionViewModel vm) return;
             

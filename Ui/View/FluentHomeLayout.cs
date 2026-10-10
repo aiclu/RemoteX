@@ -97,11 +97,11 @@ internal sealed class FluentHomeRowGrid : Grid
         var compact = IsSourceHeader ? constraint.Width < 320 : constraint.Width < 420 || FluentWorkspace.GetIsCompact(this);
         if (Compact != compact) SetValue(CompactPropertyKey, compact);
         var actionWidth = ActionWidth;
-        if (!IsSourceHeader && Children.Count > 0 && Children[Children.Count - 1] is Button button)
+        if (!IsSourceHeader && Children.Count > 0 && Children[Children.Count - 1] is FrameworkElement action)
         {
-            button.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            action.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             // Leave one spacing unit for fractional-DPI text rounding before enabling ellipsis.
-            actionWidth = Math.Max(ActionWidth, Math.Ceiling(button.DesiredSize.Width / 4) * 4 + 4);
+            actionWidth = Math.Max(ActionWidth, Math.Ceiling(action.DesiredSize.Width / 4) * 4 + 4);
             // A long localized action must not force a minimum-width window's grid past its card.
             // Keep a small name slot and let the local button template trim with a full tooltip.
             actionWidth = Math.Min(actionWidth, Math.Max(ActionWidth,

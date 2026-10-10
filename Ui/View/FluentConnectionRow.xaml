@@ -2,6 +2,11 @@
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:local="clr-namespace:_1RM.View" MinHeight="44" ToolTip="{Binding Server.SubTitle}">
+ <UserControl.Resources>
+  <DataTemplate x:Key="AlternateConnectionLabel">
+   <TextBlock Text="{Binding}" TextWrapping="Wrap" MaxWidth="300"/>
+  </DataTemplate>
+ </UserControl.Resources>
  <local:FluentHomeRowGrid x:Name="RowColumns" Margin="12,4">
   <CheckBox x:Name="RowSelection" Grid.Column="1" Width="20" Height="20" HorizontalAlignment="Left"
             IsChecked="{Binding IsSelected, Mode=TwoWay}" Click="SelectionClick" VerticalAlignment="Center"
@@ -25,7 +30,15 @@
      <DataTrigger Binding="{Binding Compact, RelativeSource={RelativeSource AncestorType=local:FluentHomeRowGrid}}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
     </Style.Triggers></Style></TextBlock.Style>
    </TextBlock>
-  <Button x:Name="RowConnect" Grid.Column="5" Style="{DynamicResource FluentHomeActionButton}" Content="{DynamicResource Connect}"
-          Command="{Binding CmdConnServer}" MinWidth="64" VerticalAlignment="Center"/>
+  <Grid x:Name="RowConnectionActions" Grid.Column="5" MinWidth="64" VerticalAlignment="Center" PreviewKeyDown="ConnectionActionsKeyDown">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="24"/></Grid.ColumnDefinitions>
+   <Button x:Name="RowConnect" Style="{DynamicResource FluentHomeActionButton}" Content="{DynamicResource Connect}"
+           Command="{Binding CmdConnServer}" MinWidth="40" Padding="4,4"/>
+   <Button x:Name="RowAlternatives" Grid.Column="1" Click="OpenAlternateConnections" Style="{DynamicResource FluentAlternateConnectionButton}"
+           ToolTip="{DynamicResource 'with alternative'}" AutomationProperties.Name="{DynamicResource 'with alternative'}">
+    <Path Data="M 0,0 L 4,4 L 8,0" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+          StrokeThickness="1.2" Width="8" Height="4" VerticalAlignment="Center"/>
+   </Button>
+  </Grid>
  </local:FluentHomeRowGrid>
 </UserControl>
