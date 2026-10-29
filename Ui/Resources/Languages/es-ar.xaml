@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Ocurrió un error inesperado. Abajo se muestra la info del error:</s:String>
     <s:String x:Key="error_report_to_clipboard">Copiar al portapapeles</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Ayudanos a mejorar RemoteX reportando este error.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Solo copiá el mensaje de error y elegí cómo reportarlo.</s:String>
-    <s:String x:Key="error_report_send_by_email">Enviar por e-mail</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Copiá la información del error y reportá el problema en el repositorio de GitHub que aparece abajo.</s:String>
     <s:String x:Key="error_report_send_by_github">Enviar por GitHub</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">seleccionar una imagen</s:String>
     <s:String x:Key="Default">Predeterminado</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">Buscar conexiones</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Buscar conexiones o #etiquetas</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Conexión rápida</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Faltan dependencias del terminal o no se pudieron cargar. Finalizá las sesiones activas y cerrá RemoteX por completo, incluida la bandeja del sistema. Volvé a abrirlo y conectate de nuevo. Si el problema persiste, extraé nuevamente el paquete oficial completo.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Las dependencias del terminal son incompatibles o están dañadas. Cerrá RemoteX y extraé nuevamente el paquete oficial completo para la arquitectura de tu sistema.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">No se pudo inicializar el terminal. Se cerró esta conexión. Reintentá o reiniciá RemoteX. Si el problema persiste, reportalo en GitHub y adjuntá el registro.</s:String>
 </ResourceDictionary>

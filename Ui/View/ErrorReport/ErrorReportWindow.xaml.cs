@@ -23,11 +23,14 @@ namespace _1RM.View.ErrorReport
     /// </summary>
     public partial class ErrorReportWindow : WindowChromeBase
     {
-        public ErrorReportWindow(Exception e)
+        internal ErrorReportWindow()
         {
             InitializeComponent();
             Init();
+        }
 
+        public ErrorReportWindow(Exception e) : this()
+        {
             TbErrorInfo.Text = e.Message;
 
             var sb = new StringBuilder();
@@ -179,22 +182,5 @@ namespace _1RM.View.ErrorReport
             }
         }
 
-        private void ButtonSendByEmail_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string mailto = string.Format("mailto:{0}?Subject={1}&Body={2}", "veckshawn@gmail.com", $"{Assert.APP_DISPLAY_NAME} error report.", "");
-#pragma warning disable CS0618
-#pragma warning disable SYSLIB0013 // 类型或成员已过时
-                mailto = Uri.EscapeUriString(mailto);
-#pragma warning restore SYSLIB0013 // 类型或成员已过时
-#pragma warning restore CS0618
-                HyperlinkHelper.OpenUriBySystem(mailto);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
     }
 }

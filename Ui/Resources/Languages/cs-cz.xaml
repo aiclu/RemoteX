@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Došlo k neočekávané chybě. Informace o chybě viz níže:</s:String>
     <s:String x:Key="error_report_to_clipboard">Zkopírovat do schránky</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Prosíme pomozte nám RemoteX vylepšit nahlášením této chyby.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Stačí jen zkopírovat tuto chybovou hlášku a zvolit způsob jejíh nahlášení.</s:String>
-    <s:String x:Key="error_report_send_by_email">Poslat e-mailem e-mail</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Zkopírujte informace o chybě a nahlaste problém v níže uvedeném repozitáři GitHub.</s:String>
     <s:String x:Key="error_report_send_by_github">Poslat prostřednictvím portálu GitHub</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">vyberte obrázek</s:String>
     <s:String x:Key="Default">Výchozí</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">Hledat připojení</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Hledat spojení nebo #štítky</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Rychlé připojení</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Závislosti terminálu chybí nebo je nelze načíst. Ukončete aktivní relace a úplně zavřete RemoteX (i v oznamovací oblasti). Poté jej znovu spusťte a připojte se. Pokud problém přetrvává, znovu rozbalte celý oficiální balíček.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Závislosti terminálu jsou nekompatibilní nebo poškozené. Ukončete RemoteX a znovu rozbalte celý oficiální balíček pro architekturu vašeho systému.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">Terminál se nepodařilo inicializovat. Toto připojení bylo ukončeno. Zkuste to znovu nebo restartujte RemoteX. Pokud problém přetrvává, nahlaste jej na GitHubu a přiložte protokol.</s:String>
 </ResourceDictionary>

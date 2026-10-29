@@ -216,8 +216,7 @@ word_oops;Jejda…
 error_report_unexpected_error_occurred;Došlo k neočekávané chybě. Informace o chybě viz níže:
 error_report_to_clipboard;Zkopírovat do schránky
 error_report_please_help_us_improve;Prosíme pomozte nám RemoteX vylepšit nahlášením této chyby.
-error_report_how_help_us_improve;Stačí jen zkopírovat tuto chybovou hlášku a zvolit způsob jejíh nahlášení.
-error_report_send_by_email;Poslat e-mailem e-mail
+error_report_how_help_us_improve;Zkopírujte informace o chybě a nahlaste problém v níže uvedeném repozitáři GitHub.
 error_report_send_by_github;Poslat prostřednictvím portálu GitHub
 logo_selector_open_file_dialog_title;vyberte obrázek
 Default;Výchozí
@@ -390,3 +389,6 @@ FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
 FluentSearchConnections;Hledat připojení
 FluentLauncherSearchHint;Hledat spojení nebo #štítky
 FluentLauncherQuickHint;Tab  Rychlé připojení
+TerminalDependencyMissing;Závislosti terminálu chybí nebo je nelze načíst. Ukončete aktivní relace a úplně zavřete RemoteX (i v oznamovací oblasti). Poté jej znovu spusťte a připojte se. Pokud problém přetrvává, znovu rozbalte celý oficiální balíček.
+TerminalDependencyInvalid;Závislosti terminálu jsou nekompatibilní nebo poškozené. Ukončete RemoteX a znovu rozbalte celý oficiální balíček pro architekturu vašeho systému.
+TerminalInitializationFailed;Terminál se nepodařilo inicializovat. Toto připojení bylo ukončeno. Zkuste to znovu nebo restartujte RemoteX. Pokud problém přetrvává, nahlaste jej na GitHubu a přiložte protokol.

@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Wystąpił nieoczekiwany błąd. Opis błędu poniżej:</s:String>
     <s:String x:Key="error_report_to_clipboard">Kopiuj do schowka</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Pomoż rozwijać RemoteX poprzez zgłoszenie tego błędu.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Po prostu skopiuj ten błąd, i wybierz sposób wysłania.</s:String>
-    <s:String x:Key="error_report_send_by_email">Wyślij mailem</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Skopiuj informacje o błędzie i zgłoś problem w repozytorium GitHub poniżej.</s:String>
     <s:String x:Key="error_report_send_by_github">Wyślij przez GitHub'a</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">Wybierz zdjęcie</s:String>
     <s:String x:Key="Default">Domyślne</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">Szukaj połączeń</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Szukaj połączeń lub #tagów</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Szybkie połączenie</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Brakuje zależności terminala lub nie można ich załadować. Zakończ aktywne sesje i całkowicie zamknij RemoteX, również w zasobniku systemowym. Uruchom go ponownie i połącz się. Jeśli problem nadal występuje, ponownie rozpakuj cały oficjalny pakiet.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Zależności terminala są niezgodne lub uszkodzone. Zamknij RemoteX i ponownie rozpakuj cały oficjalny pakiet dla architektury swojego systemu.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">Nie można zainicjować terminala. To połączenie zostało zamknięte. Spróbuj ponownie lub uruchom ponownie RemoteX. Jeśli problem nadal występuje, zgłoś go na GitHubie i dołącz dziennik.</s:String>
 </ResourceDictionary>

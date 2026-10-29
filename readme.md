@@ -15,13 +15,14 @@ RemoteX is a modern personal remote session manager and launcher. It is a single
 - **Compact connection management** with an adaptive search/action toolbar, aligned data-source headers and connection rows, clear sidebar tag selection, and view/sort menus with selection indicators.
 - **Refined launcher and session tabs** with compact Fluent results, quick connection and notes, rounded session tabs, and an alternate-connection menu beside the home list's Connect action.
 - **Consistent credential forms** with adaptive Fluent panels, compact mode selectors, aligned credential dialogs, and validation messages below the inputs.
+- **Protected terminal initialization** with restart guidance for missing dependencies, connection cleanup and a dismissible/retryable in-tab error. Error reports now point exclusively to this repository's GitHub Issues.
 - **Classic mode remains available**. Existing installations keep their classic appearance by default; classic colors and view preferences are preserved separately.
 - **.NET 9 throughout** the supported application libraries and tests; .NET 6 and .NET Framework build targets have been removed.
 - Fixes for language resource loading, search caret positioning, RDP editor completion dismissal, and SSH private-key preservation during sensitive-field encryption.
 
 To enable Fluent, open **Settings → Theme**, choose **Fluent preview**, then select light, dark, or system. In Fluent mode, the sidebar **Appearance** menu switches themes or returns to classic.
 
-See [2.0.5 release notes](docs/releases/2.0.5.md) and the [development guide](DEVELOP.md).
+See [2.0.6 release notes](docs/releases/2.0.6.md) and the [development guide](DEVELOP.md).
 
 ## Features
 
@@ -38,11 +39,11 @@ See [2.0.5 release notes](docs/releases/2.0.5.md) and the [development guide](DE
 
 ## 🚩Installation
 
-Latest Version: 2.0.5
+Latest Version: 2.0.6
 
 ### 🔻[Download](https://github.com/aiclu/RemoteX/releases)
 
-Grab the `RemoteX-2.0.5-net9-x64.zip` (framework-dependent) or `RemoteX-2.0.5-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
+Grab the `RemoteX-2.0.6-net9-x64.zip` (framework-dependent) or `RemoteX-2.0.6-net9-x64-self-contained.zip` (no .NET runtime required) asset from the [Releases page](https://github.com/aiclu/RemoteX/releases).
 
 ### Requirements and upgrading
 

@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Произошла непредвиденная ошибка. Информация об ошибке показана ниже:</s:String>
     <s:String x:Key="error_report_to_clipboard">Скопировать в буфер обмена</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Пожалуйста, помогите нам улучшить RemoteX, сообщив об этой ошибке.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Просто скопируйте сообщение об ошибке и выберите способ сообщить о нем.</s:String>
-    <s:String x:Key="error_report_send_by_email">Послать по электронной почте</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Скопируйте сведения об ошибке и сообщите о ней в репозитории GitHub ниже.</s:String>
     <s:String x:Key="error_report_send_by_github">Отправить через GitHub</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">выберите картинку</s:String>
     <s:String x:Key="Default">По умолчанию</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">Поиск подключений</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Поиск подключений или #тегов</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Быстрое подключение</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Зависимости терминала отсутствуют или не могут быть загружены. Завершите активные сеансы и полностью закройте RemoteX, в том числе в системном трее. Затем запустите его и подключитесь снова. Если ошибка повторяется, заново распакуйте полный официальный пакет.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Зависимости терминала несовместимы или повреждены. Закройте RemoteX и заново распакуйте полный официальный пакет для архитектуры вашей системы.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">Не удалось инициализировать терминал. Это соединение закрыто. Повторите попытку или перезапустите RemoteX. Если ошибка повторяется, сообщите о ней на GitHub и приложите журнал.</s:String>
 </ResourceDictionary>

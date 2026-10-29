@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Une erreur inattendue s'est produite. Les informations sur l'erreur sont affichées ci-dessous :</s:String>
     <s:String x:Key="error_report_to_clipboard">Copier dans le presse-papier</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Veuillez nous aider à améliorer RemoteX en signalant cette erreur.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Copiez simplement le message d'erreur et choisissez l'une des façons de le signaler.</s:String>
-    <s:String x:Key="error_report_send_by_email">Envoyé par email</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Copiez les informations de l'erreur et signalez le problème dans le dépôt GitHub ci-dessous.</s:String>
     <s:String x:Key="error_report_send_by_github">Envoyer par GitHub</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">sélectionner une image</s:String>
     <s:String x:Key="Default">Défaut</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">Rechercher des connexions</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Rechercher connexions ou #tags</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Connexion rapide</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Des dépendances du terminal sont absentes ou ne peuvent pas être chargées. Terminez vos sessions actives et quittez complètement RemoteX, y compris dans la zone de notification. Relancez-le et reconnectez-vous. Si le problème persiste, extrayez à nouveau le paquet officiel complet.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Les dépendances du terminal sont incompatibles ou endommagées. Quittez RemoteX et extrayez à nouveau le paquet officiel complet correspondant à votre architecture.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">Le terminal n'a pas pu être initialisé. Cette connexion a été fermée. Réessayez ou redémarrez RemoteX. Si le problème persiste, signalez-le sur GitHub en joignant le journal.</s:String>
 </ResourceDictionary>

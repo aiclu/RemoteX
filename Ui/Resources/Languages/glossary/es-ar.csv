@@ -216,8 +216,7 @@ word_oops;Uy...;
 error_report_unexpected_error_occurred;Ocurrió un error inesperado. Abajo se muestra la info del error:;
 error_report_to_clipboard;Copiar al portapapeles;
 error_report_please_help_us_improve;Ayudanos a mejorar RemoteX reportando este error.;
-error_report_how_help_us_improve;Solo copiá el mensaje de error y elegí cómo reportarlo.;
-error_report_send_by_email;Enviar por e-mail;
+error_report_how_help_us_improve;Copiá la información del error y reportá el problema en el repositorio de GitHub que aparece abajo.
 error_report_send_by_github;Enviar por GitHub;
 logo_selector_open_file_dialog_title;seleccionar una imagen;
 Default;Predeterminado;
@@ -385,3 +384,6 @@ FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
 FluentSearchConnections;Buscar conexiones
 FluentLauncherSearchHint;Buscar conexiones o #etiquetas
 FluentLauncherQuickHint;Tab  Conexión rápida
+TerminalDependencyMissing;Faltan dependencias del terminal o no se pudieron cargar. Finalizá las sesiones activas y cerrá RemoteX por completo, incluida la bandeja del sistema. Volvé a abrirlo y conectate de nuevo. Si el problema persiste, extraé nuevamente el paquete oficial completo.
+TerminalDependencyInvalid;Las dependencias del terminal son incompatibles o están dañadas. Cerrá RemoteX y extraé nuevamente el paquete oficial completo para la arquitectura de tu sistema.
+TerminalInitializationFailed;No se pudo inicializar el terminal. Se cerró esta conexión. Reintentá o reiniciá RemoteX. Si el problema persiste, reportalo en GitHub y adjuntá el registro.

@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">予期しないエラーが発生しました。エラー情報は以下のとおりです。</s:String>
     <s:String x:Key="error_report_to_clipboard">クリップボードにコピー</s:String>
     <s:String x:Key="error_report_please_help_us_improve">このエラーを報告して RemoteX の改善にご協力ください。</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">エラー情報をコピーし、報告方法を選ぶだけです。</s:String>
-    <s:String x:Key="error_report_send_by_email">電子メールで送信</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">エラー情報をコピーし、下の GitHub リポジトリで問題を報告してください。</s:String>
     <s:String x:Key="error_report_send_by_github">GitHubで送信</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">画像の選択</s:String>
     <s:String x:Key="Default">デフォルト</s:String>
@@ -386,4 +385,7 @@
     <s:String x:Key="FluentSearchConnections">接続を検索</s:String>
     <s:String x:Key="FluentLauncherSearchHint">接続または #タグを検索</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab クイック接続</s:String>
+    <s:String x:Key="TerminalDependencyMissing">ターミナルの依存ファイルが見つからないか、読み込めません。実行中のセッションを終了し、システムトレイから RemoteX を完全に終了してから、再起動して接続してください。解決しない場合は、公式パッケージ全体を再展開してください。</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">ターミナルの依存ファイルに互換性がないか、破損しています。RemoteX を終了し、お使いのシステム構成に対応した公式パッケージ全体を再展開してください。</s:String>
+    <s:String x:Key="TerminalInitializationFailed">ターミナルの初期化に失敗したため、この接続を閉じました。再試行するか RemoteX を再起動してください。解決しない場合は、ログを添えて GitHub で報告してください。</s:String>
 </ResourceDictionary>

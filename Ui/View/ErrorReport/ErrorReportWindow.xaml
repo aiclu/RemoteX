@@ -116,21 +116,7 @@
                     <TextBlock Margin="0 0 0 10" FontSize="16" Foreground="{DynamicResource PrimaryTextBrush}" Opacity="0.6" VerticalAlignment="Center" TextWrapping="Wrap" Text="{DynamicResource error_report_how_help_us_improve}" />
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Margin="10 5" Padding="0" Width="150" Height="40"
-                                                   HorizontalAlignment="Center" HorizontalContentAlignment="Left"
-                                                   Click="ButtonSendByEmail_OnClick"
-                                                   ToolTip="veckshawn@gmail.com"
-                                                   BorderThickness="1">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Margin="5 0" Width="16" Height="16" Data="M512 0C229.239467 0 0 229.239467 0 512c0 282.760533 229.239467 512 512 512 282.760533 0 512-229.239467 512-512 0-282.760533-229.239467-512-512-512z m0 179.848533l303.0016 188.928H209.032533L512 179.848533z m306.7904 490.632534h-0.068267c0 30.3104-24.541867 54.852267-54.852266 54.852266H260.130133c-30.276267 0-54.852267-24.576-54.852266-54.852266v-289.6896c0-3.208533 0.341333-6.314667 0.853333-9.386667l289.4848 150.5312 1.092267 0.546133 1.160533 0.648534c2.048 1.024 4.164267 1.877333 6.314667 2.423466l0.648533 0.170667c2.389333 0.546133 4.778667 0.887467 7.168 0.887467h0.034133c2.389333 0 4.778667-0.341333 7.168-0.887467l0.648534-0.170667a31.675733 31.675733 0 0 0 6.314666-2.423466l1.160534-0.648534 1.092266-0.546133 289.4848-150.5312c0.546133 3.072 0.887467 6.178133 0.887467 9.386667v289.6896z"
-                                              Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" StrokeThickness="1" Stretch="Uniform" />
-                                <StackPanel>
-                                    <TextBlock FontSize="14" Text="{DynamicResource error_report_send_by_email}"></TextBlock>
-                                    <TextBlock FontSize="12" Opacity="0.5" Text="veckshawn@gmail.com"></TextBlock>
-                                </StackPanel>
-                            </StackPanel>
-                        </Button>
-                        <Button Margin="10 5" Padding="0" Width="150" Height="40"
+                        <Button x:Name="GitHubFeedbackButton" Margin="10 5" Padding="8 4" MinWidth="220" MinHeight="40"
                                                    HorizontalAlignment="Center" HorizontalContentAlignment="Left"
                                                    Click="ButtonSendByGithub_OnClick"
                                                    ToolTip="https://github.com/aiclu/RemoteX/issues"
@@ -140,7 +126,7 @@
                                               Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" StrokeThickness="1" Stretch="Uniform" />
                                 <StackPanel>
                                     <TextBlock FontSize="14" Text="{DynamicResource error_report_send_by_github}"></TextBlock>
-                                    <TextBlock FontSize="12" Opacity="0.5" Text="github.com/vshawn"></TextBlock>
+                                    <TextBlock x:Name="GitHubFeedbackAddress" FontSize="12" Opacity="0.7" Text="github.com/aiclu/RemoteX"></TextBlock>
                                 </StackPanel>
                             </StackPanel>
                         </Button>

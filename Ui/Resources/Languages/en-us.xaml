@@ -217,8 +217,7 @@
     <s:String x:Key="error_report_unexpected_error_occurred">Unexpected error occurred. Error info is shown below:</s:String>
     <s:String x:Key="error_report_to_clipboard">Copy to clipboard</s:String>
     <s:String x:Key="error_report_please_help_us_improve">Please help us improve RemoteX by reporting this error.</s:String>
-    <s:String x:Key="error_report_how_help_us_improve">Simply copy the error message and choose a way to report it.</s:String>
-    <s:String x:Key="error_report_send_by_email">Send by e-mail</s:String>
+    <s:String x:Key="error_report_how_help_us_improve">Copy the error information and report the issue in the GitHub repository below.</s:String>
     <s:String x:Key="error_report_send_by_github">Send by GitHub</s:String>
     <s:String x:Key="logo_selector_open_file_dialog_title">select a picture</s:String>
     <s:String x:Key="Default">Default</s:String>
@@ -406,4 +405,7 @@
     <s:String x:Key="FluentSearchConnections">Search connections</s:String>
     <s:String x:Key="FluentLauncherSearchHint">Search connections or #tags</s:String>
     <s:String x:Key="FluentLauncherQuickHint">Tab  Quick connect</s:String>
+    <s:String x:Key="TerminalDependencyMissing">Terminal dependencies are missing or could not be loaded. Finish your active sessions, fully exit RemoteX (including the system tray), then reopen it and connect again. If this persists, extract the complete official package again.</s:String>
+    <s:String x:Key="TerminalDependencyInvalid">Terminal dependencies are incompatible or damaged. Exit RemoteX and extract the complete official package for your system architecture, then try again.</s:String>
+    <s:String x:Key="TerminalInitializationFailed">The terminal could not be initialized. This connection has been closed. Retry or restart RemoteX. If this persists, report it on GitHub and include the log.</s:String>
 </ResourceDictionary>

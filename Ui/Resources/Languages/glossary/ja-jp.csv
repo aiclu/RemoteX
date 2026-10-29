@@ -217,8 +217,7 @@ word_oops;おっと…
 error_report_unexpected_error_occurred;予期しないエラーが発生しました。エラー情報は以下のとおりです。
 error_report_to_clipboard;クリップボードにコピー
 error_report_please_help_us_improve;このエラーを報告して RemoteX の改善にご協力ください。
-error_report_how_help_us_improve;エラー情報をコピーし、報告方法を選ぶだけです。
-error_report_send_by_email;電子メールで送信
+error_report_how_help_us_improve;エラー情報をコピーし、下の GitHub リポジトリで問題を報告してください。
 error_report_send_by_github;GitHubで送信
 logo_selector_open_file_dialog_title;画像の選択
 Default;デフォルト
@@ -391,3 +390,6 @@ FluentQuickConnectHint;Quick connect, e.g. 192.0.2.10:3389
 FluentSearchConnections;接続を検索
 FluentLauncherSearchHint;接続または #タグを検索
 FluentLauncherQuickHint;Tab クイック接続
+TerminalDependencyMissing;ターミナルの依存ファイルが見つからないか、読み込めません。実行中のセッションを終了し、システムトレイから RemoteX を完全に終了してから、再起動して接続してください。解決しない場合は、公式パッケージ全体を再展開してください。
+TerminalDependencyInvalid;ターミナルの依存ファイルに互換性がないか、破損しています。RemoteX を終了し、お使いのシステム構成に対応した公式パッケージ全体を再展開してください。
+TerminalInitializationFailed;ターミナルの初期化に失敗したため、この接続を閉じました。再試行するか RemoteX を再起動してください。解決しない場合は、ログを添えて GitHub で報告してください。

@@ -24,10 +24,12 @@ namespace _1RM.View.Host.ProtocolHosts
     public sealed partial class RustTerminalHost : HostBase
     {
         private readonly ProtocolBase _protocol;
+        private readonly Func<TerminalControl> _terminalFactory;
         private SshRustBridge? _bridge;
         private RustSshConnection? _connection;
         private TerminalControl? _terminal;
         private volatile bool _connectRequested;
+        private int _connectionAttempt;
         private bool _invokeOnClosedWhenDisconnected = true;
 
         public static RustTerminalHost Create(ProtocolBase protocolServer)
@@ -40,12 +42,13 @@ namespace _1RM.View.Host.ProtocolHosts
             return view!;
         }
 
-        private RustTerminalHost(ProtocolBase protocolServer) : base(protocolServer, true)
+        internal RustTerminalHost(ProtocolBase protocolServer, Func<TerminalControl>? terminalFactory = null) : base(protocolServer, true)
         {
             InitializeComponent();
             GridMessageBox.Visibility = Visibility.Collapsed;
             GridLoading.Visibility = Visibility.Visible;
             _protocol = protocolServer;
+            _terminalFactory = terminalFactory ?? (() => new TerminalControl { AutoResize = true });
         }
 
         #region Base Interface
@@ -54,6 +57,7 @@ namespace _1RM.View.Host.ProtocolHosts
         {
             if (_connectRequested) return;
             _connectRequested = true;
+            var attempt = ++_connectionAttempt;
 
             Status = ProtocolHostStatus.Connecting;
             GridLoading.Visibility = Visibility.Visible;
@@ -69,44 +73,18 @@ namespace _1RM.View.Host.ProtocolHosts
             {
                 var bridge = new SshRustBridge();
                 string? error = null;
+                Exception? failure = null;
                 try
                 {
                     error = connectParams.Connect(bridge);
                 }
                 catch (Exception e)
                 {
+                    failure = e;
                     error = e.Message;
                 }
 
-                Execute.OnUIThread(() =>
-                {
-                    if (error != null)
-                    {
-                        ShowError(error);
-                        _connectRequested = false;
-                        return;
-                    }
-
-                    _bridge = bridge;
-                    _connection = new RustSshConnection(bridge, encoding);
-                    EnsureTerminal();
-
-                    bridge.OnData += data => Execute.OnUIThread(() => _connection?.PushRemoteData(data));
-                    bridge.OnClosed += () => Execute.OnUIThread(OnDisconnected);
-                    bridge.OnError += msg => Execute.OnUIThread(() => ShowError(msg));
-
-                    _terminal!.Connection = _connection;
-
-                    // Inject the startup auto-command into the session.
-                    if (!string.IsNullOrEmpty(startupCommand))
-                    {
-                        var cmd = encoding.GetBytes(startupCommand);
-                        bridge.Write(cmd);
-                    }
-
-                    GridLoading.Visibility = Visibility.Collapsed;
-                    Status = ProtocolHostStatus.Connected;
-                });
+                Execute.OnUIThread(() => CompleteConnectionAttempt(attempt, bridge, encoding, startupCommand, error, failure));
             });
         }
 
@@ -145,16 +123,90 @@ namespace _1RM.View.Host.ProtocolHosts
         private void EnsureTerminal()
         {
             if (_terminal != null) return;
-            _terminal = new TerminalControl { AutoResize = true };
+            _terminal = _terminalFactory();
             TerminalHost.Children.Add(_terminal);
         }
 
-        private void CloseConnection()
+        internal void CompleteConnectionAttempt(int attempt, SshRustBridge bridge, Encoding encoding,
+            string? startupCommand, string? error = null, Exception? failure = null)
         {
-            _connection?.Close();
-            _bridge?.Dispose();
+            Dispatcher.VerifyAccess();
+            // Closing/reconnecting while the worker is connecting invalidates its result.
+            if (!_connectRequested || attempt != _connectionAttempt)
+            {
+                TerminalInitialization.Cleanup(bridge.Dispose);
+                return;
+            }
+            if (error != null)
+            {
+                TerminalInitialization.Cleanup(bridge.Dispose);
+                _connectRequested = false;
+                if (failure != null && TerminalInitialization.MessageKey(failure) != TerminalInitialization.Failed)
+                {
+                    TerminalInitialization.LogFailure("connect dependency", failure);
+                    ShowError(IoC.Translate(TerminalInitialization.MessageKey(failure)));
+                }
+                else
+                {
+                    ShowError(error);
+                }
+                return;
+            }
+
+            TryAttachConnection(bridge, encoding, startupCommand);
+        }
+
+        internal bool TryAttachConnection(SshRustBridge bridge, Encoding encoding, string? startupCommand)
+        {
+            Dispatcher.VerifyAccess();
+            return TerminalInitialization.TryRun(() =>
+            {
+                _bridge = bridge;
+                _connection = new RustSshConnection(bridge, encoding);
+                EnsureTerminal();
+
+                // Ignore queued events from a closed, failed or superseded connection.
+                bridge.OnData += data => Execute.OnUIThread(() =>
+                {
+                    if (ReferenceEquals(_bridge, bridge)) _connection?.PushRemoteData(data);
+                });
+                bridge.OnClosed += () => Execute.OnUIThread(() =>
+                {
+                    if (ReferenceEquals(_bridge, bridge)) OnDisconnected();
+                });
+                bridge.OnError += message => Execute.OnUIThread(() =>
+                {
+                    if (ReferenceEquals(_bridge, bridge)) ShowError(message);
+                });
+
+                _terminal!.Connection = _connection;
+                if (!string.IsNullOrEmpty(startupCommand))
+                    bridge.Write(encoding.GetBytes(startupCommand));
+
+                GridLoading.Visibility = Visibility.Collapsed;
+                Status = ProtocolHostStatus.Connected;
+            }, () => CloseConnection(discardTerminal: true),
+                error => ShowError(IoC.Translate(TerminalInitialization.MessageKey(error))));
+        }
+
+        private void CloseConnection(bool discardTerminal = false)
+        {
+            ++_connectionAttempt;
+            _connectRequested = false;
+            var connection = _connection;
+            var bridge = _bridge;
             _bridge = null;
             _connection = null;
+            // Clean up independently: a broken renderer must not prevent the network session
+            // from being released, or turn a handled initialization error into a global crash.
+            TerminalInitialization.Cleanup(() => connection?.Close());
+            TerminalInitialization.Cleanup(() => bridge?.Dispose());
+            TerminalInitialization.Cleanup(() => { if (_terminal != null) _terminal.Connection = null!; });
+            if (discardTerminal)
+            {
+                _terminal = null;
+                TerminalInitialization.Cleanup(() => TerminalHost.Children.Clear());
+            }
         }
 
         private void OnDisconnected()

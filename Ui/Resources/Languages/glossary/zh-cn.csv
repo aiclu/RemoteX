@@ -216,8 +216,7 @@ word_oops;哎哟喂...
 error_report_unexpected_error_occurred;程序发生了一些未知错误，详细信息如下：
 error_report_to_clipboard;保存到剪贴板
 error_report_please_help_us_improve;请通过反馈这个错误来帮助我们改进 RemoteX。
-error_report_how_help_us_improve;只需要复制错误信息，下列任意方式都可进行错误反馈！（QQ群也行:168542318）
-error_report_send_by_email;通过邮件
+error_report_how_help_us_improve;请复制错误信息，通过下方 GitHub 仓库提交问题。
 error_report_send_by_github;通过GitHub
 logo_selector_open_file_dialog_title;选择图片
 Default;默认
@@ -409,3 +408,6 @@ FluentQuickConnectHint;快速连接，例如 192.0.2.10:3389
 FluentSearchConnections;搜索连接
 FluentLauncherSearchHint;搜索连接或 #标签
 FluentLauncherQuickHint;Tab 快速连接
+TerminalDependencyMissing;终端依赖文件缺失或无法加载。请先结束正在进行的会话，从系统托盘彻底退出 RemoteX，再重新打开并连接。若仍失败，请重新解压完整的官方安装包。
+TerminalDependencyInvalid;终端依赖文件不兼容或已损坏。请退出 RemoteX，重新解压适合本机架构的完整官方安装包后再试。
+TerminalInitializationFailed;终端初始化失败，本次连接已关闭。可以重试或重启 RemoteX。若问题持续，请通过 GitHub 反馈，并附上日志。
